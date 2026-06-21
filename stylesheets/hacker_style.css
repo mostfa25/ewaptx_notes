@@ -35,3 +35,18 @@
     background-color: #0d0d0d !important;
     color: #00ff41 !important;
 }
+
+/* ضبط محاذاة النص والاتجاه للصفحة الرئيسية الإنجليزية */
+.md-content {
+    text-align: left !important;
+}
+
+/* ضبط القوائم والنقاط لتظهر على اليسار بشكل صحيح */
+.md-typeset ul, .md-typeset ol {
+    padding-left: 1.5em !important;
+    padding-right: 0 !important;
+}
+
+.md-typeset li {
+    text-align: left !important;
+}
