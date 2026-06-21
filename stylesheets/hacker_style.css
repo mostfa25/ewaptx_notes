@@ -36,17 +36,22 @@
     color: #00ff41 !important;
 }
 
-/* ضبط محاذاة النص والاتجاه للصفحة الرئيسية الإنجليزية */
-.md-content {
+/* إجبار الصفحة الرئيسية بالكامل وعناصرها على المحاذاة لليسار */
+[data-md-color-scheme="slate"] .md-content,
+[data-md-color-scheme="slate"] .md-typeset,
+[data-md-color-scheme="slate"] .md-typeset h1,
+[data-md-color-scheme="slate"] .md-typeset h2,
+[data-md-color-scheme="slate"] .md-typeset h3,
+[data-md-color-scheme="slate"] .md-typeset p,
+[data-md-color-scheme="slate"] .md-typeset ul,
+[data-md-color-scheme="slate"] .md-typeset li {
     text-align: left !important;
+    direction: ltr !important;
 }
 
-/* ضبط القوائم والنقاط لتظهر على اليسار بشكل صحيح */
-.md-typeset ul, .md-typeset ol {
+/* تظبيط مسافات النقاط (Bullets) والقوائم على الشمال */
+[data-md-color-scheme="slate"] .md-typeset ul, 
+[data-md-color-scheme="slate"] .md-typeset ol {
     padding-left: 1.5em !important;
     padding-right: 0 !important;
-}
-
-.md-typeset li {
-    text-align: left !important;
 }
