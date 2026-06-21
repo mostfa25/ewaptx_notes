@@ -9,8 +9,10 @@
       
       
       
-        <link rel="prev" href="../9-NoSQL%20injection/">
+        <link rel="prev" href="../2-EWAPTX%20%28part%202%29/">
       
+      
+        <link rel="next" href="../3-Enumeration%20%26%20Brute%20force/">
       
       
         
@@ -21,7 +23,7 @@
     
     
       
-        <title>Untitled - eWAPTX Zero-Day Notes</title>
+        <title>2026 02 20 - eWAPTX Zero-Day Notes</title>
       
     
     
@@ -103,7 +105,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Untitled
+              2026 02 20
             
           </span>
         </div>
@@ -277,10 +279,17 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../2026-02-20/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -296,6 +305,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -493,17 +503,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../Untitled/" class="md-nav__link">
         
   
   
@@ -519,7 +522,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -557,11 +559,11 @@
 
 
 
-  <h1>Untitled</h1>
+  <h1>2026 02 20</h1>
 
 <p>Authentication &amp; Authorization :
-[^1]</p>
-<p>[^1]: ## أولًا: يعني إيه Authentication؟</p>
+[^1]
+ أولًا: يعني إيه Authentication؟</p>
 <pre><code>ببساطة:  
 **Authentication = "مين أنت؟"**
 
@@ -733,8 +735,8 @@
 مش بس يلاقي الثغرة… لكن **يصنفها صح**
 </code></pre>
 <p>Authentication Types :
-[^2]</p>
-<p>[^2]: # أولًا: يعني إيه Authentication Mechanism؟</p>
+[^2]
+ أولًا: يعني إيه Authentication Mechanism؟</p>
 <pre><code>ببساطة:
 
 &gt; **هو الطريقة اللي السيستم بيستخدمها علشان يتأكد إنك أنت فعلًا الشخص ده**
@@ -1046,8 +1048,8 @@ Authorization: Bearer TOKEN
 &gt; "أكسره إزاي؟ 😈"
 </code></pre>
 <p>Session Management :
-[^3]</p>
-<p>[^3]: # أولًا: الصورة الكبيرة (Big Picture)</p>
+[^3]
+أولًا: الصورة الكبيرة (Big Picture)</p>
 <pre><code>عندنا 3 مفاهيم لازم تفرق بينهم:
 
 ### 1) Authentication
@@ -1270,8 +1272,8 @@ Cookie: SESSIONID=abc123
 - السيرفر يستخدمه يعرفك
 </code></pre>
 <p>Authentication Testing methodology :
-[^4]</p>
-<p>[^4]: # أول حاجة: يعني إيه Authentication Testing؟</p>
+[^4]
+أول حاجة: يعني إيه Authentication Testing؟</p>
 <pre><code>ببساطة:
 
 &gt; هو إنك تختبر كل حاجة ليها علاقة بـ **تأكيد هوية المستخدم** وتشوف هل ممكن تتكسر ولا لأ.
@@ -1555,8 +1557,8 @@ WSTG بيساعدك في:
 5. أهم حاجة: تثبت الـ impact
 </code></pre>
 <p>Username Enumeration :
-[^5]</p>
-<p>[^5]: # أولاً: يعني إيه Username Enumeration؟</p>
+[^5]
+أولاً: يعني إيه Username Enumeration؟</p>
 <pre><code>ببساطة:
 
 &gt; هو إنك تعرف هل الـ **username/email موجود في السيستم ولا لأ** بدون ما تكون عارف الباسورد.
@@ -1825,8 +1827,8 @@ admin → length مختلف → VALID
 - Mobile apps
 </code></pre>
 <p>Testing for weak password Policy :
-[^6]</p>
-<p>[^6]: # أولًا: الجزء النظري – Weak Password Policy</p>
+[^6]
+ أولًا: الجزء النظري – Weak Password Policy</p>
 <pre><code>## 📌 يعني إيه Weak Password Policy؟
 
 ببساطة:  
@@ -2085,7 +2087,7 @@ Weak Password Policy
 </code></pre>
 <p>CAPTCHA bypass :
 [^7]</p>
-<p>[^7]: # CAPTCHA Bypass &amp; Types – Quick Notes</p>
+<p>CAPTCHA Bypass &amp; Types – Quick Notes</p>
 <pre><code>## 📌 أولًا: إيه هو CAPTCHA؟
 
 - Mechanism بيستخدمه السيرفر عشان يفرق بين:
@@ -2306,8 +2308,8 @@ Weak Password Policy
 - Monitoring
 </code></pre>
 <p>Account Lockout Bypass :
-[^8]</p>
-<p>[^8]: أولًا: يعني إيه Account Lockout؟</p>
+[^8]
+أولًا: يعني إيه Account Lockout؟</p>
 <pre><code>    ببساطة:
 
     **Account Lockout** هو Policy بيحمي الحسابات من هجمات الـ brute force.
@@ -3021,8 +3023,8 @@ logged_in = yes
 &gt; بدل ما تثبت إنك Admin… خلت السيستم يصدق إنك Admin 😏
 </code></pre>
 <p>Cookies :</p>
-<p>[^10]</p>
-<p>[^10]: # أولًا: يعني إيه Cookies؟</p>
+<p>[^10]
+أولًا: يعني إيه Cookies؟</p>
 <pre><code>ببساطة:
 
 &gt; **Cookie = ملف صغير بيتخزن في المتصفح علشان الموقع “يفتكرك”**
@@ -3323,8 +3325,8 @@ role=admin
 </code></pre>
 <p>Session Testing LABS:
 - lab 1
-[^11]</p>
-<p>[^11]: # أول حاجة: المحاضرة بتتكلم عن إيه؟</p>
+[^11]
+اول حاجة: المحاضرة بتتكلم عن إيه؟</p>
 <pre><code>الموضوع الأساسي:
 
 👉 **Testing Session Management Schema**  
@@ -3656,8 +3658,8 @@ Cookie: session=NEW_VALUE
 🔥 دي vulnerabilities real ومطلوبة جدًا
 </code></pre>
 <p>Session Hijacking :
-[^12]</p>
-<p>[^12]: # أولًا: الفكرة الأساسية (افهمها كده ببساطة)</p>
+[^12]
+أولًا: الفكرة الأساسية (افهمها كده ببساطة)</p>
 <pre><code>## 🎯 Session Hijacking يعني إيه؟
 
 👉 ببساطة:
@@ -3970,8 +3972,8 @@ User login → ياخد session → أنا أسرقه
 💀 دخلت حساب أي حد
 </code></pre>
 <p>Session Fixation :
-[^13]</p>
-<p>[^13]: ## أولًا: الفكرة الأساسية بسرعة</p>
+[^13]
+أولًا: الفكرة الأساسية بسرعة</p>
 <pre><code>**Session Fixation = أنت (المهاجم) بتحدد الـ Session ID من قبل ما اليوزر يعمل Login**
 
 يعني:
@@ -4153,8 +4155,8 @@ session شغالة forever
 - تقدر تعمله بنفسك بسهولة
 </code></pre>
 <p>Token Based-Authentication :
-[^14]</p>
-<p>[^14]: # أولاً: Bearer Token (أبسط وأخطر نوع)</p>
+[^14]
+أولاً: Bearer Token (أبسط وأخطر نوع)</p>
 <pre><code>## 📌 الفكرة الأساسية
 
 كلمة **Bearer** معناها:
