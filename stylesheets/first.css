@@ -1,0 +1,57 @@
+/* تحويل الخلفية لأسود خالص */
+[data-md-color-scheme="slate"] {
+    --md-default-bg-color: #000000;
+    --md-default-fg-color: #00ff41; /* أخضر ماتركس للكلام */
+    --md-default-fg-color--light: #008f11;
+    --md-code-bg-color: #0d0d0d;
+    --md-typeset-color: #00ff41;
+}
+
+/* تعديل شكل العناوين */
+.md-typeset h1, .md-typeset h2, .md-typeset h3 {
+    color: #00ff41 !important;
+    text-shadow: 0 0 5px #00ff41; /* توهج للعناوين */
+    border-bottom: 1px solid #00ff41;
+}
+
+/* تعديل الـ Code Blocks عشان تبان احترافية */
+.md-typeset pre code {
+    border: 1px solid #00ff41;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+}
+
+/* تعديل شكل الروابط */
+.md-typeset a {
+    color: #00d0ff !important; /* لون أزرق سيان للروابط */
+}
+
+/* القائمة الجانبية */
+.md-nav__link {
+    color: #00ff41 !important;
+}
+
+/* البحث */
+.md-search__input {
+    background-color: #0d0d0d !important;
+    color: #00ff41 !important;
+}
+
+/* إجبار الصفحة الرئيسية بالكامل وعناصرها على المحاذاة لليسار */
+[data-md-color-scheme="slate"] .md-content,
+[data-md-color-scheme="slate"] .md-typeset,
+[data-md-color-scheme="slate"] .md-typeset h1,
+[data-md-color-scheme="slate"] .md-typeset h2,
+[data-md-color-scheme="slate"] .md-typeset h3,
+[data-md-color-scheme="slate"] .md-typeset p,
+[data-md-color-scheme="slate"] .md-typeset ul,
+[data-md-color-scheme="slate"] .md-typeset li {
+    text-align: left !important;
+    direction: ltr !important;
+}
+
+/* تظبيط مسافات النقاط (Bullets) والقوائم على الشمال */
+[data-md-color-scheme="slate"] .md-typeset ul, 
+[data-md-color-scheme="slate"] .md-typeset ol {
+    padding-left: 1.5em !important;
+    padding-right: 0 !important;
+}
