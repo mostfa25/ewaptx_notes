@@ -36,22 +36,3 @@
     color: #00ff41 !important;
 }
 
-/* هذا الـ CSS مخصص ومحكوم فقط بالصفحة الرئيسية index.md */
-.md-content:has(h1#mostafa-mahmoud-sayed-junior-penetration-tester),
-.md-content:has(h1#mostafa-mahmoud-sayed-junior-penetration-tester) ~ *,
-.md-content:has(h1#mostafa-mahmoud-sayed-junior-penetration-tester) .md-typeset,
-.md-content:has(h1#mostafa-mahmoud-sayed-junior-penetration-tester) p,
-.md-content:has(h1#mostafa-mahmoud-sayed-junior-penetration-tester) h1,
-.md-content:has(h1#mostafa-mahmoud-sayed-junior-penetration-tester) h2,
-.md-content:has(h1#mostafa-mahmoud-sayed-junior-penetration-tester) h3,
-.md-content:has(h1#mostafa-mahmoud-sayed-junior-penetration-tester) li {
-    text-align: left !important;
-    direction: ltr !important;
-}
-
-/* ضبط القوائم والنقاط لليسار داخل الصفحة الرئيسية فقط */
-.md-content:has(h1#mostafa-mahmoud-sayed-junior-penetration-tester) ul,
-.md-content:has(h1#mostafa-mahmoud-sayed-junior-penetration-tester) ol {
-    padding-left: 1.5em !important;
-    padding-right: 0 !important;
-}
