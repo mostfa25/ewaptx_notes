@@ -1,0 +1,2031 @@
+
+<!doctype html>
+<html lang="ar" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../2-EWAPTX%20%28part%202%29/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>1 EWAPTX - eWAPTX Zero-Day Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto Mono";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/hacker_style.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="rtl" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="lime">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="عنوان العارضة">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-header__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            eWAPTX Zero-Day Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              1 EWAPTX
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="بحث" placeholder="بحث" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="إبحث">
+        
+        <button type="reset" class="md-search__icon md-icon" title="مسح كلي" aria-label="مسح كلي" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            بدء البحث
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="تصفح" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-nav__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    eWAPTX Zero-Day Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Welcome to MkDocs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 EWAPTX
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2-EWAPTX%20%28part%202%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 EWAPTX (part 2)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3-Enumeration%20%26%20Brute%20force/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication Enumeration — الفكرة ببساطة
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4-JWT%20port_swigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ليه JWT vulnerabilities خطيرة جداً ؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5-Oauth%20portswigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 Oauth portswigger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../6-SQL%20INJECTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 SQL INJECTION
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7-Blind%20Sql%20Injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    أولاً: ما هو Blind SQL Injection؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../8-NOSQL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📁 الدليل الشامل لأساسيات MongoDB واختبار اختراق NoSQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9-NoSQL%20injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 NoSQL injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="جدول المحتويات">
+  
+  
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>1 EWAPTX</h1>
+
+<p>1-Pre-Engagement Phase:</p>
+<p>[^1]: # أولًا: يعني إيه Pre-Engagement Phase؟</p>
+<pre><code>ببساطة:
+
+&gt; دي المرحلة اللي بتحصل **قبل ما تبدأ الاختبار فعليًا**.
+
+يعني مش هتفتح Burp ولا Nmap ولا تعمل Scan…  
+إنت لسه بتتفق مع العميل على كل حاجة.
+
+📌 الهدف منها:
+
+- تنظيم الشغل
+- تجنب المشاكل القانونية
+- تحديد إنت هتعمل إيه بالظبط
+
+---
+
+# 🧠 الفكرة الأساسية
+
+الـ Pre-engagement =  
+"قعدة بينك وبين العميل تتفقوا فيها على كل التفاصيل قبل الهجوم"
+
+---
+
+# 🔵 العناصر الأساسية (زي ما الفيديو قال)
+
+## 1️⃣ تحديد الأهداف (Objectives / Goals)
+
+دي أول حاجة 👇
+
+💬 تسأل العميل:
+
+- عايز إيه من الـ Pen Test؟
+- خايف من إيه؟
+- حصل Hack قبل كده؟
+
+### أمثلة:
+
+- عايز أعرف هل عندي SQL Injection ولا لا
+- عايز أختبر Login System
+- عايز أعمل Compliance (زي OWASP)
+
+📌 دي أهم نقطة لأنها:  
+➡️ هي اللي بتحدد باقي كل حاجة
+
+---
+
+## 2️⃣ تحديد الـ Scope (النطاق)
+
+بعد ما تعرف الهدف، تحدد:
+
+&gt; "هتختبر إيه؟ ومش هتختبر إيه؟"
+
+### مثال:
+
+✅ In Scope:
+
+- example.com
+- /login
+- /api
+
+❌ Out of Scope:
+
+- payment system
+- production database
+
+📌 مهم جدًا:  
+لو اشتغلت برا الـ scope = ممكن تدخل في مشاكل قانونية 💀
+
+---
+
+## 3️⃣ Timeline (الوقت)
+
+📅 بتحدد:
+
+- الاختبار هيبدأ إمتى؟
+- هيخلص إمتى؟
+- كل مرحلة هتاخد قد إيه؟
+
+### مثال:
+
+- Recon: يومين
+- Exploitation: 3 أيام
+- Report: يومين
+
+---
+
+## 4️⃣ Authorization (التصريح القانوني)
+
+دي أخطر نقطة 🔥
+
+لازم يكون عندك:  
+📄 **ورق رسمي إنك مسموحلك تعمل الاختبار**
+
+مين يوقع؟
+
+- CTO
+- CISO
+- صاحب السيستم
+
+📌 بدون ده:  
+👉 إنت technically "هاكر" حتى لو نيتك كويسة
+
+---
+
+## 5️⃣ Rules of Engagement (قواعد اللعب)
+
+دي القوانين اللي هتمشي عليها 👇
+
+### أمثلة:
+
+- ❌ ممنوع تعمل DoS
+- ❌ ممنوع تمسح بيانات
+- ❌ ممنوع تستخدم Web Shell
+- ✅ allowed بس read-only access
+
+📌 دي بتحدد:  
+"إنت تقدر توصل لفين"
+
+---
+
+## 6️⃣ Deliverables (هتسلم إيه؟)
+
+يعني العميل مستني منك إيه في الآخر
+
+### أمثلة:
+
+- تقرير بالثغرات
+- Proof of Concept
+- Risk level (High / Medium / Low)
+- Recommendations
+
+📌 حتى لو مفيش ثغرات:  
+👉 لازم Report برضه
+
+---
+
+## 7️⃣ Communication (التواصل)
+
+بتحدد:
+
+- هتتكلموا إزاي؟ (Slack / Teams)
+- لو حصل مشكلة تعمل إيه؟
+- في meetings ولا لا؟
+
+📌 مهم جدًا عشان:
+
+- متكسرش السيستم بالغلط
+- تبلغهم بأي حاجة خطيرة فورًا
+
+---
+
+## 8️⃣ NDA &amp; Contracts (اتفاقيات)
+
+📄 زي:
+
+- NDA (عدم إفشاء المعلومات)
+
+📌 عشان:
+
+- تحمي بيانات الشركة
+- وتحمي نفسك قانونيًا
+
+---
+
+## 9️⃣ Scoping Meeting (اجتماع مراجعة)
+
+قبل ما تبدأ فعليًا:
+
+💬 تقعدوا تاني وتتأكدوا:
+
+- ده الـ scope النهائي؟
+- في تعديل؟
+- كله متفق؟
+
+---
+
+## 🔟 تجهيز الأدوات (Preparation)
+
+بتجهز:
+
+- Burp Suite
+- Kali Linux
+- VPS (لو Black Box)
+- tools زي:
+    - ffuf
+    - sqlmap
+
+📌 + تجهز Team بتاعك
+
+---
+
+## 1️⃣1️⃣ Risk Assessment (تقييم المخاطر)
+
+بتسأل نفسك:
+
+&gt; "هل ممكن أكسر السيستم وأنا بختبر؟"
+
+### مثال:
+
+- brute force ممكن يوقع السيرفر
+- fuzzing ممكن يعمل crash
+
+📌 فبتتفق مع العميل:
+
+- لو حصل damage… مين المسؤول؟
+
+---
+
+## 1️⃣2️⃣ Kickoff (بداية الشغل)
+
+🔥 هنا بس تبدأ فعليًا الاختبار
+
+- تحدد Start Date
+- كل الفريق يبقى فاهم rules
+- تبدأ pentest
+
+---
+
+# ⚠️ خلاصة مهمة جدًا
+
+الـ Pre-Engagement مش كلام نظري…
+
+ده بيحميك من:
+
+- ❌ مشاكل قانونية
+- ❌ تضييع وقت
+- ❌ تدمير سيستم بالغلط
+- ❌ سوء تفاهم مع العميل
+
+---
+
+# 🧩 الصورة الكاملة
+
+Pre-Engagement  
+   ↓  
+Agreement + Planning  
+   ↓  
+Execution (Pentest)  
+   ↓  
+Reporting
+
+---
+
+# 💡 نصيحة ليك (مهمة جدًا في مجالك)
+
+بما إنك شغال في Cybersecurity 👀
+
+لو اشتغلت Freelance أو في شركة:  
+👉 80% من شغلك الحقيقي = Pre-engagement + Reporting  
+مش الهكر نفسه 😄
+</code></pre>
+<p>2-website Recon &amp; Foot printing:</p>
+<p>[^2]: # أولًا: يعني إيه Website Recon &amp; Footprinting؟</p>
+<pre><code>## 🧠 Reconnaissance (Recon)
+
+ده ببساطة:  
+**جمع معلومات عن الهدف (Website) بدون ما تهاجمه**
+
+## 🧠 Footprinting
+
+هو نفس الـ Recon تقريبًا  
+لكن بيركّز على:
+
+&gt; **المعلومات المهمة اللي تساعدك في الهجوم بعد كده**
+
+📌 يعني:
+
+- Recon = جمع معلومات بشكل عام
+- Footprinting = جمع معلومات “مفيدة للهجوم”
+
+---
+
+# 🟢 Passive Recon (مهم جدًا)
+
+ده اللي الفيديو بيتكلم عنه 👇
+
+## ✅ يعني إيه Passive؟
+
+إنك تجمع معلومات:
+
+- بدون ما تلمس السيرفر مباشرة (أو بأقل تفاعل)
+- بدون ما تسيب Logs واضحة
+
+💡 مثال:
+
+- Google search
+- DNS lookup
+- قراءة ملفات public زي robots.txt
+
+---
+
+# 🎯 إيه المعلومات اللي بندور عليها؟
+
+زي ما الفيديو قال، أهم الحاجات:
+
+### 1. 🌐 IP Address
+
+- عشان تعرف السيرفر الحقيقي
+- تستخدمه بعد كده في scanning
+
+---
+
+### 2. 📁 Directories مخفية
+
+- زي:
+    - /admin
+    - /backup
+    - /test
+
+---
+
+### 3. 👤 Emails / Names / Phones
+
+- Social engineering
+- Password guessing
+
+---
+
+### 4. ⚙️ Web Technologies
+
+- WordPress؟
+- PHP version؟
+- Plugins؟
+
+💣 دي مهمة جدًا عشان:
+
+&gt; تدور على vulnerabilities خاصة بالتقنية دي
+
+---
+
+# 🔧 شرح الأدوات اللي اتقالت
+
+---
+
+## 1. 🖥️ أمر `host`
+
+host example.com
+
+💡 وظيفته:
+
+- يحول Domain → IP
+
+## 🧠 ليه مهم؟
+
+- الإنترنت بيتعامل بالـ IP مش بالـ domain
+
+---
+
+### ⚠️ لو لقيت أكتر من IP؟
+
+غالبًا:
+
+- الموقع ورا Proxy زي Cloudflare
+
+💡 يعني:
+
+&gt; أنت مش شايف السيرفر الحقيقي
+
+---
+
+## 2. 📄 ملف robots.txt
+
+توصله كده:
+
+example.com/robots.txt
+
+## 🧠 وظيفته:
+
+يقول لمحركات البحث:
+
+&gt; “ما تدخلش الأماكن دي”
+
+### مثال:
+
+Disallow: /admin
+
+💣 كمهاجم:
+
+&gt; ده كنز 😈
+
+ليه؟
+
+- لأنه بيكشف:
+    - directories مخفية
+    - admin panels
+
+---
+
+## 3. 🗺️ sitemap.xml
+
+توصله:
+
+example.com/sitemap.xml
+
+## 🧠 وظيفته:
+
+- list بكل صفحات الموقع
+
+## 🎯 فايدته ليك:
+
+- تلاقي pages مش موجودة في UI
+- تكتشف:
+    - endpoints
+    - hidden pages
+
+---
+
+## 4. 🧩 BuiltWith (Browser Extension)
+
+## بيعمل إيه؟
+
+يقولك:
+
+- الموقع معمول بـ إيه
+
+مثلاً:
+
+- WordPress
+- jQuery
+- PHP
+- Plugins
+
+## 💣 مهم ليه؟
+
+عشان:
+
+&gt; تدور على exploits جاهزة
+
+مثال:
+
+- WordPress version قديم → Vulnerable
+
+---
+
+## 5. 🧩 Wappalyzer
+
+نفس فكرة BuiltWith  
+بس أحيانًا أدق أو أسرع
+
+---
+
+## 6. 🖥️ أداة WhatWeb (في Kali)
+
+whatweb example.com
+
+## 🔥 بيطلعلك:
+
+- السيرفر (Apache/Nginx)
+- PHP version
+- CMS (WordPress)
+- Plugins
+- Headers
+
+💡 ده كنز حرفيًا 👀
+
+---
+
+## 7. 📥 HTTrack (تحميل الموقع)
+
+## بيعمل إيه؟
+
+- يحمل الموقع كامل على جهازك
+
+## 💣 ليه مهم؟
+
+- تفحص:
+    - Source code براحتك
+    - JavaScript
+    - hidden endpoints
+
+---
+
+# ⚠️ نقطة مهمة جدًا (امتحان + شغل حقيقي)
+
+## الفرق بين:
+
+### Passive vs Active Recon
+
+|النوع|بيعمل إيه|
+|---|---|
+|Passive|بدون interaction مباشر|
+|Active|بيبعت requests (زي Nmap)|
+
+---
+
+# 🧠 Flow تمشي عليه في أي موقع
+
+لو جالك Target 👇
+
+## Step 1:
+
+host target.com
+
+## Step 2:
+
+/robots.txt  
+/sitemap.xml
+
+## Step 3:
+
+- BuiltWith أو Wappalyzer
+
+## Step 4:
+
+whatweb target.com
+
+## Step 5:
+
+- Google dorking (لو عايز تبقى برو 🔥)
+
+---
+
+# 🔥 Tips من خبرة (دي اللي تفرقك)
+
+✅ دايمًا:
+
+- robots.txt = أول حاجة تبص عليها
+- sitemap.xml = كنز hidden pages
+
+✅ لو لقيت:
+
+- WordPress → روح على:
+    - wp-admin
+    - plugins vulnerabilities
+
+✅ لو الموقع ورا Cloudflare:
+
+- IP اللي طلع → مش الحقيقي غالبًا
+
+---
+
+# 💬 خلاصة سريعة
+
+&gt; Recon = تعرف كل حاجة عن الهدف  
+&gt; Footprinting = تركز على اللي يفيدك في الاختراق
+
+و Passive Recon:
+
+&gt; أهم مرحلة… لأنها “ساكتة” ومش بتكشفك
+</code></pre>
+<p>3-Email Harvesting with TheHarvester:
+[^3]: ### Email Harvesting</p>
+<pre><code>يعني: **تجميع إيميلات خاصة بدومين معين (target)**
+
+مثال:
+
+target = example.com
+
+أنت هدفك تطلع:
+
+- emails → admin@example.com
+- موظفين
+- usernames
+- subdomains
+
+---
+
+## 🧠 ليه ده مهم في الـ Pentesting؟
+
+الإيميلات دي بتستخدمها في:
+
+- 🎯 Phishing attacks
+- 🎯 Brute force / password spraying
+- 🎯 Social engineering
+- 🎯 معرفة structure الشركة (مين شغال فين)
+
+---
+
+## 🔵 نوع الـ Recon هنا
+
+الفيديو أكد على نقطة مهمة:
+
+### 🔹 Passive Recon (OSINT)
+
+يعني:
+
+- مش بتهاجم السيرفر
+- مش بتبعت requests مباشرة للtarget
+- بتجمع من **مصادر عامة**
+
+زي:
+
+- Google
+- Bing
+- LinkedIn
+- GitHub leaks
+
+---
+
+## 🟡 الأداة الأساسية: theHarvester
+
+### 💡 هي إيه؟
+
+Tool موجودة في Kali Linux بتعمل:
+
+- Email gathering
+- Subdomains
+- IPs
+- أسماء موظفين
+
+---
+
+## ⚙️ بتشتغل إزاي؟
+
+الأداة **مش بتخترق**  
+هي بس:
+
+&gt; بتسأل search engines + databases وتجمع النتائج
+
+---
+
+## 🧰 مصادر البيانات (Data Sources)
+
+دي أهم نقطة في قوة الأداة:
+
+كل ما تزود sources → النتائج تزيد
+
+أمثلة:
+
+- google
+- bing
+- yahoo
+- linkedin
+- hunter.io
+- crt.sh (شهادات SSL)
+
+---
+
+## 🔧 استخدام الأداة (Practical)
+
+### 📌 الأمر الأساسي:
+
+uv run theHarvester -d target.com -b google
+
+### شرح:
+
+- `-d` → الدومين
+- `-b` → المصدر (source)
+
+---
+
+## 🧪 مثال حقيقي:
+
+uv run theHarvester -d tesla.com -b google
+
+هيطلع:
+
+- emails
+- subdomains
+- hosts
+
+---
+
+## 🔄 استخدام أكثر من source
+
+uv run theHarvester -d target.com -b all
+
+🔥 ده مهم جدًا لأنه:
+
+- بيجمع من كل المصادر
+- بيزود coverage
+
+---
+
+## 📊 تحديد عدد النتائج
+
+uv run theHarvester -d target.com -b google -l 100
+
+- `-l` → limit (عدد النتائج)
+
+---
+
+## 📁 حفظ النتائج
+
+uv run theHarvester -d target.com -b google -f output
+
+هيعمل:
+
+- ملف HTML
+- ملف XML
+
+💡 مفيد جدًا لو هتستخدمه في:
+
+- reporting
+- automation
+
+---
+
+## 🧠 ملاحظات مهمة من الفيديو
+
+### 1️⃣ الأداة قوية بس…
+
+قوتها تعتمد على:
+
+&gt; **المصادر اللي بتستخدمها**
+
+---
+
+### 2️⃣ دي مرحلة بدري في الـ Pentest
+
+بتستخدمها في:
+
+&gt; Recon Phase (قبل أي استغلال)
+
+---
+
+### 3️⃣ شبه أدوات تانية
+
+الفيديو قال إنها شبه:
+
+- subdomain tools زي sublist3r
+
+---
+
+## ⚠️ Limitations
+
+- مش هتجيب كل الإيميلات
+- بيعتمد على leaks + public data
+- أحيانًا فيه false positives
+
+---
+
+## 🧩 إزاي تربطها بشغلك كـ Pentester
+
+أنت ممكن تعمل workflow زي ده:
+
+1. theHarvester
+2. تجيب emails
+3. تعمل:
+    - Password spraying
+    - Phishing simulation
+4. أو تستخدمها مع tools زي:
+    - Nmap (للسيرفرات)
+    - Burp Suite (للويب)
+
+---
+
+## 🔥 الخلاصة
+
+الأداة:
+
+&gt; "عينك على الإنترنت"
+
+مش بتكسر حاجة، بس:
+
+- بتشوف إيه متسرب
+- إيه ظاهر للناس
+- وإيه ممكن تستغله
+</code></pre>
+<p>4-Leaked Passwords Database :
+[^3]: Leaked Password Databases</p>
+<pre><code>يعني:
+
+&gt; قواعد بيانات فيها **إيميلات + باسوردات اتسربت من اختراقات (Data Breaches)**
+
+---
+
+# 🟡 الهدف من الكلام ده
+
+إنت في الفيديو اللي قبله:
+
+- استخدمت **theHarvester**
+- وطلعت emails لموظفين شركة
+
+📌 دلوقتي بقى السؤال:
+
+&gt; هل الإيميلات دي اتسربت قبل كده؟ 👀
+
+---
+
+# 🔵 الأداة الأساسية هنا
+
+## 🌐 Have I Been Pwned
+
+### 💡 دي بتعمل إيه؟
+
+- موقع بيجمع كل الـ **data breaches** في العالم
+- تقدر تحط:
+    - Email
+    - أو رقم موبايل
+- يقولك:
+    - هل اتسرب ولا لأ
+    - واتسرب من أنهي موقع
+
+---
+
+# 🧪 مثال بسيط
+
+لو حطيت:
+
+test@example.com
+
+هيقولك:
+
+- ❌ Not found → تمام
+- ✅ Found → الإيميل ده اتسرب قبل كده
+
+---
+
+# 🔥 السيناريو الحقيقي في الـ Pentest
+
+خلينا نمشيها step by step:
+
+## 1️⃣ تجمع Emails
+
+باستخدام:
+
+- theHarvester
+
+---
+
+## 2️⃣ تدخلهم في الموقع
+
+تشوف:
+
+- مين منهم اتسرب
+
+---
+
+## 3️⃣ لو اتسرب 👀
+
+يبقى:
+
+- في احتمال كبير إن:
+    - الباسورد اتسرب
+    - أو على الأقل الحساب اتأثر
+
+---
+
+# ⚠️ نقطة خطيرة جدًا
+
+الفيديو ركز عليها:
+
+## 🔴 Password Reuse
+
+يعني:
+
+&gt; الشخص بيستخدم نفس الباسورد في أكتر من موقع
+
+---
+
+### مثال:
+
+واحد عنده:
+
+email: ahmed@gmail.com  
+password: 123456
+
+اتسرب من:
+
+- موقع قديم
+
+لكن هو لسه بيستخدم نفس الباسورد في:
+
+- Facebook
+- Gmail
+- LinkedIn
+
+💥 هنا الكارثة:
+
+&gt; كل حساباته ممكن تتفتح بنفس الباسورد
+
+---
+
+# 🟣 الهجوم المرتبط بالكلام ده
+
+## 🎯 Password Spraying
+
+يعني:
+
+- عندك list إيميلات
+- وعندك باسورد مسرب
+- تجرب نفس الباسورد على كل الإيميلات
+
+---
+
+📌 مثال:
+
+emails:  
+- user1@company.com  
+- user2@company.com
+
+password:  
+- leaked123
+
+تجرب:
+
+- نفس الباسورد على كل الحسابات
+
+---
+
+# 🟢 ليه ده لسه Passive Recon؟
+
+الفيديو قال نقطة مهمة:
+
+&gt; ❗ إحنا لسه في Passive Phase
+
+يعني:
+
+- مش بنهاجم
+- مش بنعمل login attempts
+- بس **بنجمع معلومات**
+
+---
+
+# 🟠 ليه الموقع ده مهم جدًا؟
+
+## لأنه:
+
+- بيختصر وقت رهيب
+- بدل ما تدور في leaks بنفسك
+- هو مجمع كل حاجة
+
+---
+
+# 🧠 معلومة جامدة
+
+الموقع معمول بواسطة:
+
+## 👤 Troy Hunt
+
+واحد من أشهر الناس في مجال:
+
+- Data breaches
+- Security awareness
+
+---
+
+# 🔍 إيه المعلومات اللي بتظهر؟
+
+مش دايمًا بيظهر الباسورد مباشرة ❌  
+لكن ممكن يظهر:
+
+- الموقع اللي اتسرب منه
+- نوع البيانات:
+    - email
+    - password
+    - phone
+    - username
+
+---
+
+# ⚠️ ليه الفيديو ما عرضش passwords؟
+
+قالك:
+
+&gt; ❌ لأسباب أخلاقية (Ethics)
+
+لأن:
+
+- دي بيانات حساسة
+- مش المفروض تستخدمها بشكل مباشر
+
+---
+
+# 🔴 خطورة الموضوع
+
+الفيديو قال حاجة مهمة جدًا:
+
+&gt; معظم الناس أصلاً مش عارفة إن بياناتها اتسربت
+
+---
+
+# 🧠 كـ Pentester المفروض تفكر إزاي؟
+
+## السيناريو المثالي:
+
+1. تستخدم theHarvester
+2. تجيب emails
+3. تستخدم Have I Been Pwned
+4. تشوف:
+    - مين exposed
+5. تكتب في التقرير:
+
+### 📝 Finding:
+
+- Employees using compromised credentials
+
+### 🛠 Recommendation:
+
+- Password reset
+- Enable MFA
+- Security awareness
+
+---
+
+# 🔥 نقطة جامدة جدًا في الفيديو
+
+&gt; "Not a lot of pentesters do this… but experienced ones do"
+
+يعني:  
+💡 الحركة دي بتفرق بين:
+
+- Beginner
+- وواحد فاهم بجد
+
+---
+
+# 🟢 الخلاصة
+
+الفيديو بيقولك:
+
+&gt; 🧠 "الإيميل لوحده مش كفاية… شوف تاريخه"
+
+يعني:
+
+- هل اتسرب؟
+- هل ممكن يتستغل؟
+- هل صاحبه بيكرر الباسورد؟
+</code></pre>
+<p>5-Web app fingerprinting :</p>
+<p>[^3]: # أولاً: يعني إيه Web App Fingerprinting؟</p>
+<pre><code>## 🔴 التعريف
+
+&gt; تحديد التقنيات (Technologies) اللي الموقع شغال بيها
+
+يعني تعرف:
+
+- بيستخدم إيه CMS؟ (WordPress؟)
+- اللغة؟ (PHP؟ Python؟)
+- السيرفر؟ (Apache؟ Nginx؟)
+- Plugins / Libraries؟
+
+---
+
+## 🧠 الهدف
+
+قبل ما تهاجم:
+
+&gt; لازم تعرف **بتهاجم إيه أصلاً**
+
+💡 مثال:
+
+- WordPress → ليه vulnerabilities معروفة
+- PHP version قديم → ممكن RCE
+- Plugin معين → فيه exploit جاهز
+
+---
+
+# 🟡 نوع الفحص هنا
+
+## ✅ Passive Fingerprinting
+
+يعني:
+
+- ❌ مفيش هجوم مباشر
+- ❌ مفيش brute force
+- ✅ مجرد تحليل من اللي ظاهر
+
+---
+
+# 🧰 الأدوات اللي اتكلم عنها الفيديو
+
+هنقسمهم 3 أنواع:
+
+---
+
+# 🔵 1. Browser Extensions
+
+## 🌐 BuiltWith
+
+### 💡 بيعمل إيه؟
+
+- بيحلل الموقع ويقولك:
+    - CMS
+    - Plugins
+    - Frameworks
+    - CDN
+
+---
+
+### 📊 مثال نتايج:
+
+- WordPress
+- MailChimp
+- Google Analytics
+- Cloudflare
+
+---
+
+### 🔥 مميزاته:
+
+- سهل جدًا
+- Passive 100%
+- مناسب للبداية
+
+---
+
+## 🌐 Wappalyzer
+
+### 💡 ده أهم من BuiltWith شوية
+
+بيوريك:
+
+- CMS → WordPress
+- لغة → PHP
+- Database → MySQL
+- Plugins
+- JS libraries
+
+---
+
+### 🔥 ليه أحسن؟
+
+- UI بسيط
+- أسرع
+- معلومات واضحة
+
+---
+
+### 📌 مثال من الفيديو:
+
+طلع:
+
+- WordPress
+- PHP
+- MySQL
+- Plugins زي:
+    - Jetpack
+    - Mailchimp
+
+---
+
+# 🟣 2. Command Line Tool
+
+## ⚙️ WhatWeb
+
+### 💡 ده level أعلى شوية
+
+---
+
+## 🔧 استخدامه:
+
+whatweb target.com
+
+---
+
+## 🧠 بيطلع إيه؟
+
+- Web Server (Apache / Nginx)
+- PHP version
+- Headers
+- Cookies
+- JS libraries
+- Redirects
+- Emails أحيانًا 👀
+
+---
+
+## 📊 مثال من الفيديو:
+
+طلع:
+
+- Apache
+- PHP
+- WordPress
+- jQuery version
+- Headers
+
+---
+
+# 🔴 حاجة مهمة جدًا (Headers)
+
+WhatWeb بيطلع:
+
+## HTTP Headers
+
+زي:
+
+Server: Apache  
+X-Powered-By: PHP
+
+---
+
+## 🧠 دي بتفيدك في إيه؟
+
+- تعرف version → تدور على CVEs
+- تعرف framework → exploit جاهز
+
+---
+
+# 🟠 فكرة الـ Stack
+
+الفيديو قال:
+
+## 🧱 LAMP Stack
+
+- Linux
+- Apache
+- MySQL
+- PHP
+
+---
+
+💡 لما تعرف ده:
+
+&gt; تبقى فاهم البيئة كلها
+
+---
+
+# 🟢 ليه الكلام ده مهم جدًا؟
+
+## لأنه بيساعدك تعمل:
+
+### 🎯 Attack Mapping
+
+يعني:
+
+- WordPress → WPScan
+- PHP → RCE / File upload
+- Apache → Misconfig
+- JS libraries → XSS
+
+---
+
+# 🔥 مثال عملي (تفكير Pentester)
+
+لو طلعت:
+
+- WordPress
+- Plugin: vulnerable-plugin
+- PHP 7.x
+
+📌 تعمل إيه؟
+
+1. تدور على:
+    - CVE للـ plugin
+2. تشوف:
+    - Exploit على GitHub
+3. تبدأ attack
+
+---
+
+# ⚠️ نقطة جامدة في الفيديو
+
+قال:
+
+&gt; استخدم أكتر من tool
+
+ليه؟  
+لأن:
+
+- كل tool بيشوف حاجة مختلفة
+
+---
+
+# 🧠 مقارنة سريعة
+
+|Tool|النوع|الاستخدام|
+|---|---|---|
+|BuiltWith|Browser|Overview|
+|Wappalyzer|Browser|سريع وواضح|
+|WhatWeb|CLI|Detailed|
+
+---
+
+# 🔴 WAF Detection (اتذكرت في الآخر)
+
+زي:
+
+## 🛡️ Cloudflare
+
+---
+
+### 💡 ليه مهم؟
+
+لو فيه WAF:
+
+- هيمنع attacks
+- لازم تغير tactics
+
+---
+
+# 🟣 معلومات إضافية طلعت في الفيديو
+
+### ✅ Emails من الموقع
+
+أحيانًا tools زي WhatWeb:
+
+- بتلقط emails 👀
+
+---
+
+### ✅ JavaScript Libraries
+
+زي:
+
+- jQuery
+- moment.js
+
+💡 ممكن يكون فيها:
+
+- XSS vulnerabilities
+</code></pre>
+<p>6-session hijacking &amp; session fixation
+[^4]</p>
+<p>[^4]: ## أولاً: يعني إيه Session أصلاً؟</p>
+<pre><code>ببساطة:
+
+- لما تعمل login لأي موقع، السيرفر بيديك **Session ID** (غالبًا في Cookie)
+- الـ Session ده هو اللي بيقول للسيرفر: _"الشخص ده متسجل دخول بالفعل"_
+
+يعني بدل ما تكتب الباسورد كل مرة، بيتم الاعتماد على الـ session.
+
+---
+
+## 🟠 Session Hijacking (سرقة السيشن)
+
+### 💡 الفكرة الأساسية:
+
+المهاجم **بيسرق Session ID بتاعك** ويستخدمه كأنه أنت.
+
+### 🧠 تخيلها كده:
+
+معاك كارت دخول لنادي VIP  
+لو حد سرق الكارت → يقدر يدخل مكانك بدون باسورد
+
+---
+
+### ⚙️ بيحصل إزاي؟
+
+#### 1. **Session Prediction (تخمين السيشن)**
+
+لو السيشن بيتولد بشكل غبي زي:
+
+user001  
+user002  
+admin003
+
+المهاجم ممكن يخمنه بسهولة 😅
+
+---
+
+#### 2. **Session Sniffing (التجسس على الشبكة)**
+
+لو الموقع مش بيستخدم HTTPS:
+
+- المهاجم يراقب الترافيك
+- يلقط الـ session token
+
+زي لما تستخدم Wi-Fi مفتوحة ☠️
+
+---
+
+#### 3. **XSS (أخطرهم 🔥)**
+
+المهاجم يحقن JavaScript في الموقع:
+
+document.cookie
+
+ويبعت الكوكيز بتاعتك ليه
+
+👉 ودي اسمها Cookie Stealing
+
+---
+
+### 🎭 مرحلة الانتحال (Impersonation)
+
+بعد ما يجيب الـ session:
+
+- يبعته مع الطلبات للسيرفر
+- السيرفر يقول: "ده المستخدم الحقيقي"
+
+---
+
+### 💥 النتائج:
+
+- سرقة بيانات
+- Account Takeover
+- تحويل فلوس
+- تعديل/حذف بيانات
+
+---
+
+## 🔵 Session Fixation (تثبيت السيشن)
+
+ده مختلف شوية وناس كتير بتتلخبط فيه 👇
+
+### 💡 الفكرة:
+
+المهاجم **مش بيسرق السيشن**  
+هو **بيخلي الضحية يستخدم Session هو عارفه مسبقًا**
+
+---
+
+### 🧠 تخيلها:
+
+المهاجم يديك كارت VIP جاهز  
+ويقولك: "ادخل بيه"  
+أول ما تدخل → هو أصلاً معاه نفس الكارت 😈
+
+---
+
+### ⚙️ الخطوات:
+
+#### 1. المهاجم يجيب Session ID
+
+مثلاً:
+
+ABC123
+
+---
+
+#### 2. يبعته للضحية
+
+عن طريق:
+
+- لينك:
+
+example.com/login?session=ABC123
+
+- أو Social Engineering
+
+---
+
+#### 3. الضحية يعمل Login بنفس السيشن
+
+🚨 هنا المشكلة:  
+الموقع **ما بيغيرش السيشن بعد تسجيل الدخول**
+
+---
+
+#### 4. المهاجم يدخل بنفس السيشن
+
+ويبقى هو والضحية نفس الحساب!
+
+---
+
+## ⚖️ الفرق بين Hijacking و Fixation
+
+|النقطة|Session Hijacking|Session Fixation|
+|---|---|---|
+|وقت الهجوم|بعد تسجيل الدخول|قبل تسجيل الدخول|
+|الطريقة|سرقة السيشن|فرض سيشن على الضحية|
+|الهدف|استخدام Session مسروق|استخدام Session معروف مسبقًا|
+
+---
+
+## 🛡️ الحماية (مهم جدًا في شغلك كـ Pentester)
+
+### ضد Hijacking:
+
+- استخدام HTTPS دايمًا
+- HttpOnly &amp; Secure Cookies
+- تقليل مدة السيشن
+- استخدام 2FA
+
+---
+
+### ضد Fixation:
+
+- 🔥 أهم حاجة:
+    - **تغيير Session ID بعد login**
+- عدم قبول session من URL
+- استخدام Cookies فقط
+
+---
+
+## 🎯 خلاصة سريعة:
+
+- **Hijacking = سرقة السيشن**
+- **Fixation = تثبيت سيشن معروف قبل login**
+- الاتنين بيعتمدوا على ضعف إدارة الـ Sessions
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u062a\u0645 \u0627\u0644\u0646\u0633\u062e \u0627\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "clipboard.copy": "\u0646\u0633\u062e \u0625\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "search.result.more.one": "\u0623\u0643\u062b\u0631 \u0645\u0646 1 \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.more.other": "\u0623\u0643\u062b\u0631 \u0645\u0646 # \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.none": "\u0644\u0627 \u062a\u0648\u062c\u062f \u0646\u062a\u0627\u0626\u062c", "search.result.one": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b \u0645\u0633\u062a\u0646\u062f \u0648\u0627\u062d\u062f", "search.result.other": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b # \u0645\u0633\u062a\u0646\u062f\u0627\u062a", "search.result.placeholder": "\u0627\u0643\u062a\u0628 \u0644\u0628\u062f\u0621 \u0627\u0644\u0628\u062d\u062b", "search.result.term.missing": "\u0645\u0641\u0642\u0648\u062f", "select.version": "\u0625\u062e\u062a\u0631 \u0627\u0644\u0625\u0635\u062f\u0627\u0631"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

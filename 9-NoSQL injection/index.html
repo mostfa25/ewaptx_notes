@@ -1,0 +1,1966 @@
+
+<!doctype html>
+<html lang="ar" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../8-NOSQL/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>9 NoSQL injection - eWAPTX Zero-Day Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto Mono";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/hacker_style.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="rtl" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="lime">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1-nosql-injection" class="md-skip">
+          انتقل إلى المحتوى
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="عنوان العارضة">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-header__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            eWAPTX Zero-Day Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              9 NoSQL injection
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="بحث" placeholder="بحث" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="إبحث">
+        
+        <button type="reset" class="md-search__icon md-icon" title="مسح كلي" aria-label="مسح كلي" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            بدء البحث
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="تصفح" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-nav__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    eWAPTX Zero-Day Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Welcome to MkDocs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1-EWAPTX/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 EWAPTX
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2-EWAPTX%20%28part%202%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 EWAPTX (part 2)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3-Enumeration%20%26%20Brute%20force/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication Enumeration — الفكرة ببساطة
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4-JWT%20port_swigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ليه JWT vulnerabilities خطيرة جداً ؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5-Oauth%20portswigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 Oauth portswigger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../6-SQL%20INJECTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 SQL INJECTION
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7-Blind%20Sql%20Injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    أولاً: ما هو Blind SQL Injection؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../8-NOSQL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📁 الدليل الشامل لأساسيات MongoDB واختبار اختراق NoSQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 NoSQL injection
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 NoSQL injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="جدول المحتويات">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      جدول المحتويات
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-nosql-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. أنواع ثغرات الـ NoSQL Injection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-syntax-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. إزاي نكتشف ثغرة الـ Syntax Injection؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-mongodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. المثال العملي على MongoDB (زي ما النص ذكره)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-testing-individual-characters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. تحديد الحروف المؤثرة (Testing Individual Characters)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-confirming-conditional-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. اختبار السلوك الشرطي (Confirming Conditional Behavior)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-overriding-existing-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. تخطي الشروط الأساسية (Overriding Existing Conditions)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-null-byte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. خدعة الـ Null Byte (تجاهل باقي الشروط)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-operator-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. النوع الثاني: Operator Injection (حقن المعاملات)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. إزاي بنحقن المعاملات دي؟ (طرق الإرسال)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-login-bypass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. التطبيق العملي: تخطي صفحة تسجيل الدخول (Login Bypass)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-wienerpeter-reconnaissance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. تسجيل الدخول بحساب wiener:peter (مرحلة الـ Reconnaissance)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-operators-username-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. اختبار الـ Operators على الـ Username (مرحلة الـ Testing)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-regex" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. اختبار قوة الـ Regex
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. تأكيد الثغرة في الباسورد (وهنا بيحصل الـ Error اللي شفناه)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-exploitation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. الضربة القاضية (مرحلة الـ Exploitation)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-character-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. استخراج الباسورد حرف بحرف (Character Extraction)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-regex" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. البحث عن أنماط معينة في الباسورد (استخدام الـ Regex)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الفكرة ببساطة:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#burp-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي تنفذها عملي في Burp Suite:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identifying-field-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identifying field names:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#no-fixed-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المشكلة: مفيش هيكل ثابت (No Fixed Schema)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#baseline-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الحل: استراتيجية المقارنة (Baseline Testing)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#password-dictionary-attack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إيه الحل لو الخانة مش اسمها Password؟ (Dictionary Attack)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploiting-nosql-operator-injection-to-extract-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exploiting NoSQL operator injection to extract data :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-where-injecting-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. حقن معامل $where بنفسك (Injecting Operators)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-extracting-field-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. استخراج أسماء الخانات بدقة (Extracting Field Names)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exfiltrating-data-using-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exfiltrating data using operators:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-vulnerability-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. مرحلة الفحص والتأكد (Vulnerability Check)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-data-exfiltration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. مرحلة استخراج البيانات حرف بحرف (Data Exfiltration)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-hacker-way" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي تطبق ده عملي بسرعة؟ (The Hacker Way)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#timing-based-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timing based injection:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-black-hole" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إيه المشكلة اللي بتحلها الطريقة دي؟ (The Black Hole)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-baseline-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. مرحلة جس النبض (Baseline Test)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-payloads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. استخراج الباسورد بالوقت (الـ Payloads المعقدة)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. استخراج الباسورد بالوقت (الـ Payloads المعقدة)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sleep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الطريقة الأولى: استخدام sleep()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-cpu-burner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الطريقة التانية: حرق المعالج (The CPU Burner)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#burp-suite_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي تنفذها في Burp Suite كالمحترفين؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="جدول المحتويات">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      جدول المحتويات
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-nosql-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. أنواع ثغرات الـ NoSQL Injection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-syntax-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. إزاي نكتشف ثغرة الـ Syntax Injection؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-mongodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. المثال العملي على MongoDB (زي ما النص ذكره)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-testing-individual-characters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. تحديد الحروف المؤثرة (Testing Individual Characters)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-confirming-conditional-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. اختبار السلوك الشرطي (Confirming Conditional Behavior)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-overriding-existing-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. تخطي الشروط الأساسية (Overriding Existing Conditions)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-null-byte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. خدعة الـ Null Byte (تجاهل باقي الشروط)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-operator-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. النوع الثاني: Operator Injection (حقن المعاملات)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. إزاي بنحقن المعاملات دي؟ (طرق الإرسال)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-login-bypass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. التطبيق العملي: تخطي صفحة تسجيل الدخول (Login Bypass)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-wienerpeter-reconnaissance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. تسجيل الدخول بحساب wiener:peter (مرحلة الـ Reconnaissance)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-operators-username-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. اختبار الـ Operators على الـ Username (مرحلة الـ Testing)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-regex" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. اختبار قوة الـ Regex
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. تأكيد الثغرة في الباسورد (وهنا بيحصل الـ Error اللي شفناه)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-exploitation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. الضربة القاضية (مرحلة الـ Exploitation)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-character-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. استخراج الباسورد حرف بحرف (Character Extraction)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-regex" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. البحث عن أنماط معينة في الباسورد (استخدام الـ Regex)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الفكرة ببساطة:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#burp-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي تنفذها عملي في Burp Suite:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identifying-field-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identifying field names:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#no-fixed-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المشكلة: مفيش هيكل ثابت (No Fixed Schema)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#baseline-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الحل: استراتيجية المقارنة (Baseline Testing)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#password-dictionary-attack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إيه الحل لو الخانة مش اسمها Password؟ (Dictionary Attack)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploiting-nosql-operator-injection-to-extract-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exploiting NoSQL operator injection to extract data :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-where-injecting-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. حقن معامل $where بنفسك (Injecting Operators)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-extracting-field-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. استخراج أسماء الخانات بدقة (Extracting Field Names)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exfiltrating-data-using-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exfiltrating data using operators:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-vulnerability-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. مرحلة الفحص والتأكد (Vulnerability Check)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-data-exfiltration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. مرحلة استخراج البيانات حرف بحرف (Data Exfiltration)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-hacker-way" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي تطبق ده عملي بسرعة؟ (The Hacker Way)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#timing-based-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timing based injection:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-black-hole" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إيه المشكلة اللي بتحلها الطريقة دي؟ (The Black Hole)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-baseline-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. مرحلة جس النبض (Baseline Test)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-payloads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. استخراج الباسورد بالوقت (الـ Payloads المعقدة)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. استخراج الباسورد بالوقت (الـ Payloads المعقدة)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sleep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الطريقة الأولى: استخدام sleep()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-cpu-burner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الطريقة التانية: حرق المعالج (The CPU Burner)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#burp-suite_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي تنفذها في Burp Suite كالمحترفين؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>9 NoSQL injection</h1>
+
+<h3 id="1-nosql-injection">1. أنواع ثغرات الـ NoSQL Injection</h3>
+<p>النص بيقول إن في نوعين رئيسيين من الثغرة دي:</p>
+<ul>
+<li>
+<p><strong>النوع الأول: Syntax Injection (حقن بناء الجملة)</strong></p>
+<ul>
+<li>
+<p><strong>الفكرة:</strong> هنا المخترق بيحاول يكسر "الهيكل" أو "القواعد" بتاعة الكود اللي رايح لقاعدة البيانات.</p>
+</li>
+<li>
+<p><strong>إزاي؟</strong> المبرمج بيكون كاتب كود بيستقبل كلمة من المستخدم (مثلاً اسم منتج). لو المستخدم دخل علامات معينة زي <code>"</code> أو <code>'</code> أو <code>{</code>، الكود الأصلي بينكسر، والمخترق بيقدر يكتب كود أو (Payload) من عنده يتنفذ جوه قاعدة البيانات.</p>
+</li>
+<li>
+<p><strong>الفرق عن الـ SQL العادي:</strong> النص بيوضح إن الطريقة دي شبه الـ SQL Injection، لكنها أصعب شوية ومختلفة؛ لأن قواعد الـ NoSQL ملهاش لغة واحدة ثابتة، كل قاعدة بيانات (زي MongoDB, CouchDB, Cassandra) ليها طريقتها وهيكلة البيانات الخاصة بيها.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>النوع الثاني: Operator Injection (حقن المعاملات)</strong></p>
+<ul>
+<li>
+<p><strong>الفكرة:</strong> هنا المخترق مش بيكسر الكود، لكن بيستغل "المعاملات" (Operators) اللي بتستخدمها قاعدة البيانات عشان يغير منطق البحث.</p>
+</li>
+<li>
+<p><strong>مثال للتوضيح:</strong> في MongoDB في معامل اسمه <code>$ne</code> (يعني Not Equal - لا يساوي). المخترق ممكن يبعت طلب يقول فيه للموقع: "هاتلي بيانات المستخدم اللي اسمه <em>لا يساوي</em> لا شيء"، فيقوم الموقع مرجعله بيانات كل المستخدمين!</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-syntax-injection">2. إزاي نكتشف ثغرة الـ Syntax Injection؟</h3>
+<p>النص بيشرح استراتيجية لاكتشاف الثغرة دي، وهي استخدام حاجة اسمها <strong>Fuzzing</strong>.</p>
+<ul>
+<li>
+<p><strong>يعني إيه Fuzz Strings؟</strong> هي عبارة عن نصوص عشوائية مليانة رموز خاصة (زي الأقواس، علامات التنصيص، علامات الدولار، وغيرها).</p>
+</li>
+<li>
+<p><strong>الهدف:</strong> إنت بتبعت الرموز دي للموقع (في خانة البحث مثلاً)، وتشوف الموقع هيتصرف إزاي. لو الموقع مش بيعمل "تنظيف" (Sanitization) للمدخلات دي، الرموز دي هتدخل تلخبط قاعدة البيانات وتعمل <strong>Error</strong> (خطأ برمجي) أو تخلي الصفحة تحمل بشكل غريب. لو ده حصل، بنعرف إن الموقع ده "مصاب" وممكن اختراقه.</p>
+</li>
+</ul>
+<h3 id="3-mongodb">3. المثال العملي على MongoDB (زي ما النص ذكره)</h3>
+<p>تخيل إنك في موقع تسوق، وضغطت على قسم "المشروبات الغازية" (Fizzy drinks).</p>
+<ul>
+<li>
+<p><strong>الوضع الطبيعي:</strong> المتصفح بيبعت الرابط ده: <code>https://insecure-website.com/product/lookup?category=fizzy</code> الموقع بياخد كلمة <code>fizzy</code> ويبعتها لقاعدة البيانات بالشكل ده: <code>this.category == 'fizzy'</code> (يعني هاتلي المنتجات اللي قسمها يساوي fizzy).</p>
+</li>
+<li>
+<p><strong>وضع الاختبار (الهجوم):</strong> النص بيقولك بدل ما تبعت كلمة <code>fizzy</code> العادية، هنبعت الـ Fuzz String المعقد ده: <code>'"</code>{;$Foo}$Foo \xYZ <code>*ليه السلسلة دي بالذات؟* لأنها بتحتوي على كل الرموز اللي ممكن تقفل الـ String بتاع المبرمج وتفتح كود جديد (</code>'<code>,</code> "<code>,</code> {<code>,</code> }`).</p>
+<p>الرابط هيكون شكله كده (بعد تحويل الرموز لصيغة يقبلها الرابط - URL Encoding): <code>https://insecure-website.com/product/lookup?category='%22%60%7b%0d%0a%3b%24Foo%7d%0d%0a%24Foo%20%5cxYZ%00</code></p>
+</li>
+<li>
+<p><strong>النتيجة المنتظرة:</strong> الكود جوه قاعدة البيانات هيبقى شكله ملخبط جداً ومكسور. لو الموقع رجعلك استجابة مختلفة عن المعتاد (مثلاً صفحة بيضاء، أو رسالة خطأ زي <code>Internal Server Error 500</code>)، ده معناه إن كلامك (الرموز اللي بعتها) اتنفذت كأنها كود مش مجرد نص عادي.. مبروك، أنت كده اكتشفت ثغرة!</p>
+</li>
+</ul>
+<hr />
+<p>[^1]</p>
+<p>[^1]: الهدف الأساسي من الـ "Fuzz String" ده هو إنه <strong>يخبط في كل الاحتمالات الممكنة</strong> اللي المبرمج ممكن يكون كاتب بيها الكود بتاعه، عشان يكسره ويجبر قاعدة البيانات تطلع رسالة خطأ (Error).</p>
+<pre><code>تعالى نحلل النص ده:
+
+Plaintext
+
+```
+'"`{
+;$Foo}
+$Foo \xYZ
+```
+
+واللي لما بيتحول لصيغة الرابط (URL Encoded) بيبقى شكله كده: `'%22%60%7b%0d%0a%3b%24Foo%7d%0d%0a%24Foo%20%5cxYZ%00`
+
+### تفريغ الكود (رمز برمز):
+
+- **`'` و `"` و `` ` `` (علامات التنصيص بأنواعها):** المبرمج ممكن يكون كاتب الكود بتاعه جوه علامات تنصيص مفردة (Single Quotes) زي كده: `'fizzy'`، أو مزدوجة (Double Quotes) `"fizzy"`، أو حتى Backticks في الجافاسكريبت `` `fizzy` ``. إحنا بنبعت التلاتة عشان أيًا كان المبرمج استخدم إيه، نقدر نقفل النص بتاعه ونبدأ نكتب الكود بتاعنا. _(في الرابط بتترجم لـ: `%22` و `%60` بالإضافة للـ `'` العادية)._
+
+- **`{` و `}` (أقواس المجموعات):** قاعدة بيانات MongoDB بتعتمد على هيكل بيانات اسمه JSON، واللي كله مبني على الأقواس دي `{ }`. إحنا بنبعت الأقواس دي عشان نحاول نلخبط هيكل الـ JSON أو نقفل Block كود مفتوح. _(في الرابط بتترجم لـ: `%7b` و `%7d`)._
+
+- **النزول لسطر جديد (New Line):** في النص الأصلي هتلاقي الكود مكتوب على 3 سطور. النزول لسطر جديد ده مقصود عشان لو المبرمج عامل "تعليق" (Comment) لبعض الأكواد، النزول لسطر جديد بيكسر التعليق ده ويجبر السيرفر يقرا الكود. _(في الرابط بتترجم لـ: `%0d%0a` واللي هي اختصار لـ Carriage Return &amp; Line Feed)._
+
+- **`;` (الفاصلة المنقوطة - Semicolon):** في لغات برمجة كتير (زي الجافاسكريبت اللي بتعتمد عليها MongoDB)، الفاصلة المنقوطة معناها "السطر ده خلص، نفذ السطر اللي بعده". إحنا بنستخدمها عشان ننهي أمر المبرمج، ونقول لقاعدة البيانات "دلوقتي نفذي الأمر بتاعي أنا". _(في الرابط بتترجم لـ: `%3b`)._
+
+- **`$Foo` (علامة الدولار مع كلمة):** في MongoDB، كل المعاملات (Operators) القوية اللي بتعمل بحث أو استعلام بتبدأ بعلامة الدولار (زي `$where` و `$ne` و `$gt`). المخترق بيبعت `$Foo` (كمتغير عشوائي أو غير معروف) عشان يشوف هل قاعدة البيانات هتتعامل معاه على إنه أمر غير صالح وتطلع Error، ولا هتعديه عادي؟ _(في الرابط بتترجم لـ: `%24Foo`)._
+
+- **`\xYZ` (علامة الهروب الخاطئة - Invalid Escape Sequence):** عادةً في البرمجة، الرمز `\x` بييجي وراه أرقام وحروف معينة (Hexadecimal). هنا المخترق باعت `YZ` (ودي حروف غير صالحة في النظام السداسي عشر). الهدف هنا هو إجبار محرك الجافاسكريبت جوه MongoDB إنه يطلّع Syntax Error صريح لأنه مش هيعرف يترجم الكلمة دي. _(في الرابط بتترجم لـ: `%5cxYZ`)._
+
+- **`%00` (الـ Null Byte):** دي مش مكتوبة في النص العادي لكن محطوطة في آخر الرابط. الرمز ده سحري شوية، ومعناه للمتصفح والسيرفر: "النص خلص هنا، تجاهل أي حاجة مكتوبة بعد النقطة دي". ده بيساعد المخترق يتجاهل أي كود المبرمج كان ضايفه بعد كلمة البحث.
+
+
+**الخلاصة:** إنت مش بتبعت كلمة يبحث عنها، إنت بتبعت "قنبلة" من الرموز البرمجية. لو الموقع محمي كويس (بيعمل Sanitization)، هيعتبر كل الرموز دي مجرد "نص عادي" وهيبحث عن منتج اسمه `'"`{;$Foo}...` ومش هيلاقي حاجة. لكن لو الموقع مش محمي، الرموز دي هتتنفذ كأنها **أوامر برمجية**، وتكسر الاستعلام الأصلي، وتكشف لك إن الموقع مصاب بثغرة Syntax Injection!
+</code></pre>
+<hr />
+<h3 id="1-testing-individual-characters">1. تحديد الحروف المؤثرة (Testing Individual Characters)</h3>
+<p>في الخطوة دي، إنت بتحاول تتأكد بنسبة 100% إن الموقع فعلاً مصاب ومش مجرد علق بالصدفة.</p>
+<ul>
+<li>
+<p><strong>كسر الكود:</strong> بدل ما تبعت كلمة طويلة ومعقدة، بتبعت حرف واحد بس وهو علامة التنصيص المفردة <code>'</code>. الكود في قاعدة البيانات هيبقى شكله كده: <code>this.category == '''</code>. التلات علامات ورا بعض دول هيعملوا خطأ برمجي (Syntax Error) والموقع هيتصرف بشكل غريب.</p>
+</li>
+<li>
+<p><strong>تأكيد الثغرة (الهروب):</strong> عشان تتأكد إن الخطأ ده حصل بسبب الثغرة، بتبعت علامة التنصيص ومعاها شرطة مايلة كده <code>\'</code>. الشرطة المايلة دي في البرمجة اسمها (Escape Character)، وبتقول لقاعدة البيانات: "اعتبري علامة التنصيص اللي جاية دي مجرد حرف عادي مش أمر برمجي". لو الموقع رجع اشتغل طبيعي ومفيش خطأ ظهر، يبقى إنت كده اتأكدت إن الموقع مصاب وثغرتك شغالة.</p>
+</li>
+</ul>
+<h3 id="2-confirming-conditional-behavior">2. اختبار السلوك الشرطي (Confirming Conditional Behavior)</h3>
+<p>دلوقتي إنت اتأكدت إنك بتقدر تكتب كود، عايزين بقى نختبر هل نقدر نتحكم في "منطق" قاعدة البيانات ولا لأ (يعني نتحكم في الـ True و الـ False).</p>
+<ul>
+<li>
+<p><strong>تجربة الشرط الخاطئ (False):</strong> بتبعت الكود ده <code>' &amp;&amp; 0 &amp;&amp; 'x</code>. علامة <code>&amp;&amp;</code> معناها (و - AND)، ورقم <code>0</code> في البرمجة معناه (خطأ - False). هنا إنت بتقول للموقع: "هاتلي قسم المشروبات الغازية <strong>و</strong> كمان شرط مستحيل يحصل". النتيجة؟ الموقع مش هيرجعلك أي منتجات خالص.</p>
+</li>
+<li>
+<p><strong>تجربة الشرط الصحيح (True):</strong> بتبعت الكود ده <code>' &amp;&amp; 1 &amp;&amp; 'x</code>. رقم <code>1</code> معناه (صحيح - True). هنا بتقول للموقع: "هاتلي قسم المشروبات الغازية <strong>و</strong> كمان شرط صحيح". النتيجة؟ الموقع هيرجعلك المنتجات بشكل طبيعي جداً.</p>
+</li>
+<li>
+<p><strong>الاستنتاج:</strong> طالما الموقع استجاب للـ 0 مرة وللـ 1 مرة تانية، يبقى إنت بقيت بتتحكم في عقل قاعدة البيانات من بره! (حرف الـ <code>x'</code> في الكود هدفه بس يقفل أي علامات تنصيص مفتوحة في الكود الأصلي عشان مايحصلش Error).</p>
+</li>
+</ul>
+<h3 id="3-overriding-existing-conditions">3. تخطي الشروط الأساسية (Overriding Existing Conditions)</h3>
+<p>دي بقى "الضربة القاضية". إنت دلوقتي عرفت إنك بتتحكم في الشروط، فهتستخدم ده عشان تخلي قاعدة البيانات تعرضلك كل حاجة عندها، حتى المنتجات المخفية أو اللي لسه مانزلتش السوق.</p>
+<ul>
+<li>
+<p><strong>الهجوم:</strong> بتبعت الكود ده <code>'||'1'=='1</code>. علامة <code>||</code> معناها (أو - OR).</p>
+</li>
+<li>
+<p><strong>الكود النهائي في قاعدة البيانات هيبقى كده:</strong> <code>this.category == 'fizzy'||'1'=='1'</code>
+this.category == 'fizzy%27%7c%7c%27%31%27%3d%3d%27%31</p>
+</li>
+<li>
+<p><strong>الترجمة للمنطق:</strong> إنت بتقول لقاعدة البيانات: "هاتلي المنتجات اللي قسمها مشروبات غازية، <strong>أو</strong> المنتجات اللي بينطبق عليها إن رقم 1 يساوي رقم 1".</p>
+</li>
+<li>
+<p><strong>النتيجة:</strong> لأن رقم 1 دايماً بيساوي 1 (ده شرط صحيح دايماً True)، قاعدة البيانات هتتجاهل شرط القسم خالص، وهترجعلك <strong>كل المنتجات</strong> الموجودة في الموقع دفعة واحدة!</p>
+</li>
+</ul>
+<hr />
+<h3 id="1-null-byte">1. خدعة الـ Null Byte (تجاهل باقي الشروط)</h3>
+<p>تخيل إن الموقع مش بس بيبحث عن القسم، لأ ده كمان بيضيف شرط من عنده عشان يتأكد إن المنتج ده "متاح للبيع" (Released) ومش لسه في المخزن.</p>
+<ul>
+<li>
+<p><strong>الكود الأصلي في قاعدة البيانات:</strong></p>
+<p>JavaScript</p>
+<p><code>this.category == 'fizzy' &amp;&amp; this.released == 1</code></p>
+<p>الموقع هنا بيقول: "هاتلي المنتجات اللي قسمها مشروبات غازية، <strong>وكمان</strong> يكون شرط (released) يساوي 1 (يعني متاح للبيع)". لو منتج مخفي، قيمته هتكون 0 فمش هيظهر للناس.</p>
+</li>
+<li>
+<p><strong>كود الهجوم:</strong> أنت كمخترق بتبعت الرابط ده: <code>https://insecure-website.com/product/lookup?category=fizzy'%00</code></p>
+<p>الرمز السحري هنا هو <strong><code>%00</code></strong> (اللي بيترجم برمجياً لـ <code>\u0000</code> أو Null Byte). الرمز ده في لغات برمجة كتير معناه "النص خلص هنا، أي حاجة مكتوبة بعدي ملهاش لازمة وما تقراهاش".</p>
+</li>
+<li>
+<p><strong>النتيجة بعد الهجوم:</strong></p>
+<p>JavaScript</p>
+<p><code>this.category == 'fizzy'\u0000' &amp;&amp; this.released == 1</code></p>
+<p>قاعدة البيانات هتقرأ لحد كلمة <code>'fizzy'</code> وتلاقي الـ Null Byte، فتقوم <strong>متجاهلة</strong> تماماً الجزء بتاع <code>&amp;&amp; this.released == 1</code>. النتيجة؟ الموقع هيعرضلك كل المشروبات الغازية، حتى المنتجات المخفية اللي لسه مانزلتش السوق!</p>
+</li>
+</ul>
+<h3 id="2-operator-injection">2. النوع الثاني: Operator Injection (حقن المعاملات)</h3>
+<p>هنا إحنا مش بنحاول "نكسر" الكود بعلامات تنصيص، إحنا بنستخدم أدوات لغة MongoDB نفسها ضدها. في MongoDB، أي أمر بيبدأ بعلامة دولار <strong><code>$</code></strong> بيتسمى "معامل" (Operator).</p>
+<p><strong>أهم المعاملات اللي بنستخدمها:</strong></p>
+<ul>
+<li>
+<p><strong><code>$where</code></strong>: بيسمحلك تكتب كود جافاسكريبت كامل يتنفذ جوه قاعدة البيانات.</p>
+</li>
+<li>
+<p><strong><code>$ne</code></strong>: اختصار لـ Not Equal (لا يساوي).</p>
+</li>
+<li>
+<p><strong><code>$in</code></strong>: اختصار لـ In Array (موجود في القائمة).</p>
+</li>
+<li>
+<p><strong><code>$regex</code></strong>: للبحث المتقدم بالنصوص (Regular Expressions).</p>
+</li>
+</ul>
+<h3 id="3">3. إزاي بنحقن المعاملات دي؟ (طرق الإرسال)</h3>
+<p>النص بيشرحلك إنك عشان تبعت المعاملات دي للسيرفر، بتغير شكل البيانات اللي بتبعتها:</p>
+<ul>
+<li>
+<p><strong>في نظام الـ JSON (لو الموقع بيستقبل بيانات زي الـ API):</strong> بدل ما تبعت اسم المستخدم ككلمة عادية كده: <code>{"username":"wiener"}</code> بتحوله لـ "كائن متداخل" (Nested Object) وتدخل المعامل بتاعك: <code>{"username":{"$ne":"invalid"}}</code></p>
+</li>
+<li>
+<p><strong>في نظام الروابط (URL Parameters):</strong> بدل ما تبعت <code>?username=wiener</code> بتخليها كده: <code>?username[$ne]=invalid</code></p>
+</li>
+</ul>
+<blockquote>
+<p><strong>💡 نصيحة احترافية:</strong> النص بيقولك لو جربت تحقن في الرابط والموقع رفض، تقدر تفتح أداة زي Burp Suite وتحول الطلب من <code>GET</code> (عن طريق الرابط) إلى <code>POST</code> (بيانات مخفية)، وتغير نوع البيانات (Content-Type) لـ <code>application/json</code>. ده بيخلي جدار الحماية (WAF) يتلخبط ويسمحلك تعدي.</p>
+</blockquote>
+<h3 id="4-login-bypass">4. التطبيق العملي: تخطي صفحة تسجيل الدخول (Login Bypass)</h3>
+<p>ده أمتع جزء! تخيل قدامك صفحة Login بتطلب يوزر وباسورد.</p>
+<ul>
+<li>
+<p><strong>الوضع الطبيعي للطلب (Normal Request):</strong></p>
+<p>JSON</p>
+<p><code>{"username":"wiener","password":"peter"}</code></p>
+<p>قاعدة البيانات بتدور على شخص اسمه wiener والباسورد بتاعه peter. لو لقته بتدخلك.</p>
+</li>
+<li>
+<p><strong>هجوم التخطي الأعمى (Blind Bypass):</strong> أنت مش عارف أي يوزر ولا أي باسورد، فبتبعت الكود ده:</p>
+<p>JSON</p>
+<p><code>{"username":{"$ne":"invalid"},"password":{"$ne":"invalid"}}</code></p>
+<p><strong>الشرح:</strong> أنت هنا بتقول لقاعدة البيانات: "سجل لي دخول بأي مستخدم اسمه <strong>لا يساوي</strong> كلمة 'invalid'، والباسورد بتاعه <strong>لا يساوي</strong> كلمة 'invalid'". <strong>النتيجة:</strong> لأن كل المستخدمين في الموقع أسماءهم مش 'invalid'، الشرط هيتحقق، وقاعدة البيانات هتسجل دخولك بأول حساب يقابلها في السجلات (واللي غالباً بيكون حساب الـ Admin لأنه أول حساب بيتكريت!).</p>
+</li>
+<li>
+<p><strong>هجوم التخطي المستهدف (Targeted Bypass):</strong> لو أنت عاوز تخترق حساب محدد (زي الأدمن)، ومش عاوز الموقع يدخلك على أي حساب عشوائي، بتستخدم معامل <code>$in</code> بالشكل ده:</p>
+<p>JSON</p>
+<p><code>{"username":{"$in":["admin","administrator","superadmin"]},"password":{"$ne":""}}</code></p>
+<p><strong>الشرح:</strong> 1. معامل <code>$in</code>: بتقول للموقع دورلي على مستخدم اسمه موجود جوه القائمة دي (admin أو administrator أو superadmin). 2. معامل <code>$ne</code>: بتقول للموقع "والباسورد بتاعه لا يساوي (فراغ)". <strong>النتيجة:</strong> الموقع هيلاقي حساب الأدمن، وهيتأكد إن الباسورد بتاعه مش فاضي (وهو فعلاً مش فاضي)، فهيدخلك على حساب الأدمن مباشرة بدون ما تكتب حرف واحد من الباسورد الحقيقي!</p>
+</li>
+</ul>
+<hr />
+<p>Exploiting NoSQL operator injection to bypass authentication LAB:</p>
+<h3 id="1-wienerpeter-reconnaissance">1. تسجيل الدخول بحساب <code>wiener:peter</code> (مرحلة الـ Reconnaissance)</h3>
+<p>JSON</p>
+<pre><code>{&quot;username&quot;: &quot;wiener&quot;, &quot;password&quot;: &quot;peter&quot;}
+</code></pre>
+<p>الخطوة دي هدفها إنك تشوف "الشكل الطبيعي" للـ Request والـ Response لما السيرفر بيقبل بيانات صحيحة (زي الـ Redirect والـ 302 Found). دي بتكون نقطة المرجع (Baseline) بتاعتك.</p>
+<h3 id="2-operators-username-testing">2. اختبار الـ Operators على الـ Username (مرحلة الـ Testing)</h3>
+<p>JSON</p>
+<pre><code>{&quot;username&quot;: {&quot;$ne&quot;:&quot;&quot;}, &quot;password&quot;: &quot;peter&quot;}
+</code></pre>
+<p>هنا إنت بتسأل السيرفر: "هل بتفهم الـ Operators؟". إنت بتقوله: "سجل دخولي بحساب الباسورد بتاعه <code>peter</code>، واسم المستخدم بتاعه <strong>لا يساوي (فراغ)</strong>". بما إن مفيش غير حساب <code>wiener</code> هو اللي الباسورد بتاعه <code>peter</code>، السيرفر هيرجع حساب واحد بس، وهيسجل دخولك بنجاح. ده بيأكدلك بنسبة 100% إن الـ Operator Injection شغال في خانة اليوزر.</p>
+<h3 id="3-regex">3. اختبار قوة الـ Regex</h3>
+<p>JSON</p>
+<pre><code>{&quot;username&quot;: {&quot;$regex&quot;:&quot;wien.*&quot;}, &quot;password&quot;: &quot;peter&quot;}
+</code></pre>
+<p>هنا بتختبر الـ Regular Expressions. العلامة <code>.*</code> في الـ Regex معناها "أي عدد من الحروف". فإنت بتقوله: "هاتلي المستخدم اللي اسمه بيبدأ بكلمة <code>wien</code> وبعدها أي حاجة". السيرفر هيفهمها ويجيب <code>wiener</code>، وتدخل عادي. إنت كده اتأكدت إن الـ Regex كمان شغال ومفيش حماية ضده.</p>
+<h3 id="4-error">4. تأكيد الثغرة في الباسورد (وهنا بيحصل الـ Error اللي شفناه)</h3>
+<p>JSON</p>
+<pre><code>{&quot;username&quot;: {&quot;$ne&quot;:&quot;&quot;}, &quot;password&quot;: {&quot;$ne&quot;:&quot;&quot;}}
+</code></pre>
+<p>دي نفس الخطوة اللي إحنا عملناها وطلعت لنا <code>Query returned unexpected number of records</code>. اللاب قاصد يخليك تعمل كده عشان تفهم إنك لما بتلغي شرط اليوزر وشرط الباسورد مع بعض، قاعدة البيانات بترجع <strong>كل المستخدمين</strong>. وبما إن الكود بتاع الموقع متبرمج إنه يستقبل "حساب واحد فقط"، بيضرب Error 500. الخطوة دي بتأكدلك إن الثغرة موجودة في خانة الباسورد كمان، بس محتاجة تتظبط.</p>
+<h3 id="5-exploitation">5. الضربة القاضية (مرحلة الـ Exploitation)</h3>
+<p>JSON</p>
+<pre><code>{&quot;username&quot;: {&quot;$regex&quot;:&quot;admin.*&quot;}, &quot;password&quot;: {&quot;$ne&quot;:&quot;&quot;}}
+</code></pre>
+<p>هنا بقى الـ Bypass الحقيقي والحل السحري للمشكلة بتاعتنا:</p>
+<ul>
+<li>
+<p><strong><code>"username": {"$regex":"admin.*"}</code>:</strong> إنت هنا بتقول للسيرفر هاتلي المستخدم اللي اسمه بيبدأ بكلمة <code>admin</code> وبعده أي حروف (عشان لو اسمه administrator أو admin أو admin123، الكود يصطاده من غير ما تعرف اسمه بالكامل). ده بيضمن إن قاعدة البيانات <strong>هترجع حساب واحد بس</strong> (حساب الأدمن)، فالسيرفر مش هيطلع Error.</p>
+</li>
+<li>
+<p><strong><code>"password": {"$ne":""}</code>:</strong> وفي نفس الوقت، بتقول للسيرفر "تخطى فحص الباسورد طالما هو مش فاضي".</p>
+</li>
+</ul>
+<p><strong>النتيجة:</strong> السيرفر بيلاقي حساب الأدمن، بيتخطى الباسورد، وبيرجعلك سجل واحد بس، فبيديك الـ Session أو الـ Redirect، وبتدخل كأدمن واللاب بيتحل!</p>
+<p><strong>الخلاصة:</strong> إحنا كنا صح جداً لما استخدمنا <code>$ne</code> وشفنا الـ Error، وكنا صح لما فكرنا في الـ <code>$regex</code>. التريكة كلها كانت في دمجهم مع بعض واستخدام <code>admin.*</code> عشان نجبر السيرفر يرجّع يوزر واحد بس ونتفادى رسالة الـ <code>unexpected number of records</code> اللي كانت بتوقفنا.</p>
+<hr />
+<p>النص بيشرح إزاي نستغل دالة خطيرة جداً في MongoDB اسمها <strong><code>$where</code></strong>. الدالة دي بتسمح للمبرمج إنه يكتب أوامر بـ JavaScript وتتنفذ جوه قاعدة البيانات. وطالما بنقدر نكتب JavaScript، يبقى نقدر نبرمج قاعدة البيانات تطلع لنا اللي إحنا عايزينه.</p>
+<p>تعالى نفصص الأكواد ونفهم اللعبة ماشية إزاي:</p>
+<h3 id="1-character-extraction">1. استخراج الباسورد حرف بحرف (Character Extraction)</h3>
+<p>تخيل إن الموقع بيبحث عن المستخدمين بالكود ده في الخلفية: <code>{"$where":"this.username == ' [مدخلات المستخدم] '"}</code></p>
+<p>أنت كمخترق هتبعت الـ Payload ده: <code>admin' &amp;&amp; this.password[0] == 'a' || 'a'=='b</code></p>
+<p><strong>إيه اللي هيحصل جوه قاعدة البيانات؟ الكود هيبقى شكله كده:</strong> <code>{"$where":"this.username == 'admin' &amp;&amp; this.password[0] == 'a' || 'a'=='b'"}</code></p>
+<p><strong>شرح الكود حتة حتة:</strong></p>
+<ul>
+<li>
+<p><strong><code>'admin</code></strong>: إنت قفلت اسم المستخدم الأول عشان تبدأ تكتب الكود بتاعك.</p>
+</li>
+<li>
+<p><strong><code>&amp;&amp;</code></strong>: (و) بتضيف شرط جديد.</p>
+</li>
+<li>
+<p><strong><code>this.password[0] == 'a'</code></strong>: ده السؤال الخبيث! إنت بتسأل قاعدة البيانات: "هل أول حرف (Index 0) في باسورد الأدمن هو حرف الـ a؟".</p>
+</li>
+<li>
+<p><strong><code>|| 'a'=='b'</code></strong>: (أو) شرط خاطئ للتمويه. أهمية الجزء ده إنه بيمسك علامة التنصيص الأخيرة <code>'</code> اللي السيرفر بيحطها في نهاية الكود، فبيحولها لـ <code>'a'=='b'</code> عشان مايحصلش Syntax Error والكود يضرب.</p>
+</li>
+</ul>
+<p><strong>النتيجة المنطقية:</strong> لو السيرفر رجعلك بيانات الأدمن عادي، يبقى <strong>أول حرف في الباسورد هو فعلاً a</strong>. لو السيرفر مارجعش حاجة (أو رجع User not found)، يبقى الحرف غلط. في الحالة دي، هتروح لبرنامج زي <strong>Burp Suite</strong>، وتستخدم أداة الـ <strong>Intruder</strong> عشان تجرب الحروف كلها أوتوماتيك (a, b, c, d...) لحد ما تكتشف الحرف الأول، وبعدين تغير <code>[0]</code> لـ <code>[1]</code> عشان تجيب الحرف التاني، وهكذا لحد ما تجمع الباسورد كله!</p>
+<h3 id="2-regex">2. البحث عن أنماط معينة في الباسورد (استخدام الـ Regex)</h3>
+<p>عشان توفر على نفسك وقت التخمين الطويل، ممكن تسأل السيرفر أسئلة عامة الأول عن شكل الباسورد باستخدام دالة <code>match()</code> في الجافاسكريبت.</p>
+<p>أنت هتبعت الـ Payload ده: <code>admin' &amp;&amp; this.password.match(/\d/) || 'a'=='b</code> ذي </p>
+<pre><code>GET /user/lookup?user=administrator'%20%26%26%20this.password[0]%20%3d%3d%20'a'%20||%20'a'%3d%3d'b HTTP/2
+Host: 0ad700c9035911d3802dcb9400ff002b.web-security-academy.net
+Cookie: session=VJ5CmBEdtlxKKnJffPxOyk8NIHTcBNFb
+</code></pre>
+<p><em>ملاحظة : لازم تعمل URL Encode لل payload</em></p>
+<p><strong>شرح الكود:</strong></p>
+<ul>
+<li>
+<p>الجزء الأول والأخير نفس الفكرة اللي فاتت بالظبط.</p>
+</li>
+<li>
+<p><strong><code>this.password.match(/\d/)</code></strong>: هنا إنت بتستخدم تعبير نمطي (Regular Expression). الرمز <code>\d</code> معناه <strong>أرقام (Digits)</strong>. إنت بتسأل قاعدة البيانات: "هل باسورد الأدمن بيحتوي على أي أرقام جواه؟".</p>
+</li>
+</ul>
+<p><strong>النتيجة المنطقية:</strong> لو السيرفر استجاب ورجع بيانات الأدمن، يبقى الباسورد فيه أرقام، وساعتها لما تيجي تخمن بالـ Intruder هتركز على الأرقام. لو مارجعش حاجة، يبقى الباسورد كله حروف، فهتوفر وقت التخمين في الأرقام تماماً.</p>
+<p><strong>الخلاصة:</strong> الطريقة دي بتعتمد على إنك بتسأل قاعدة البيانات أسئلة إجابتها (أيوة أو لأ - True or False). ومن خلال مراقبة استجابة السيرفر، بتقدر تستنتج البيانات المخفية وتجمعها قطعة قطعة. ده بالظبط نفس كونسبت الـ Blind SQL Injection بس مطبق على الـ NoSQL والجافاسكريبت.</p>
+<hr />
+<p>علشان تعرف ال password length :</p>
+<h3 id="_1">الفكرة ببساطة:</h3>
+<p>بدل ما نسأل قاعدة البيانات "هل أول حرف هو كذا؟"، هنسألها المرة دي: <strong>"هل طول الباسورد بيساوي رقم كذا؟"</strong></p>
+<p>الكود اللي هنحقنه هيكون شكله كده: <code>administrator' &amp;&amp; this.password.length == 8 || 'a'=='b</code></p>
+<p><strong>شرح الكود:</strong> أنت بتقول للموقع: "هاتلي بيانات الأدمن، <strong>بشرط</strong> إن طول الباسورد بتاعه يكون بيساوي 8 حروف".</p>
+<h3 id="burp-suite">إزاي تنفذها عملي في Burp Suite:</h3>
+<p><strong>1. تجهيز الطلب (Request):</strong> هتاخد الكود وتعمله URL Encoding، وتحطه في الـ GET request بتاعك. ده شكل الطلب اللي هتبعته للـ Repeater عشان تجربه:</p>
+<p>HTTP</p>
+<pre><code>GET /user/lookup?user=administrator'%20%26%26%20this.password.length%20%3d%3d%208%20||%20'a'%3d%3d'b HTTP/2
+Host: 0ad700c9035911d3802dcb9400ff002b.web-security-academy.net
+</code></pre>
+<p><strong>2. الأتمتة باستخدام الـ Intruder:</strong> بدل ما تجرب الأرقام بإيدك (1، 2، 3...)، هتبعت الطلب ده لـ <strong>Intruder</strong>.</p>
+<ul>
+<li>
+<p>هتعمل تحديد (Highlight) على رقم <strong><code>8</code></strong> وتخليه هو الـ Payload Position بتاعك.</p>
+</li>
+<li>
+<p>في قسم الـ Payloads، هتختار النوع <strong>Numbers</strong>.</p>
+</li>
+<li>
+<p>هتحدد النطاق (مثلاً من 1 إلى 20)، وتخليه يعد خطوة بخطوة (Step: 1).</p>
+</li>
+<li>
+<p>هتبدأ الهجوم (Start Attack).</p>
+</li>
+</ul>
+<p><strong>3. قراءة النتيجة:</strong> الـ Intruder هيبعت 20 طلب. كل الطلبات هترجع استجابة مختلفة (غالباً حجمها هيكون صغير أو هترجع رسالة خطأ/مستخدم غير موجود) <strong>ما عدا طلب واحد بس</strong>. الطلب اللي هيصادف الرقم الصحيح لطول الباسورد، هو الوحيد اللي هيرجعلك بيانات الأدمن و<code>200 OK</code> (حجم الاستجابة Length هيكون أكبر ومختلف). الرقم ده هو طول الباسورد بالظبط!</p>
+<p>بعد ما تعرف الطول (مثلاً طلع 8 حروف)، هترجع بقى للكود بتاع استخراج الحروف (<code>this.password[0] == 'a'</code>)، وتبقى عارف إنك هتعمل الهجوم من الـ Index رقم <code>0</code> لحد الـ Index رقم <code>7</code>.</p>
+<hr />
+<h3 id="identifying-field-names">Identifying field names:</h3>
+<p>عشان تفهم الجزء ده، لازم نعرف الأول إيه الفرق الجوهري بين قواعد البيانات القديمة (SQL) والجديدة زي MongoDB (NoSQL).</p>
+<h3 id="no-fixed-schema">المشكلة: مفيش هيكل ثابت (No Fixed Schema)</h3>
+<p>في قواعد البيانات العادية، الجداول بتبقى ثابتة؛ لو في خانة اسمها <code>password</code>، هتبقى موجودة عند كل الناس. لكن في MongoDB، البيانات "شبه مهيكلة" (Semi-structured). ده معناه إن ممكن يكون خانة الرقم السري متسمية <code>password</code>، وممكن المبرمج يكون مسميها <code>pwd</code> أو <code>pass</code> أو <code>secretHash</code>.</p>
+<p>عشان كده، قبل ما نضيع وقت في استخراج حروف الباسورد زي ما عملنا في الخطوة اللي فاتت، لازم نأكد الأول إن الخانة اللي بنستهدفها اسمها فعلاً <code>password</code>.</p>
+<h3 id="baseline-testing">الحل: استراتيجية المقارنة (Baseline Testing)</h3>
+<p>النص بيشرح تكنيك ذكي جداً بيعتمد على إننا نسأل السيرفر 3 أسئلة: سؤال إجابته أكيد صح، وسؤال إجابته أكيد غلط، وسؤال عن الخانة اللي بندور عليها، وبعدين نقارن الاستجابات.</p>
+<p><strong>1. اختبار خانة إحنا متأكدين إنها موجودة (True Baseline):</strong></p>
+<p>JavaScript</p>
+<pre><code>admin' &amp;&amp; this.username!='
+</code></pre>
+<p>أنت هنا بتقوله: "هاتلي بيانات الأدمن، بشرط إن خانة الـ <code>username</code> متكونش فاضية". بما إننا متأكدين إن خانة اليوزر نيم موجودة، السيرفر هيستجيب بنجاح ويرجع بيانات الأدمن. (كده عرفنا شكل الاستجابة الناجحة).</p>
+<p><strong>2. اختبار خانة إحنا متأكدين إنها مش موجودة (False Baseline):</strong></p>
+<p>JavaScript</p>
+<pre><code>admin' &amp;&amp; this.foo!='
+</code></pre>
+<p>أنت هنا بتسأل عن خانة اسمها <code>foo</code> (اسم وهمي). لأن الخانة دي مش موجودة أصلاً في قاعدة البيانات (قيمتها بتكون Undefined)، الشرط مش هيتحقق، والسيرفر هيرجع استجابة مختلفة (سواء Error، أو يقولك مفيش مستخدم بالاسم ده، أو يرجع صفحة فاضية). (كده عرفنا شكل الاستجابة الفاشلة).</p>
+<p><strong>3. اختبار الخانة المستهدفة (The Target):</strong></p>
+<p>JavaScript</p>
+<pre><code>admin' &amp;&amp; this.password!='
+</code></pre>
+<p>دلوقتي إحنا بنختبر الخانة اللي شاكين فيها وهي <code>password</code>. هتبعت الطلب ده وتقارن النتيجة:</p>
+<ul>
+<li>
+<p>لو النتيجة رجعت <strong>شبه الاستجابة رقم 1 (نجاح)</strong>: يبقى مبروك، الخانة دي موجودة فعلاً واسمها <code>password</code>، وتقدر تبدأ تخمن طولها وحروفها.</p>
+</li>
+<li>
+<p>لو النتيجة رجعت <strong>شبه الاستجابة رقم 2 (فشل)</strong>: يبقى الخانة دي مش موجودة، والمبرمج مسمي الباسورد اسم تاني.</p>
+</li>
+</ul>
+<h3 id="password-dictionary-attack">إيه الحل لو الخانة مش اسمها Password؟ (Dictionary Attack)</h3>
+<p>السطر الأخير في النص بيقولك إنك مش هتقعد تجرب الأسماء التانية بإيدك. لو طلعت مش موجودة، هتروح على برنامج <strong>Burp Suite (Intruder)</strong>، وتحط كلمة <code>password</code> كـ Payload Position كده: <code>admin' &amp;&amp; this.§password§!='</code></p>
+<p>وتقوم ضايف قائمة كلمات (Wordlist) مليانة أسماء مشهورة للخانات (زي <code>pwd</code>, <code>pass</code>, <code>token</code>, <code>secret</code>, <code>hash</code>). الـ Intruder هيبدأ يبدل الكلمات ويبعت الطلبات، وأول ما تلاقي طلب رجع لك استجابة حجمها مختلف وشبه الـ True Baseline، يبقى أنت كده اصطدت اسم الخانة الصحيح!</p>
+<p><strong>الخلاصة للـ Blind Injection، ترتيب شغلك كمخترق بيكون كده:</strong></p>
+<ol>
+<li>
+<p><strong>تكتشف اسم الخانة:</strong> (الخطوة دي).</p>
+</li>
+<li>
+<p><strong>تكتشف طول البيانات جوه الخانة:</strong> (بخاصية <code>.length</code> اللي شرحناها المرة اللي فاتت).</p>
+</li>
+<li>
+<p><strong>تستخرج البيانات حرف حرف:</strong> (باستخدام <code>[0] == 'a'</code>).</p>
+</li>
+</ol>
+<hr />
+<h3 id="exploiting-nosql-operator-injection-to-extract-data">Exploiting NoSQL operator injection to extract data :</h3>
+<p>يا بطل، إنت كده دخلت في "ليفل الوحش" في اختراق الـ NoSQL! الجزء ده بينقلك من مرحلة التخمين لمرحلة السيطرة الكاملة على قاعدة البيانات.</p>
+<p>النص ده بيحل مشكلتين كبار قابلونا في الخطوات اللي فاتت:</p>
+<ol>
+<li>
+<p>إيه العمل لو الموقع <strong>مش بيستخدم</strong> دالة <code>$where</code> أصلاً في الكود بتاعه؟</p>
+</li>
+<li>
+<p>إيه العمل لو جربنا نخمن اسم خانة الباسورد بـ Wordlist (زي ما شرحنا المرة اللي فاتت) ومفيش ولا كلمة نفعت؟</p>
+</li>
+</ol>
+<p>تعالى نشرح الحلين بالتفصيل:</p>
+<h3 id="1-where-injecting-operators">1. حقن معامل <code>$where</code> بنفسك (Injecting Operators)</h3>
+<p>في الأمثلة اللي فاتت، كنا بنكسر الكود لأن المبرمج كان كاتب دالة <code>$where</code> من عنده. هنا بقى، المبرمج كاتب كود عادي جداً ومفيش أي جافاسكريبت، بس إحنا اللي <strong>هنجبر</strong> قاعدة البيانات تنفذ كود جافاسكريبت!</p>
+<p>بما إننا بنبعت البيانات في شكل JSON، إحنا نقدر نضيف معاملات (Operators) من عندنا كأنها جزء من الطلب.</p>
+<p><strong>إزاي نختبر ده؟ (اختبار الصح والغلط)</strong> هتبعت طلبين للسيرفر عشان تشوف هو بينفذ أوامرك ولا بيتجاهلها:</p>
+<ul>
+<li>
+<p><strong>الطلب الأول (شرط خاطئ):</strong></p>
+<p>JSON</p>
+<p><code>{"username":"wiener","password":"peter", "$where":"0"}</code></p>
+<p>أنت هنا بتضيف <code>$where</code> وبتحط قيمتها <code>0</code> (اللي هي في البرمجة معناها False). لو السيرفر نفذ الكود ده، الشرط هيكون غلط فمش هيسجل دخولك (أو هيرجع Error).</p>
+</li>
+<li>
+<p><strong>الطلب الثاني (شرط صحيح):</strong></p>
+<p>JSON</p>
+<p><code>{"username":"wiener","password":"peter", "$where":"1"}</code></p>
+<p>هنا حطيت <code>1</code> (اللي معناها True). لو السيرفر نفذ الكود وسجل دخولك بنجاح.. <strong>يبقى مبروك!</strong> إنت كده اكتشفت إن السيرفر بياخد الـ <code>$where</code> بتاعتك وينفذها، وبقى معاك صلاحية تنفذ أي كود جافاسكريبت على قاعدة البيانات (Remote Code Execution بشكل مصغر).</p>
+</li>
+</ul>
+<h3 id="2-extracting-field-names">2. استخراج أسماء الخانات بدقة (Extracting Field Names)</h3>
+<p>المرة اللي فاتت قلنا لو مش عارفين اسم خانة الباسورد، بنخمنها بقائمة كلمات (Dictionary Attack). بس التخمين بياخد وقت وممكن يفشل. النص ده بيديك الحل السحري: <strong>خلي قاعدة البيانات هي اللي تنطق وتقولك أسماء خاناتها إيه!</strong></p>
+<p>بما إننا خلاص أثبتنا إننا نقدر نشغل جافاسكريبت بالـ <code>$where</code>، هنستخدم دالة في الجافاسكريبت اسمها <code>Object.keys()</code>. الدالة دي وظيفتها إنها تجيب كل أسماء الخانات اللي جوه السجل وتحطهم في قائمة (Array).</p>
+<p><strong>تحليل كود الاستخراج:</strong></p>
+<p>JSON</p>
+<pre><code>&quot;$where&quot;:&quot;Object.keys(this)[0].match('^.{0}a.*')&quot;
+</code></pre>
+<p>تعالى نفصص الكود ده حتة حتة:</p>
+<ul>
+<li>
+<p><strong><code>this</code></strong>: بتشير للسجل الحالي (مثلاً بيانات المستخدم wiener).</p>
+</li>
+<li>
+<p><strong><code>Object.keys(this)</code></strong>: بتجيب أسماء الخانات، يعني النتيجة هتبقى كده مثلاً: <code>["_id", "username", "password", "role"]</code>.</p>
+</li>
+<li>
+<p><strong><code>[0]</code></strong>: بتختار أول خانة في القائمة (اللي هي هنا <code>_id</code>). لو خليتها <code>[1]</code> هتجيب <code>username</code> وهكذا.</p>
+</li>
+<li>
+<p><strong><code>.match('^.{0}a.*')</code></strong>: ده كود Regex عبقري بيسأل قاعدة البيانات سؤال محدد جداً:</p>
+<ul>
+<li>
+<p><code>^</code>: ابدأ من أول الكلمة.</p>
+</li>
+<li>
+<p><code>.{0}</code>: اتخطى صفر من الحروف (يعني خليك عند الحرف الأول). لو بقت <code>.{1}</code> يعني اتخطى أول حرف وركز مع الحرف التاني.</p>
+</li>
+<li>
+<p><code>a</code>: هل الحرف ده هو 'a'؟</p>
+</li>
+<li>
+<p><code>.*</code>: وبعده أي حروف تانية مش مهم.</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>الخلاصة العملية للـ Payload ده:</strong> أنت بتقول للسيرفر: "سجل دخولي لو كان <strong>الحرف الأول</strong> من <strong>اسم الخانة الأولى</strong> هو حرف الـ <strong>a</strong>".</p>
+<ul>
+<li>
+<p>لو سجل دخول: يبقى اسم الخانة بيبدأ بحرف a.</p>
+</li>
+<li>
+<p>لو رفض: يبقى بيبدأ بحرف تاني، وتقوم رايح للـ <strong>Intruder</strong> في Burp Suite وتخليه يجرب باقي الحروف.</p>
+</li>
+</ul>
+<p>لما تخلص الحرف الأول، تغير <code>.{0}</code> تخليها <code>.{1}</code> عشان تخمن الحرف التاني، وهكذا لحد ما تجمّع اسم الخانة بالكامل (مثلاً تكتشف إن اسمها <code>secret_token</code> بدل <code>password</code>). وبعد ما تكتشف اسمها، ترجع للدرس اللي فات وتستخرج البيانات اللي جواها!</p>
+<hr />
+<h3 id="exfiltrating-data-using-operators">Exfiltrating data using operators:</h3>
+<p>الدرس ده بيشرح الـ <strong>"Plan B"</strong> أو الخطة البديلة لأي Penetration Tester لما بيلاقي السيرفر متأمن بزيادة.</p>
+<p>في الدروس اللي فاتت، كنا بنعتمد على إننا نكتب كود جافاسكريبت (زي الـ <code>$where</code>) وقاعدة البيانات بتنفذه. لكن إيه العمل لو المبرمج كان ذكي وقفل خاصية تنفيذ الجافاسكريبت تماماً؟ هل كده نقف؟ أكيد لأ.</p>
+<p>هنا بييجي دور استخراج البيانات باستخدام الـ <strong>Operators العادية</strong> (المعاملات الأصلية بتاعة MongoDB)، وأهم وأخطر معامل فيهم هو <strong><code>$regex</code></strong> (التعبيرات النمطية).</p>
+<p>تعالى نفصص التكنيك ده خطوة بخطوة:</p>
+<h3 id="1-vulnerability-check">1. مرحلة الفحص والتأكد (Vulnerability Check)</h3>
+<p>أول حاجة لازم تعملها هي إنك تتأكد هل السيرفر بيقبل الـ <code>$regex</code> أصلاً ولا بيعمله Block. عشان كده هتبعت الـ Payload الأولاني ده:</p>
+<p>JSON</p>
+<pre><code>{&quot;username&quot;:&quot;admin&quot;,&quot;password&quot;:{&quot;$regex&quot;:&quot;^.*&quot;}}
+</code></pre>
+<p><strong>إيه معنى كود الـ Regex ده؟</strong></p>
+<ul>
+<li>
+<p><strong><code>^</code></strong> : معناها "ابحث من بداية الكلمة".</p>
+</li>
+<li>
+<p><strong><code>.*</code></strong> : معناها "أي عدد من أي حروف".</p>
+</li>
+<li>
+<p><strong>الترجمة الحرفية:</strong> "سجل دخولي لو كان الباسورد بيبدأ بأي حاجة".</p>
+</li>
+</ul>
+<p>بما إن أي باسورد في الدنيا "بيبدأ بأي حاجة"، فالشرط ده دايماً (True). لو الموقع رد عليك برد إيجابي (عمل تسجيل دخول أو جاب استجابة مختلفة عن رسالة الباسورد الغلط)، يبقى إنت كده اتأكدت إن ثغرة الـ Regex Injection موجودة وشغالة.</p>
+<h3 id="2-data-exfiltration">2. مرحلة استخراج البيانات حرف بحرف (Data Exfiltration)</h3>
+<p>بما إن الثغرة شغالة، هنبدأ نسأل قاعدة البيانات أسئلة محددة جداً عشان نسرق الباسورد. هتبعت الـ Payload التاني ده:</p>
+<p>JSON</p>
+<pre><code>{&quot;username&quot;:&quot;admin&quot;,&quot;password&quot;:{&quot;$regex&quot;:&quot;^a.*&quot;}}
+</code></pre>
+<p><strong>إيه اللي اتغير هنا؟</strong> إحنا حطينا حرف الـ <code>a</code> بعد علامة البداية <code>^</code>.</p>
+<ul>
+<li><strong>الترجمة الحرفية:</strong> "سجل دخولي لو كان الباسورد بيبدأ بحرف الـ a، وبعده أي حاجة".</li>
+</ul>
+<p><strong>هتقرأ الاستجابة إزاي؟</strong></p>
+<ul>
+<li>
+<p><strong>لو السيرفر عملك تسجيل دخول:</strong> يبقى مبروك، أول حرف من باسورد الأدمن هو <code>a</code>!</p>
+</li>
+<li>
+<p><strong>لو السيرفر رفض وقالك الباسورد غلط:</strong> يبقى الحرف الأول مش <code>a</code>، ولازم تجرب الحرف اللي بعده <code>b</code>، وبعده <code>c</code>، وهكذا.</p>
+</li>
+</ul>
+<h3 id="the-hacker-way">إزاي تطبق ده عملي بسرعة؟ (The Hacker Way)</h3>
+<p>أكيد مش هتقعد تجرب الحروف كلها بإيدك. هتروح لـ Burp Suite وتبعث الطلب ده للـ <strong>Intruder</strong>.</p>
+<p><strong>الخطوة الأولى (اكتشاف الحرف الأول):</strong> هتحدد الحرف الأول كـ Payload Position بالشكل ده: <code>{"username":"admin","password":{"$regex":"^§a§.*"}}</code> وتخلي الـ Intruder يجرب كل الحروف والأرقام (a-z, 0-9). الطلب الوحيد اللي هيرجع استجابة مختلفة (زي 302 Redirect)، هيكون هو الحرف الصح.</p>
+<p><strong>الخطوة التانية (اكتشاف الحرف التاني):</strong> لنفترض إن الـ Intruder اكتشف إن أول حرف هو <code>m</code>. هترجع تعدل الـ Request بتاعك وتثبت الـ <code>m</code>، وتحط الـ Payload Position في الحرف التاني بالشكل ده: <code>{"username":"admin","password":{"$regex":"^m§a§.*"}}</code></p>
+<p>وهكذا، تفضل تصطاد الحروف واحد ورا التاني لحد ما تجمّع باسورد الأدمن بالكامل وتخترق الحساب. التكنيك ده بطيء شوية (عشان كده اسمه Blind Injection)، لكنه فتاك ومبيحتاجش جافاسكريبت خالص!</p>
+<hr />
+<h3 id="timing-based-injection">Timing based injection:</h3>
+<h3 id="the-black-hole">إيه المشكلة اللي بتحلها الطريقة دي؟ (The Black Hole)</h3>
+<p>في الدروس اللي فاتت، كنا بنعتمد على إن السيرفر بيرد علينا باستجابة مختلفة (مثلاً: بيسجل دخول، بيرجع Error 500، أو حجم الصفحة بيتغير). لكن إيه العمل لو السيرفر متأمن لدرجة إنه بيرجع <strong>نفس الرد بالضبط</strong> في كل الحالات؟ (يعني سواء الباسورد صح، غلط، أو الكود فيه مشكلة، السيرفر بيرجعلك دايماً صفحة مكتوب فيها "Invalid Login" بنفس الحجم وبنفس الـ Status Code).</p>
+<p>هنا، إحنا فقدنا ميزة الرؤية تماماً (Total Blindness). وعشان نعرف إجابة أسئلتنا (True or False)، بنلجأ لسلاح <strong>"الوقت"</strong>. بنقول لقاعدة البيانات: "لو إجابتي صحيحة، أقفلي السيرفر وماترديش عليا لمدة 5 ثواني.. ولو غلط ردي عليا فوراً".</p>
+<p>تعالى نفصص الأكواد المكتوبة:</p>
+<h3 id="1-baseline-test">1. مرحلة جس النبض (Baseline Test)</h3>
+<p>JSON</p>
+<pre><code>{&quot;$where&quot;: &quot;sleep(5000)&quot;}
+</code></pre>
+<p>أول حاجة بتعملها هي إنك بتجرب تبعت طلب عادي وتحسب بياخد كام مللي ثانية عشان يرد (مثلاً 200ms). بعدين تبعت الكود ده، اللي بيأمر السيرفر ينام (sleep) لمدة 5000 مللي ثانية (5 ثواني). لو السيرفر اتأخر فعلاً 5 ثواني في الرد، يبقى إنت اتأكدت 100% إنك تقدر تنفذ Time-based Injection.</p>
+<h3 id="2-payloads">2. استخراج الباسورد بالوقت (الـ Payloads المعقدة)</h3>
+<p>النص بيقدم لك طريقتين عشان تختبر بيهم أول حرف من الباسورد بناءً على الوقت:</p>
+<h4 id="sleep">الطريقة الأولى: استخدام <code>sleep()</code></h4>
+<p>JavaScript</p>
+<pre><code>admin'+function(x){if(x.password[0]===&quot;a&quot;){sleep(5000)};}(this)+'
+</code></pre>
+<ul>
+<li>
+<p><strong>الشرح:</strong> أنت هنا حقنت دالة جافاسكريبت بتسأل: "لو الباسورد بتاع الأدمن أول حرف فيه هو 'a'، نفذ أمر <code>sleep(5000)</code>".</p>
+</li>
+<li>
+<p><strong>النتيجة:</strong> لو الرد اتأخر 5 ثواني، إذن الحرف هو <code>a</code>. لو الرد جه بسرعة، إذن الحرف مش <code>a</code>، وتجرب اللي بعده.</p>
+</li>
+</ul>
+<h4 id="the-cpu-burner">الطريقة التانية: حرق المعالج (The CPU Burner)</h4>
+<p>JavaScript</p>
+<pre><code>admin'+function(x){var waitTill = new Date(new Date().getTime() + 5000);while((x.password[0]===&quot;a&quot;) &amp;&amp; waitTill &gt; new Date()){};}(this)+'
+</code></pre>
+<p><strong>ليه الكود ده معقد كده؟</strong> لأن في بعض الأحيان، مطورين MongoDB بيعملوا تعطيل (Disable) لدالة <code>sleep()</code> عشان يمنعوا الهجمات دي. فبنضطر نستخدم حيلة برمجية بالـ <code>while</code> loop.</p>
+<ul>
+<li>
+<p><strong>الشرح:</strong> الكود ده بيعمل الآتي:</p>
+<ol>
+<li>
+<p>بيسجل الوقت الحالي، ويزود عليه 5 ثواني لقدام ويحفظه في المتغير <code>waitTill</code>.</p>
+</li>
+<li>
+<p>بيدخل في حلقة مفرغة (Loop): "طول ما الحرف الأول هو 'a'، وطول ما الوقت الحالي لسه موصلش للوقت اللي حفظناه.. أفضل لف في دوامة فاضية وماتعملش حاجة".</p>
+</li>
+</ol>
+</li>
+<li>
+<p><strong>النتيجة:</strong> الكود ده بيجبر الـ CPU بتاع السيرفر يفضل يلف في مكانه لمدة 5 ثواني كاملة لو الشرط صحيح، وبكده بنحقق نفس نتيجة الـ <code>sleep()</code> بالظبط حتى لو الدالة نفسها مقفولة!</p>
+</li>
+</ul>
+<h3 id="burp-suite_1">إزاي تنفذها في Burp Suite كالمحترفين؟</h3>
+<p>بما إن الـ Status Code والـ Length مش هيتغيروا، الـ Intruder مش هيعرف يفرق بين الحروف الصح والغلط بالطريقة العادية. <strong>التريكة هنا:</strong> لما تبعت الهجوم للـ Intruder، لازم تروح لقائمة <strong>Columns</strong> (في نافذة النتايج)، وتضيف عمود اسمه <strong>Response received</strong> أو <strong>Response completed</strong> (واللي بيحسب الوقت بالمللي ثانية). ولما الهجوم يخلص، ترتب النتايج تصاعدياً أو تنازلياً بناءً على عمود الوقت. الطلب الوحيد اللي هتلاقي وقته كسر الـ 5000، هو ده الحرف الصح بتاعك!</p>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u062a\u0645 \u0627\u0644\u0646\u0633\u062e \u0627\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "clipboard.copy": "\u0646\u0633\u062e \u0625\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "search.result.more.one": "\u0623\u0643\u062b\u0631 \u0645\u0646 1 \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.more.other": "\u0623\u0643\u062b\u0631 \u0645\u0646 # \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.none": "\u0644\u0627 \u062a\u0648\u062c\u062f \u0646\u062a\u0627\u0626\u062c", "search.result.one": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b \u0645\u0633\u062a\u0646\u062f \u0648\u0627\u062d\u062f", "search.result.other": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b # \u0645\u0633\u062a\u0646\u062f\u0627\u062a", "search.result.placeholder": "\u0627\u0643\u062a\u0628 \u0644\u0628\u062f\u0621 \u0627\u0644\u0628\u062d\u062b", "search.result.term.missing": "\u0645\u0641\u0642\u0648\u062f", "select.version": "\u0625\u062e\u062a\u0631 \u0627\u0644\u0625\u0635\u062f\u0627\u0631"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

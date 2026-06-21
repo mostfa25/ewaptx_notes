@@ -1,0 +1,1597 @@
+
+<!doctype html>
+<html lang="ar" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../2-EWAPTX%20%28part%202%29/">
+      
+      
+        <link rel="next" href="../4-JWT%20port_swigger/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Authentication Enumeration — الفكرة ببساطة - eWAPTX Zero-Day Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto Mono";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/hacker_style.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="rtl" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="lime">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#authentication-enumeration" class="md-skip">
+          انتقل إلى المحتوى
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="عنوان العارضة">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-header__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            eWAPTX Zero-Day Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Authentication Enumeration — الفكرة ببساطة
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="بحث" placeholder="بحث" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="إبحث">
+        
+        <button type="reset" class="md-search__icon md-icon" title="مسح كلي" aria-label="مسح كلي" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            بدء البحث
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="تصفح" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-nav__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    eWAPTX Zero-Day Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Welcome to MkDocs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1-EWAPTX/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 EWAPTX
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2-EWAPTX%20%28part%202%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 EWAPTX (part 2)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication Enumeration — الفكرة ببساطة
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4-JWT%20port_swigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ليه JWT vulnerabilities خطيرة جداً ؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5-Oauth%20portswigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 Oauth portswigger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../6-SQL%20INJECTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 SQL INJECTION
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7-Blind%20Sql%20Injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    أولاً: ما هو Blind SQL Injection؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../8-NOSQL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📁 الدليل الشامل لأساسيات MongoDB واختبار اختراق NoSQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9-NoSQL%20injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 NoSQL injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="جدول المحتويات">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="authentication-enumeration">Authentication Enumeration — الفكرة ببساطة</h1>
+<p><strong>Authentication Enumeration</strong> يعني إنك تحاول تعرف معلومات عن نظام تسجيل الدخول بدون ما تخترقه فعليًا.</p>
+<p>الهدف غالبًا يكون:</p>
+<ul>
+<li>
+<p>معرفة <strong>يوزرنيمات صحيحة</strong></p>
+</li>
+<li>
+<p>معرفة <strong>سياسة الباسورد</strong></p>
+</li>
+<li>
+<p>معرفة <strong>وجود حسابات</strong></p>
+</li>
+</ul>
+<p>يعني بدل ما المهاجم يجرب:</p>
+<p>username + password</p>
+<p>هو يحاول الأول يعرف:</p>
+<p>username الصحيح</p>
+<p>وبعدها يركز بس على <strong>الباسورد</strong>.</p>
+<hr />
+<h1 id="1-identifying-valid-usernames">1️⃣ Identifying Valid Usernames</h1>
+<p>دي أشهر طريقة في الـ Enumeration.</p>
+<p>مثال 👇</p>
+<p>لو عملت login كده:</p>
+<p>username: admin<br />
+password: 123456</p>
+<p>الموقع يرد:</p>
+<p>Incorrect password</p>
+<p>لكن لو كتبت:</p>
+<p>username: randomuser123<br />
+password: 123456</p>
+<p>الموقع يرد:</p>
+<p>User does not exist</p>
+<p>هنا حصلت مشكلة أمنية.</p>
+<p>لأن الرسالة <strong>بتفرق بين الحالتين</strong>.</p>
+<p>النتيجة:</p>
+<p>المهاجم عرف إن:</p>
+<p>admin = username صحيح</p>
+<p>حتى لو الباسورد غلط.</p>
+<hr />
+<h1 id="2-password-policy-enumeration">2️⃣ Password Policy Enumeration</h1>
+<p>دي معناها إنك تحاول تفهم <strong>سياسة الباسورد</strong> بتاعت الموقع.</p>
+<p>المثال اللي في الكود:</p>
+<p>$pattern = '/^(?=.<em>[A-Z])(?=.</em>\d)(?=.*[\W_]).+$/';</p>
+<p>الـ regex ده معناه:</p>
+<p>الباسورد لازم يحتوي على:</p>
+<table>
+<thead>
+<tr>
+<th>requirement</th>
+<th>المعنى</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>(?=.*[A-Z])</code></td>
+<td>حرف Capital</td>
+</tr>
+<tr>
+<td><code>(?=.*\d)</code></td>
+<td>رقم</td>
+</tr>
+<tr>
+<td><code>(?=.*[\W_])</code></td>
+<td>Symbol</td>
+</tr>
+</tbody>
+</table>
+<p>مثال باسورد مقبول:</p>
+<p>Password1!</p>
+<hr />
+<h3 id="_1">المشكلة الأمنية هنا</h3>
+<p>لو الموقع قال للمستخدم:</p>
+<p>Password must contain uppercase, number, and symbol</p>
+<p>المهاجم فهم:</p>
+<ul>
+<li>
+<p>نوع الباسورد</p>
+</li>
+<li>
+<p>شروطه</p>
+</li>
+</ul>
+<p>فيقدر يعمل <strong>wordlist مخصوصة</strong>.</p>
+<p>مثلاً باستخدام أدوات زي:</p>
+<ul>
+<li>
+<p><strong>Burp Suite</strong></p>
+</li>
+<li>
+<p><strong>ffuf</strong></p>
+</li>
+</ul>
+<hr />
+<h1 id="3-enumeration">3️⃣ أماكن يحصل فيها Enumeration</h1>
+<h2 id="registration-page">Registration Page</h2>
+<p>لو عملت register بيوزر:</p>
+<p>ahmed</p>
+<p>الموقع رد:</p>
+<p>Username already exists</p>
+<p>ده معناه إن:</p>
+<p>ahmed = مستخدم حقيقي</p>
+<p>المهاجم يكرر العملية مع آلاف الأسماء.</p>
+<hr />
+<h2 id="password-reset">Password Reset</h2>
+<p>في صفحة reset password:</p>
+<p>لو كتبت:</p>
+<p>admin@example.com</p>
+<p>الرد:</p>
+<p>Password reset link sent</p>
+<p>لكن لو كتبت:</p>
+<p>random@email.com</p>
+<p>الرد:</p>
+<p>Email not found</p>
+<p>كده المهاجم عرف الإيميلات الصحيحة.</p>
+<hr />
+<h2 id="verbose-error-messages">Verbose Error Messages</h2>
+<p>الرسائل التفصيلية مشكلة كبيرة.</p>
+<p>سيء:</p>
+<p>User not found</p>
+<p>أو</p>
+<p>Incorrect password</p>
+<p>الأفضل:</p>
+<p>Invalid username or password</p>
+<p>رسالة واحدة للحالتين.</p>
+<hr />
+<h1 id="4-data-breach-information">4️⃣ Data Breach Information</h1>
+<p>المهاجم ممكن يستخدم بيانات من تسريبات.</p>
+<p>مثال مواقع:</p>
+<ul>
+<li><strong>Have I Been Pwned</strong></li>
+</ul>
+<p>لو لقى:</p>
+<p>mostafa@example.com</p>
+<p>موجود في تسريب.</p>
+<p>هيجربه في مواقع تانية.</p>
+<p>دي اسمها:</p>
+<p><strong>Credential Stuffing</strong></p>
+<hr />
+<h1 id="_2">مثال عملي للهجوم</h1>
+<p>المهاجم يعمل الخطوات دي:</p>
+<p>1️⃣ يجمع usernames<br />
+2️⃣ يعرف password policy<br />
+3️⃣ يعمل wordlist مناسبة<br />
+4️⃣ يبدأ brute force</p>
+<hr />
+<h1 id="tryhackme">سؤال مهم غالبًا بييجي في TryHackMe</h1>
+<p>ليه <strong>Authentication Enumeration خطر؟</strong></p>
+<p>الإجابة:</p>
+<p>لأنه يسمح للمهاجم:</p>
+<ul>
+<li>
+<p>تحديد المستخدمين الحقيقيين</p>
+</li>
+<li>
+<p>تحسين هجمات brute force</p>
+</li>
+<li>
+<p>تقليل عدد المحاولات</p>
+</li>
+</ul>
+<hr />
+<p>💡 سؤال ليك بقى عشان أتأكد إن الفكرة وصلت:</p>
+<p>لو موقع login بيرجع الرسالة دي:</p>
+<p>Invalid username or password</p>
+<p>هل ده يمنع <strong>Username Enumeration</strong> بالكامل؟<br />
+ولا لسه فيه طرق تانية؟ 😏</p>
+<hr />
+<h1 id="verbose-errors">أولًا: يعني إيه Verbose Errors؟</h1>
+<p><strong>Verbose Errors</strong> يعني رسائل خطأ <strong>تفصيلية زيادة عن اللزوم</strong>.</p>
+<p>المطورين بيحطوها عشان:</p>
+<ul>
+<li>
+<p>تساعدهم في <strong>debugging</strong></p>
+</li>
+<li>
+<p>يعرفوا المشكلة فين</p>
+</li>
+</ul>
+<p>لكن لما تظهر للمستخدم العادي… تبقى مشكلة أمنية.</p>
+<hr />
+<h1 id="_3">ليه خطيرة؟</h1>
+<p>لأنها ممكن تكشف معلومات حساسة زي:</p>
+<h3 id="1-internal-paths">1️⃣ Internal Paths</h3>
+<p>يعني مسار الملفات داخل السيرفر.</p>
+<p>مثال رسالة خطأ:</p>
+<p>Warning: include(/var/www/html/config/database.php) failed</p>
+<p>هنا عرفنا إن السيرفر فيه:</p>
+<p>/var/www/html/</p>
+<p>ده بيساعد المهاجم يعمل:</p>
+<ul>
+<li>
+<p><strong>Path Traversal</strong></p>
+</li>
+<li>
+<p><strong>LFI</strong></p>
+</li>
+</ul>
+<hr />
+<h3 id="2-database-details">2️⃣ Database Details</h3>
+<p>أحيانًا الخطأ يكشف:</p>
+<ul>
+<li>
+<p>اسم الجدول</p>
+</li>
+<li>
+<p>اسم الأعمدة</p>
+</li>
+</ul>
+<p>مثال:</p>
+<p>SQL Error: Unknown column 'passwords' in 'users' table</p>
+<p>المهاجم عرف إن فيه جدول اسمه:</p>
+<p>users</p>
+<p>وده مهم جدًا لو بيعمل <strong>SQL Injection</strong>.</p>
+<hr />
+<h3 id="3-user-information">3️⃣ User Information</h3>
+<p>ممكن الرسائل تكشف:</p>
+<ul>
+<li>
+<p>usernames</p>
+</li>
+<li>
+<p>emails</p>
+</li>
+</ul>
+<p>وده يسهّل <strong>User Enumeration</strong>.</p>
+<hr />
+<h1 id="verbose-errors_1">إزاي المهاجم يسبب Verbose Errors؟</h1>
+<h2 id="1-invalid-login-attempts">1️⃣ Invalid Login Attempts</h2>
+<p>المهاجم يجرب login ببيانات مختلفة.</p>
+<p>مثال:</p>
+<p>email: test@test.com<br />
+password: 123</p>
+<p>لو الرد:</p>
+<p>Email does not exist</p>
+<p>لكن لو:</p>
+<p>Invalid password</p>
+<p>يبقى الإيميل <strong>موجود</strong>.</p>
+<p>ده بالضبط اللي حصل في lab بتاع TryHackMe.</p>
+<hr />
+<h1 id="_4">المثال اللي في اللاب</h1>
+<p>لو دخلت:</p>
+<p>random@email.com</p>
+<p>الرد:</p>
+<p>Email does not exist</p>
+<p>لكن لو دخلت:</p>
+<p>real@email.com</p>
+<p>الرد:</p>
+<p>Invalid password</p>
+<p>الاستنتاج:</p>
+<p>real@email.com = valid email</p>
+<p>وده اسمه:</p>
+<p><strong>Email Enumeration</strong></p>
+<hr />
+<h1 id="automation">الأتمتة (Automation)</h1>
+<p>بدل ما تجرب يدويًا 1000 ايميل…</p>
+<p>تستخدم script زي اللي في اللاب.</p>
+<p>الفكرة ببساطة:</p>
+<p>1️⃣ script يقرأ قائمة ايميلات<br />
+2️⃣ يبعث request للـ login<br />
+3️⃣ يشوف الرد<br />
+4️⃣ يحدد valid أو invalid</p>
+<p>الكود يستخدم مكتبة:</p>
+<p>requests</p>
+<p>في Python.</p>
+<hr />
+<h1 id="_5">فكرة الكود ببساطة</h1>
+<h2 id="1">الخطوة 1</h2>
+<p>يبعت request:</p>
+<p>response = requests.post(url, headers=headers, data=data)</p>
+<p>يعني:</p>
+<p>POST /login</p>
+<hr />
+<h2 id="2">الخطوة 2</h2>
+<p>يقرأ الرد:</p>
+<p>response.json()</p>
+<p>الرد بيكون JSON.</p>
+<p>مثال:</p>
+<p>{<br />
+ "status": "error",<br />
+ "message": "Email does not exist"<br />
+}</p>
+<hr />
+<h2 id="3">الخطوة 3</h2>
+<p>يقارن الرسالة:</p>
+<p>if "Email does not exist"</p>
+<p>لو موجودة:</p>
+<p>INVALID</p>
+<p>لو مش موجودة:</p>
+<p>VALID</p>
+<hr />
+<h1 id="_6">الناتج</h1>
+<p>مثلاً:</p>
+<p>[INVALID] test@gmail.com<br />
+[INVALID] admin@gmail.com<br />
+[VALID] john@gmail.com</p>
+<p>يبقى المهاجم عرف إن:</p>
+<p>john@gmail.com</p>
+<p>مستخدم حقيقي.</p>
+<hr />
+<h1 id="_7">الأدوات اللي بتعمل ده تلقائي</h1>
+<p>في الـ Pentesting الحقيقي غالبًا تستخدم:</p>
+<ul>
+<li>
+<p><strong>Burp Suite</strong></p>
+</li>
+<li>
+<p><strong>ffuf</strong></p>
+</li>
+<li>
+<p><strong>Hydra</strong></p>
+</li>
+</ul>
+<hr />
+<h1 id="enumeration-brute-force">العلاقة بين Enumeration و Brute Force</h1>
+<p>الـ attacker يعمل كده:</p>
+<h3 id="1-enumeration">1️⃣ Enumeration</h3>
+<p>يجمع usernames</p>
+<p>مثال:</p>
+<p>admin<br />
+john<br />
+support</p>
+<hr />
+<h3 id="2-brute-force">2️⃣ Brute Force</h3>
+<p>يجرب passwords عليهم.</p>
+<p>بدل:</p>
+<p>1000 username × 1000 password</p>
+<p>يبقى:</p>
+<p>3 username × 1000 password</p>
+<p>الهجوم بقى <strong>أسرع بكتير</strong>.</p>
+<hr />
+<h1 id="tryhackme_1">سؤال TryHackMe الشهير في الجزء ده</h1>
+<p>غالبًا بيسأل:</p>
+<p><strong>Why are verbose errors dangerous?</strong></p>
+<p>الإجابة:</p>
+<p>لأنها تكشف:</p>
+<ul>
+<li>
+<p>internal paths</p>
+</li>
+<li>
+<p>database structure</p>
+</li>
+<li>
+<p>valid usernames</p>
+</li>
+<li>
+<p>application logic</p>
+</li>
+</ul>
+<hr />
+<h1 id="password-reset-flow">أولًا: يعني إيه Password Reset Flow؟</h1>
+<p><strong>Password Reset Flow</strong> هو السيناريو اللي يحصل لما المستخدم ينسى الباسورد.</p>
+<p>الخطوات الطبيعية تكون كده:</p>
+<p>1️⃣ المستخدم يدخل الإيميل<br />
+2️⃣ الموقع يبعث <strong>reset token</strong> أو <strong>link</strong><br />
+3️⃣ المستخدم يفتح اللينك<br />
+4️⃣ يغير الباسورد</p>
+<p>لو أي خطوة فيهم ضعيفة → المهاجم ممكن يسيطر على الحساب.</p>
+<hr />
+<h1 id="reset-password">أشهر طرق Reset Password</h1>
+<h2 id="1-email-based-reset">1️⃣ Email-Based Reset</h2>
+<p>الموقع يبعث link زي:</p>
+<p>https://site.com/reset?token=abc123</p>
+<p>لو المهاجم حصل على التوكن → يقدر يغير الباسورد.</p>
+<p>المشكلة هنا تعتمد على:</p>
+<ul>
+<li>
+<p>أمان الإيميل</p>
+</li>
+<li>
+<p>قوة التوكن</p>
+</li>
+</ul>
+<hr />
+<h2 id="2-security-questions">2️⃣ Security Questions</h2>
+<p>زي:</p>
+<ul>
+<li>
+<p>What is your pet name?</p>
+</li>
+<li>
+<p>What is your mother's maiden name?</p>
+</li>
+</ul>
+<p>المشكلة إن المعلومات دي أحيانًا موجودة على السوشيال ميديا 😅</p>
+<p>مثلاً:</p>
+<ul>
+<li>
+<p>فيسبوك</p>
+</li>
+<li>
+<p>لينكدإن</p>
+</li>
+<li>
+<p>إنستجرام</p>
+</li>
+</ul>
+<hr />
+<h2 id="3-sms-reset">3️⃣ SMS Reset</h2>
+<p>الموقع يبعت OTP على الموبايل.</p>
+<p>المشكلة هنا:</p>
+<p>هجوم اسمه <strong>SIM Swapping</strong><br />
+المهاجم يقنع شركة الاتصالات ينقل الرقم لشريحة عنده.</p>
+<hr />
+<h1 id="password-reset_1">المشاكل الأمنية في Password Reset</h1>
+<h2 id="1-predictable-tokens">1️⃣ Predictable Tokens</h2>
+<p>دي أهم نقطة في اللاب.</p>
+<p>المثال في الكود:</p>
+<p>$token = mt_rand(100, 200);</p>
+<p>ده معناه إن التوكن هيكون رقم بين:</p>
+<p>100 → 200</p>
+<p>يعني:</p>
+<p>101 احتمالات فقط</p>
+<p>ده سهل جدًا يتعمل له <strong>Brute Force</strong>.</p>
+<hr />
+<h1 id="_8">السيناريو في اللاب</h1>
+<p>انت تدخل:</p>
+<p>admin@admin.com</p>
+<p>الموقع يقول:</p>
+<p>Password reset link has been sent</p>
+<p>الرابط يكون:</p>
+<p>reset_password.php?token=123</p>
+<p>المشكلة:</p>
+<p>التوكن مجرد رقم صغير.</p>
+<hr />
+<h1 id="_9">استغلال الثغرة</h1>
+<p>المهاجم يجرب كل التوكنات.</p>
+<p>مثلاً:</p>
+<p>token=100<br />
+token=101<br />
+token=102<br />
+...<br />
+token=200</p>
+<hr />
+<h1 id="intruder">استخدام Intruder في</h1>
+<p><strong>Burp Suite</strong></p>
+<p>الخطوات:</p>
+<p>1️⃣ تمسك request للـ reset page<br />
+2️⃣ تبعتها لـ Intruder<br />
+3️⃣ تحدد مكان التوكن</p>
+<p>مثلاً:</p>
+<p>token=§123§</p>
+<p>4️⃣ تحط dictionary للتوكنات</p>
+<hr />
+<h1 id="_10">توليد القائمة باستخدام</h1>
+<p><strong>Crunch</strong></p>
+<p>الأمر في اللاب:</p>
+<p>crunch 3 3 -o otp.txt -t %%% -s 100 -e 200</p>
+<p>معناه:</p>
+<table>
+<thead>
+<tr>
+<th>الجزء</th>
+<th>معناه</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3 3</td>
+<td>الطول 3 أرقام</td>
+</tr>
+<tr>
+<td>-s 100</td>
+<td>البداية</td>
+</tr>
+<tr>
+<td>-e 200</td>
+<td>النهاية</td>
+</tr>
+<tr>
+<td>-o otp.txt</td>
+<td>حفظ في ملف</td>
+</tr>
+</tbody>
+</table>
+<p>الناتج:</p>
+<p>100<br />
+101<br />
+102<br />
+...<br />
+200</p>
+<hr />
+<h1 id="_11">كيف تعرف التوكن الصحيح؟</h1>
+<p>أثناء الهجوم هتشوف:</p>
+<p><strong>Response Size مختلف</strong></p>
+<p>مثلاً:</p>
+<table>
+<thead>
+<tr>
+<th>token</th>
+<th>response length</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100</td>
+<td>1200</td>
+</tr>
+<tr>
+<td>101</td>
+<td>1200</td>
+</tr>
+<tr>
+<td>137</td>
+<td>4500 ←</td>
+</tr>
+</tbody>
+</table>
+<p>الرقم الكبير غالبًا هو:</p>
+<p>valid token</p>
+<hr />
+<h1 id="reset-password_1">بعدها تعمل Reset Password</h1>
+<p>وتدخل بالحساب.</p>
+<hr />
+<h1 id="_12">ليه الثغرة دي خطيرة؟</h1>
+<p>لأنها تسمح للمهاجم:</p>
+<ul>
+<li>
+<p>اختراق الحساب</p>
+</li>
+<li>
+<p>بدون معرفة الباسورد</p>
+</li>
+<li>
+<p>فقط عبر reset mechanism</p>
+</li>
+</ul>
+<hr />
+<h1 id="_13">الحماية الصحيحة</h1>
+<p>المواقع المفروض تعمل:</p>
+<h3 id="1-token">1️⃣ Token قوي</h3>
+<p>مثال:</p>
+<p>3f9a8e12d4c7b5</p>
+<p>مش رقم بسيط.</p>
+<hr />
+<h3 id="2-expiration">2️⃣ Expiration سريع</h3>
+<p>مثلاً:</p>
+<p>token expires in 5 minutes</p>
+<hr />
+<h3 id="3-single-use">3️⃣ Single Use</h3>
+<p>بعد الاستخدام:</p>
+<p>token invalid</p>
+<hr />
+<h3 id="4-rate-limiting">4️⃣ Rate Limiting</h3>
+<p>منع brute force.</p>
+<hr />
+<h1 id="_14">حاجة مهمة جدًا في الامتحانات</h1>
+<p>غالبًا يسأل:</p>
+<p><strong>Why are predictable reset tokens dangerous?</strong></p>
+<p>الإجابة:</p>
+<p>لأنها تسمح للمهاجم بعمل:</p>
+<ul>
+<li>
+<p><strong>Brute Force</strong></p>
+</li>
+<li>
+<p><strong>Account takeover</strong></p>
+</li>
+</ul>
+<hr />
+<p>💡 نصيحة Pentester حقيقية:<br />
+كتير جدًا من الـ bug bounty reports في منصات زي <strong>HackerOne</strong> بتكون بسبب <strong>Password Reset Vulnerabilities</strong>.</p>
+<hr />
+<h1 id="http-basic-authentication">أولًا: يعني إيه HTTP Basic Authentication؟</h1>
+<p><strong>HTTP Basic Authentication</strong> هو طريقة بسيطة جدًا لحماية صفحة ويب.</p>
+<p>بدل ما يكون فيه form login عادي، المتصفح يظهر popup يطلب:</p>
+<ul>
+<li>
+<p>Username</p>
+</li>
+<li>
+<p>Password</p>
+</li>
+</ul>
+<p>زي اللي بيظهر لما تدخل على بعض <strong>الراوترات</strong>.</p>
+<p>مثال أجهزة تستخدمه:</p>
+<ul>
+<li>
+<p>Routers</p>
+</li>
+<li>
+<p>IP Cameras</p>
+</li>
+<li>
+<p>Network appliances</p>
+</li>
+</ul>
+<hr />
+<h1 id="basic-auth">ازاي Basic Auth بيشتغل؟</h1>
+<p>المتصفح يبعت request فيها Header اسمه:</p>
+<p>Authorization: Basic <credentials></p>
+<p>الـ credentials تكون:</p>
+<p>username:password</p>
+<p>لكن قبل الإرسال يتم تحويلها إلى <strong>Base64</strong>.</p>
+<p>مثال:</p>
+<p>admin:password123</p>
+<p>لو عملنا لها Base64 تصبح:</p>
+<p>YWRtaW46cGFzc3dvcmQxMjM=</p>
+<p>فالـ request يكون:</p>
+<p>Authorization: Basic YWRtaW46cGFzc3dvcmQxMjM=</p>
+<hr />
+<h1 id="_15">مشكلة كبيرة هنا ⚠️</h1>
+<p><strong>Base64 ليس Encryption</strong></p>
+<p>هو فقط <strong>Encoding</strong>.</p>
+<p>أي حد يقدر يفكّه بسهولة.</p>
+<hr />
+<h1 id="_16">مثال فك التشفير</h1>
+<p>لو عندك:</p>
+<p>YWRtaW46MTIzNDU2</p>
+<p>وفكيتها Base64 هتكون:</p>
+<p>admin:123456</p>
+<hr />
+<h1 id="basic-auth_1">ليه Basic Auth خطر؟</h1>
+<p>لو الموقع يستخدم:</p>
+<p>HTTP</p>
+<p>بدل</p>
+<p>HTTPS</p>
+<p>أي شخص يعمل <strong>Packet Sniffing</strong> يقدر يشوف الباسورد.</p>
+<hr />
+<h1 id="_17">الهجوم في اللاب</h1>
+<p>في اللاب بتاع<br />
+<strong>TryHackMe</strong></p>
+<p>انت بتعمل <strong>Brute Force</strong> على Basic Auth.</p>
+<hr />
+<h1 id="_18">الخطوات</h1>
+<h2 id="1-request">1️⃣ تسجيل request في</h2>
+<p><strong>Burp Suite</strong></p>
+<p>المتصفح يبعت request زي:</p>
+<p>GET /labs/basic_auth HTTP/1.1<br />
+Host: enum.thm<br />
+Authorization: Basic YWRtaW46MTIz</p>
+<hr />
+<h1 id="2-base64">2️⃣ فك Base64</h1>
+<p>في Burp تعمل decode:</p>
+<p>YWRtaW46MTIz</p>
+<p>تصبح:</p>
+<p>admin:123</p>
+<hr />
+<h1 id="3-request-intruder">3️⃣ إرسال request إلى Intruder</h1>
+<p>في Burp:</p>
+<p>Right Click → Send to Intruder</p>
+<hr />
+<h1 id="4-payload">4️⃣ تحديد مكان الـ Payload</h1>
+<p>تحدد:</p>
+<p>admin:123</p>
+<p>وتخليه:</p>
+<p>§admin:123§</p>
+<hr />
+<h1 id="5-wordlist">5️⃣ اختيار Wordlist</h1>
+<p>في اللاب يستخدم:</p>
+<p>500-worst-passwords.txt</p>
+<p>من repository:</p>
+<p><strong>SecLists</strong></p>
+<p>المسار في Kali:</p>
+<p>/usr/share/wordlists/SecLists/</p>
+<hr />
+<h1 id="6-payload-processing">6️⃣ Payload Processing</h1>
+<p>هنا أهم خطوة.</p>
+<p>لأن السيرفر يتوقع:</p>
+<p>username:password</p>
+<p>فنضيف Rule:</p>
+<p>admin:<password></p>
+<p>مثال:</p>
+<p>admin:123456<br />
+admin:password<br />
+admin:qwerty</p>
+<hr />
+<h1 id="7-base64">7️⃣ تحويلها Base64</h1>
+<p>Burp يعمل encode تلقائي.</p>
+<p>مثال:</p>
+<p>admin:123456</p>
+<p>تصبح:</p>
+<p>YWRtaW46MTIzNDU2</p>
+<hr />
+<h1 id="8">8️⃣ بدء الهجوم</h1>
+<p>تشغل:</p>
+<p>Start Attack</p>
+<p>وتراقب النتائج.</p>
+<hr />
+<h1 id="_19">كيف تعرف الباسورد الصحيح؟</h1>
+<p>في النتائج هتلاقي:</p>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>401</td>
+<td>Unauthorized</td>
+</tr>
+<tr>
+<td>200</td>
+<td>Success</td>
+</tr>
+</tbody>
+</table>
+<p>لو ظهر:</p>
+<p>Status 200</p>
+<p>يبقى لقيت الباسورد.</p>
+<hr />
+<h1 id="decode-base64">بعدها تعمل Decode للـ Base64</h1>
+<p>مثال:</p>
+<p>YWRtaW46cGFzc3dvcmQ=</p>
+<p>تصبح:</p>
+<p>admin:password</p>
+<p>وتستخدمها لتسجيل الدخول.</p>
+<hr />
+<h1 id="_20">نقطة مهمة جدًا في الامتحانات</h1>
+<p>يسألوا:</p>
+<p><strong>Why is HTTP Basic Authentication insecure?</strong></p>
+<p>الإجابة:</p>
+<p>1️⃣ يستخدم <strong>Base64 وليس Encryption</strong><br />
+2️⃣ يمكن اعتراضه عبر <strong>Man-in-the-Middle</strong> لو بدون HTTPS<br />
+3️⃣ سهل عمل <strong>Brute Force</strong></p>
+<hr />
+<h1 id="pentester">معلومة Pentester حقيقية</h1>
+<p>Basic Auth يظهر كثير في:</p>
+<ul>
+<li>
+<p>APIs القديمة</p>
+</li>
+<li>
+<p>Routers</p>
+</li>
+<li>
+<p>Admin Panels</p>
+</li>
+</ul>
+<p>وغالبًا يتم كسره باستخدام:</p>
+<ul>
+<li>
+<p><strong>Hydra</strong></p>
+</li>
+<li>
+<p><strong>Burp Suite</strong></p>
+</li>
+</ul>
+<hr />
+<h1 id="_21">شكل الأمر الأساسي</h1>
+<p>لو عندك:</p>
+<ul>
+<li>
+<p>username = <code>admin</code></p>
+</li>
+<li>
+<p>wordlist = <code>passwords.txt</code></p>
+</li>
+<li>
+<p>target = <code>http://enum.thm</code></p>
+</li>
+</ul>
+<p>الأمر يكون:</p>
+<p>hydra -l admin -P passwords.txt enum.thm http-get /</p>
+<hr />
+<h1 id="_22">شرح الأمر</h1>
+<table>
+<thead>
+<tr>
+<th>الجزء</th>
+<th>معناه</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hydra</td>
+<td>تشغيل الأداة</td>
+</tr>
+<tr>
+<td>-l admin</td>
+<td>username واحد</td>
+</tr>
+<tr>
+<td>-P passwords.txt</td>
+<td>wordlist للباسورد</td>
+</tr>
+<tr>
+<td>enum.thm</td>
+<td>الهدف</td>
+</tr>
+<tr>
+<td>http-get</td>
+<td>نوع الـ authentication</td>
+</tr>
+<tr>
+<td>/</td>
+<td>المسار</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="2-lab-tryhackme">2️⃣ الأمر المناسب للـ Lab في TryHackMe</h1>
+<p>غالبًا يكون:</p>
+<p>hydra -l admin -P /usr/share/wordlists/SecLists/Passwords/Common-Credentials/500-worst-passwords.txt enum.thm http-get /labs/basic_auth/</p>
+<p>الـ wordlist من repository:</p>
+<p><strong>SecLists</strong></p>
+<hr />
+<h1 id="3-output">3️⃣ مثال Output</h1>
+<p>Hydra هيبدأ يجرب passwords:</p>
+<p>[80][http-get] host: enum.thm   login: admin   password: password123</p>
+<p>ده معناه إن الباسورد الصحيح هو:</p>
+<p>password123</p>
+<hr />
+<h1 id="4-username-list">4️⃣ لو فيه Username List</h1>
+<p>بدل:</p>
+<p>admin</p>
+<p>لو عندك wordlist usernames:</p>
+<p>hydra -L users.txt -P passwords.txt enum.thm http-get /</p>
+<hr />
+<h1 id="5">5️⃣ تسريع الهجوم</h1>
+<p>Hydra سريع أصلاً لكن تقدر تزود السرعة:</p>
+<p>hydra -t 30 -l admin -P passwords.txt enum.thm http-get /</p>
+<table>
+<thead>
+<tr>
+<th>الخيار</th>
+<th>معناه</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-t 30</td>
+<td>عدد threads</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="6-https">6️⃣ لو الموقع HTTPS</h1>
+<p>تضيف:</p>
+<p>hydra -l admin -P passwords.txt https://enum.thm http-get /</p>
+<p>أو:</p>
+<p>hydra -l admin -P passwords.txt enum.thm https-get /</p>
+<hr />
+<h1 id="7-pentester">7️⃣ أهم نصيحة Pentester</h1>
+<p>قبل استخدام Hydra لازم تعرف:</p>
+<p>1️⃣ نوع authentication<br />
+2️⃣ المسار الصحيح<br />
+3️⃣ هل فيه rate limiting<br />
+4️⃣ هل فيه account lockout</p>
+<p>عشان كده غالبًا نستخدم:</p>
+<ul>
+<li>
+<p><strong>Burp Suite</strong> للـ recon</p>
+</li>
+<li>
+<p><strong>Hydra</strong> للهجوم السريع</p>
+</li>
+</ul>
+<hr />
+<h1 id="wayback-urls">أولًا: Wayback URLs</h1>
+<p>الفكرة هنا إنك ترجع <strong>لنسخ قديمة من الموقع</strong> وتشوف كان فيه إيه زمان.</p>
+<p>الموقع اللي بيعمل كده هو:</p>
+<p><strong>Internet Archive</strong></p>
+<p>ومن خلال خدمة اسمها:</p>
+<p><strong>Wayback Machine</strong></p>
+<p>الموقع ده بيحفظ snapshots للمواقع من سنين.</p>
+<hr />
+<h2 id="pentesting">ليه ده مفيد في Pentesting؟</h2>
+<p>لأن النسخ القديمة ممكن تكشف:</p>
+<ul>
+<li>
+<p>صفحات محذوفة</p>
+</li>
+<li>
+<p>APIs قديمة</p>
+</li>
+<li>
+<p>ملفات backup</p>
+</li>
+<li>
+<p>Admin panels</p>
+</li>
+<li>
+<p>parameters</p>
+</li>
+</ul>
+<p>مثال:</p>
+<p>ممكن تلاقي URL قديم زي:</p>
+<p>example.com/admin_old</p>
+<p>حتى لو الصفحة اختفت من الموقع الحالي…<br />
+ممكن <strong>لسه موجودة على السيرفر</strong>.</p>
+<hr />
+<h1 id="_23">استخراج الروابط تلقائيًا</h1>
+<p>بدل ما تدور يدويًا، تستخدم tool اسمها:</p>
+<p><strong>waybackurls</strong></p>
+<p>الأداة دي تعمل:</p>
+<p>domain → استخراج كل الروابط المؤرشفة</p>
+<hr />
+<h2 id="_24">تثبيت الأداة</h2>
+<p>git clone https://github.com/tomnomnom/waybackurls<br />
+cd waybackurls<br />
+go build</p>
+<hr />
+<h2 id="_25">الاستخدام</h2>
+<p>مثلاً:</p>
+<p>./waybackurls tryhackme.com</p>
+<p>الناتج يكون:</p>
+<p>https://tryhackme.com/.well-known/security.txt<br />
+https://tryhackme.com/login<br />
+https://tryhackme.com/reset_password<br />
+https://tryhackme.com/admin</p>
+<p>كل دي URLs كانت موجودة في وقت ما.</p>
+<hr />
+<h2 id="pentester_1">Pentester بيعمل إيه بعدها؟</h2>
+<p>يجرب:</p>
+<ul>
+<li>
+<p>فتح الروابط</p>
+</li>
+<li>
+<p>يعمل عليها fuzzing</p>
+</li>
+<li>
+<p>يبحث عن parameters</p>
+</li>
+</ul>
+<p>مثال:</p>
+<p>page.php?id=1</p>
+<p>ده ممكن يقود إلى:</p>
+<ul>
+<li>
+<p><strong>SQL Injection</strong></p>
+</li>
+<li>
+<p><strong>Cross-Site Scripting</strong></p>
+</li>
+</ul>
+<hr />
+<h1 id="google-dorks">ثانيًا: Google Dorks</h1>
+<p>دي طريقة <strong>OSINT قوية جدًا</strong> باستخدام Google.</p>
+<p>الفكرة:</p>
+<p>تستخدم أوامر خاصة في البحث للوصول لملفات مخفية.</p>
+<hr />
+<h2 id="1-admin-panels">مثال 1 — البحث عن admin panels</h2>
+<p>site:example.com inurl:admin</p>
+<p>المعنى:</p>
+<ul>
+<li>
+<p>ابحث فقط داخل الموقع</p>
+</li>
+<li>
+<p>عن أي رابط فيه كلمة admin</p>
+</li>
+</ul>
+<hr />
+<h2 id="2_1">مثال 2 — البحث عن كلمات مرور</h2>
+<p>filetype:log "password" site:example.com</p>
+<p>ده يبحث عن:</p>
+<ul>
+<li>
+<p>ملفات log</p>
+</li>
+<li>
+<p>فيها كلمة password</p>
+</li>
+</ul>
+<p>أحيانًا يطلع:</p>
+<p>admin password = 123456</p>
+<p>حصلت كتير في Bug Bounty 😅</p>
+<hr />
+<h2 id="3-backup-folders">مثال 3 — backup folders</h2>
+<p>intitle:"index of" "backup" site:example.com</p>
+<p>ده ممكن يطلع directory listing زي:</p>
+<p>/backup/<br />
+/database/<br />
+/old_site/</p>
+<hr />
+<h1 id="google-dorks-pentesters">أمثلة Google Dorks يستخدمها Pentesters</h1>
+<h3 id="config-files">البحث عن config files</h3>
+<p>site:example.com ext:env</p>
+<hr />
+<h3 id="database-dumps">البحث عن database dumps</h3>
+<p>site:example.com ext:sql</p>
+<hr />
+<h3 id="login-pages">البحث عن login pages</h3>
+<p>site:example.com inurl:login</p>
+<hr />
+<h1 id="google-dorks_1">ليه Google Dorks قوية؟</h1>
+<p>لأن Google يكون <strong>مؤرشف ملفات غصب عن الموقع</strong>.</p>
+<p>يعني ممكن تلاقي:</p>
+<p>backup.zip<br />
+database.sql<br />
+config.php</p>
+<p>كلها متاحة للتحميل.</p>
+<hr />
+<h1 id="_26">الأدوات المرتبطة بالموضوع</h1>
+<p>Pentesters غالبًا يستخدموا:</p>
+<ul>
+<li>
+<p><strong>waybackurls</strong></p>
+</li>
+<li>
+<p><strong>Burp Suite</strong></p>
+</li>
+<li>
+<p><strong>ffuf</strong></p>
+</li>
+</ul>
+<p>عشان يكتشفوا:</p>
+<ul>
+<li>
+<p>endpoints</p>
+</li>
+<li>
+<p>parameters</p>
+</li>
+<li>
+<p>hidden directories</p>
+</li>
+</ul>
+<hr />
+<h1 id="web-recon">ترتيب الخطوات الحقيقي في Web Recon</h1>
+<p>الـ Pentester يعمل كده:</p>
+<p>1️⃣ Google Dorks<br />
+2️⃣ Wayback URLs<br />
+3️⃣ Directory fuzzing<br />
+4️⃣ Parameter discovery<br />
+5️⃣ Vulnerability testing</p>
+<hr />
+<p>💡 نصيحة حقيقية من Bug Bounty:</p>
+<p>أكتر من <strong>30٪ من الثغرات</strong> بيتم اكتشافها من <strong>روابط قديمة في Wayback Machine</strong>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u062a\u0645 \u0627\u0644\u0646\u0633\u062e \u0627\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "clipboard.copy": "\u0646\u0633\u062e \u0625\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "search.result.more.one": "\u0623\u0643\u062b\u0631 \u0645\u0646 1 \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.more.other": "\u0623\u0643\u062b\u0631 \u0645\u0646 # \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.none": "\u0644\u0627 \u062a\u0648\u062c\u062f \u0646\u062a\u0627\u0626\u062c", "search.result.one": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b \u0645\u0633\u062a\u0646\u062f \u0648\u0627\u062d\u062f", "search.result.other": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b # \u0645\u0633\u062a\u0646\u062f\u0627\u062a", "search.result.placeholder": "\u0627\u0643\u062a\u0628 \u0644\u0628\u062f\u0621 \u0627\u0644\u0628\u062d\u062b", "search.result.term.missing": "\u0645\u0641\u0642\u0648\u062f", "select.version": "\u0625\u062e\u062a\u0631 \u0627\u0644\u0625\u0635\u062f\u0627\u0631"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
