@@ -1,0 +1,1487 @@
+
+<!doctype html>
+<html lang="ar" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../11-XML%20injection%20%28XXE%29/">
+      
+      
+        <link rel="next" href="../2-EWAPTX%20%28part%202%29/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>12 Path traversal - eWAPTX Zero-Day Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto Mono";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/hacker_style.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="rtl" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="lime">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1-path-traversal" class="md-skip">
+          انتقل إلى المحتوى
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="عنوان العارضة">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-header__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            eWAPTX Zero-Day Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              12 Path traversal
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="بحث" placeholder="بحث" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="إبحث">
+        
+        <button type="reset" class="md-search__icon md-icon" title="مسح كلي" aria-label="مسح كلي" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            بدء البحث
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="تصفح" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="eWAPTX Zero-Day Notes" class="md-nav__button md-logo" aria-label="eWAPTX Zero-Day Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    eWAPTX Zero-Day Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1-EWAPTX/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1 EWAPTX
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-OS%20Command%20Injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 OS Command Injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11-XML%20injection%20%28XXE%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 XML injection (XXE)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Path traversal
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 Path traversal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="جدول المحتويات">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      جدول المحتويات
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-path-traversal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1- يعني ايه path traversal :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        برمجياً بقى الموضوع بيمشي إزاي؟
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="برمجياً بقى الموضوع بيمشي إزاي؟">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2-reading-arbitrary-files-via-path-traversal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2- Reading arbitrary files via path traversal :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        السيناريو الطبيعي (كيف يعمل التطبيق)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الهجوم (كيف يحدث الـ Exploit)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        كيف يفهم نظام التشغيل هذا المسار؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ماذا لو كان السيرفر يعمل بنظام Windows؟
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ماذا لو كان السيرفر يعمل بنظام Windows؟">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-obstacles-to-exploiting-path-traversal-vulnerabilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common obstacles to exploiting path traversal vulnerabilities :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#absolute-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        يعني إيه Absolute Path؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ليه الطريقة دي بتنجح؟
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ليه الطريقة دي بتنجح؟">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nested-traversal-sequences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nested Traversal Sequences :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي المبرمج بيفكر؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pentesters-exploit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي إحنا بنفكر كـ Pentesters؟ (الـ Exploit)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        بالنسبة لويندوز؟
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="بالنسبة لويندوز؟">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sequences-stripped-with-superfluous-url-decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sequences stripped with superfluous URL-decode :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#url-encoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ١. الـ URL Encoding العادي
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#double-url-encoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ٢. الـ Double URL Encoding (الضربة المزدوجة)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#non-standard-encodings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ٣. التشفير غير القياسي (Non-standard encodings)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#burp-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الأتمتة باستخدام Burp Suite 🛠️
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="الأتمتة باستخدام Burp Suite 🛠️">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#validation-of-start-of-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        validation of start of path :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي بنضحك على الفلتر ده؟
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="إزاي بنضحك على الفلتر ده؟">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#validation-of-file-extension-with-null-byte-bypass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        validation of file extension with null byte bypass :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#null-byte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        يعني إيه Null Byte؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#c" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        أصل المشكلة (مشكلة لغة C)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي الثغرة دي بتحصل؟ (اختلاف اللغات)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2-EWAPTX%20%28part%202%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2 EWAPTX (part 2)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3-Enumeration%20%26%20Brute%20force/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication Enumeration — الفكرة ببساطة
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4-JWT%20port_swigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ليه JWT vulnerabilities خطيرة جداً ؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5-Oauth%20portswigger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5 Oauth portswigger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../6-SQL%20INJECTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6 SQL INJECTION
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../7-Blind%20Sql%20Injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    أولاً: ما هو Blind SQL Injection؟
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../8-NOSQL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📁 الدليل الشامل لأساسيات MongoDB واختبار اختراق NoSQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../9-NoSQL%20injection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9 NoSQL injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="جدول المحتويات">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      جدول المحتويات
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-path-traversal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1- يعني ايه path traversal :
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        برمجياً بقى الموضوع بيمشي إزاي؟
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="برمجياً بقى الموضوع بيمشي إزاي؟">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2-reading-arbitrary-files-via-path-traversal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2- Reading arbitrary files via path traversal :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        السيناريو الطبيعي (كيف يعمل التطبيق)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exploit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الهجوم (كيف يحدث الـ Exploit)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        كيف يفهم نظام التشغيل هذا المسار؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ماذا لو كان السيرفر يعمل بنظام Windows؟
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ماذا لو كان السيرفر يعمل بنظام Windows؟">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-obstacles-to-exploiting-path-traversal-vulnerabilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common obstacles to exploiting path traversal vulnerabilities :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#absolute-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        يعني إيه Absolute Path؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ليه الطريقة دي بتنجح؟
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ليه الطريقة دي بتنجح؟">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nested-traversal-sequences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nested Traversal Sequences :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي المبرمج بيفكر؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pentesters-exploit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي إحنا بنفكر كـ Pentesters؟ (الـ Exploit)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        بالنسبة لويندوز؟
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="بالنسبة لويندوز؟">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sequences-stripped-with-superfluous-url-decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sequences stripped with superfluous URL-decode :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#url-encoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ١. الـ URL Encoding العادي
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#double-url-encoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ٢. الـ Double URL Encoding (الضربة المزدوجة)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#non-standard-encodings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ٣. التشفير غير القياسي (Non-standard encodings)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#burp-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        الأتمتة باستخدام Burp Suite 🛠️
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="الأتمتة باستخدام Burp Suite 🛠️">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#validation-of-start-of-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        validation of start of path :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي بنضحك على الفلتر ده؟
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="إزاي بنضحك على الفلتر ده؟">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#validation-of-file-extension-with-null-byte-bypass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        validation of file extension with null byte bypass :
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#null-byte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        يعني إيه Null Byte؟
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#c" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        أصل المشكلة (مشكلة لغة C)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        إزاي الثغرة دي بتحصل؟ (اختلاف اللغات)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>12 Path traversal</h1>
+
+<h3 id="1-path-traversal">1- يعني ايه path traversal :</h3>
+<p>تخيل إن سيرفر الويب ده عبارة عن مبنى، والتطبيق اللي شغال عليه هو موظف الأرشيف. الموظف ده واخد تعليمات إنه يسلمك أي ورقة تطلبها من <strong>درج الصور</strong> بس. الطبيعي إنك تقوله "هاتلي الصورة اللي اسمها كذا"، فيفتح الدرج ويجيبها.</p>
+<p>بس الموظف ده (اللي هو الكود بتاع التطبيق) بيثق في كلامك زيادة عن اللزوم ومبياخدش باله إنت بتقول إيه بالظبط. فبدل ما تطلب صورة، بتقوله: "اخرج من درج الصور، ارجع خطوتين لورا في الطرقة، وادخل مكتب المدير وهاتلي ملف المرتبات". الموظف الساذج هيمشي ورا كلامك وينفذ ده حرفياً!</p>
+<h2 id="_1">برمجياً بقى الموضوع بيمشي إزاي؟</h2>
+<p>التطبيق بيكون متبرمج إنه يقرأ الملفات من مسار أساسي (Base Directory) مقفول عليه، مثلاً: <code>/var/www/html/images/</code></p>
+<p>المشكلة (أو الثغرة) بتحصل لما المبرمج ياخد الـ Input بتاعك (اسم الملف اللي إنت عاوزه) ويلزقه في المسار ده من غير ما يعمل عليه أي فحص أو فلترة (Validation).</p>
+<p>زي ما إنت عارف في أنظمة التشغيل، الرمز <code>../</code> (أو Dot-Dot-Slash) معناه "ارجع فولدر واحد لورا" (Go up one directory).</p>
+<ul>
+<li>
+<p><strong>الاستخدام الطبيعي:</strong> إنت بتطلب <code>avatar.png</code>، فالسيرفر بيقرأ المسار كدة: <code>/var/www/html/images/avatar.png</code> (وهنا بيجيب الصورة عادي).</p>
+</li>
+<li>
+<p><strong>الاستخدام الخبيث (Path Traversal):</strong> إنت بتكتب في الـ Input بتاعك <code>../../../etc/passwd</code>. السيرفر بياخد الـ Input يلزقه ويبقى المسار كدة: <code>/var/www/html/images/../../../etc/passwd</code></p>
+</li>
+</ul>
+<p>السيرفر هينفذ الـ <code>../</code> ثلاث مرات، ويرجع لورا لحد ما يوصل لأول السيرفر خالص اللي هو الـ Root Directory (<code>/</code>)، وبعدين يدخل على مجلد <code>etc</code> ويجيبلك ملف <code>passwd</code> (اللي فيه بيانات تخص النظام).</p>
+<p><strong>الخلاصة:</strong> الثغرة دي بتحصل بسبب انعدام الثقة (Improper Input Validation)، وبتسمحلك تكسر السجن (الفولدر) اللي التطبيق حاطك فيه، وتتفسح في سيرفر الضحية وتقرأ ملفات حساسة المفروض إنك متشوفهاش (زي الأكواد البرمجية، كلمات السر، أو ملفات الـ Configuration).</p>
+<hr />
+<h3 id="2-reading-arbitrary-files-via-path-traversal">2- Reading arbitrary files via path traversal :</h3>
+<h2 id="_2">السيناريو الطبيعي (كيف يعمل التطبيق)</h2>
+<p>تخيل إن عندنا موقع تجارة إلكترونية (Shopping App) بيعرض صور للمنتجات. في كود الـ HTML، الموقع بيطلب الصورة بالشكل ده: <code>&lt;img src="/loadImage?filename=218.png"&gt;</code></p>
+<p>هنا الموقع بيبعت طلب (Request) لصفحة اسمها <code>loadImage</code> وبيديها parameter اسمه <code>filename</code> قيمته <code>218.png</code>. السيرفر متبرمج إنه يحتفظ بكل الصور جوه فولدر ثابت (Base Directory) المسار بتاعه هو: <code>/var/www/images/</code>.</p>
+<p>عشان السيرفر يرجعلك الصورة، بياخد الكلمة اللي إنت كتبتها في الـ <code>filename</code> ويلزقها في المسار الأساسي، فبيقرأ الملف من هنا: <code>/var/www/images/218.png</code></p>
+<h2 id="exploit">الهجوم (كيف يحدث الـ Exploit)</h2>
+<p>بما إن التطبيق ده مش بيعمل أي نوع من الفلترة أو الحماية (No defenses)، المهاجم يقدر يتلاعب بقيمة الـ <code>filename</code>. بدل ما يطلب صورة، هيبعت الـ Request بالشكل ده: <code>[https://insecure-website.com/loadImage?filename=../../../etc/passwd](https://insecure-website.com/loadImage?filename=../../../etc/passwd)</code></p>
+<p>بناءً على البرمجة بتاعة التطبيق، السيرفر هياخد الـ Payload ده ويلزقه في المسار الأساسي زي ما هو، فهيبقى المسار النهائي اللي السيرفر بيحاول يقرأه كده: <code>/var/www/images/../../../etc/passwd</code></p>
+<h2 id="_3">كيف يفهم نظام التشغيل هذا المسار؟</h2>
+<p>في أنظمة التشغيل، الرمز <code>../</code> بيُعتبر أمر سليم (Valid sequence) معناه "ارجع فولدر واحد لورا" (Step up one level). بما إن المهاجم كتب <code>../</code> تلات مرات ورا بعض، السيرفر هينفذها كالتالي:</p>
+<ol>
+<li>
+<p>أول <code>../</code> هترجعه من فولدر <code>images</code> إلى فولدر <code>www</code>.</p>
+</li>
+<li>
+<p>تاني <code>../</code> هترجعه من <code>www</code> إلى <code>var</code>.</p>
+</li>
+<li>
+<p>تالت <code>../</code> هترجعه من <code>var</code> إلى الـ <strong>Root Directory</strong> اللي هو الجدر الأساسي لنظام التشغيل (<code>/</code>).</p>
+</li>
+</ol>
+<p>من الـ Root ده، السيرفر هيدخل على فولدر اسمه <code>etc</code> ويقرأ ملف اسمه <code>passwd</code>. في أنظمة <strong>لينكس ويونيكس (Unix-based)</strong>، ملف الـ <code>/etc/passwd</code> ده ملف قياسي ومهم جداً لأنه بيحتوي على تفاصيل كل المستخدمين (Users) اللي متسجلين على السيرفر. وبنفس الطريقة دي، المهاجم يقدر يوصل لأي ملف تاني في السيرفر.</p>
+<h2 id="windows">ماذا لو كان السيرفر يعمل بنظام Windows؟</h2>
+<p>في أنظمة لينكس بنستخدم الـ Forward Slash (<code>/</code>). لكن الجميل في <strong>ويندوز</strong> إنه بيفهم الطريقتين: الـ <code>../</code> و كمان الـ <code>..\</code> (Backslash). عشان كده، لو بتعمل Pen-Test على سيرفر ويندوز، الهجوم هيكون مشابه جداً بس هتستهدف ملفات خاصة بويندوز، والـ Payload هيكون كده: <code>[https://insecure-website.com/loadImage?filename=](https://insecure-website.com/loadImage?filename=)..\..\..\windows\win.ini</code></p>
+<blockquote>
+<p><strong>معلومة لك كـ Penteser:</strong> ملف الـ <code>win.ini</code> في ويندوز، وملف الـ <code>/etc/passwd</code> في لينكس، هما أكتر ملفين بنستخدمهم كـ Proof of Concept (PoC) عشان نثبت للعميل إن الثغرة موجودة فعلاً ونجحنا نقرأ ملفات النظام.</p>
+</blockquote>
+<hr />
+<h3 id="common-obstacles-to-exploiting-path-traversal-vulnerabilities">Common obstacles to exploiting path traversal vulnerabilities :</h3>
+<p>المبرمج هنا بياخد باله إن فيه هجوم اسمه Path Traversal بيعتمد على الرجوع لورا، فبيعمل فلتر (Blacklist) وبيقول للتطبيق: "لو لقيت اليوزر كاتب <code>../</code> أو <code>..\</code> في الـ Input، امسحهم أو ارفض الطلب (Block) خالص".</p>
+<p>هنا إنت كـ Pentester مش محتاج تستخدم الـ <code>../</code> أصلاً عشان ترجع لورا. إنت بتلجأ لاستخدام <strong>المسار المطلق (Absolute Path)</strong>.</p>
+<h2 id="absolute-path">يعني إيه Absolute Path؟</h2>
+<p>يعني بدل ما تقول للسيرفر "ارجع من الفولدر اللي إنت فيه خطوتين لورا وبعدين ادخل على ملف كذا" (Relative Path)، إنت بتديله العنوان الكامل للملف بداية من الجدر الأساسي (Root) بتاع السيرفر.</p>
+<p><strong>المثال العملي:</strong> بدل ما تبعت الـ Payload بالشكل ده (والسيرفر هيعمله Block): <code>filename=../../../etc/passwd</code></p>
+<p>هتبعته بالشكل ده: <code>filename=/etc/passwd</code></p>
+<h2 id="_4">ليه الطريقة دي بتنجح؟</h2>
+<p>في بعض الدوال (Functions) الخاصة بالتعامل مع الملفات في لغات البرمجة والـ APIs بتاعة نظام التشغيل، لما بتستقبل مسار بيبدأ بعلامة <code>/</code> (اللي بتعبر عن الـ Root)، بتفهمه فوراً إنه <strong>مسار مطلق</strong>.</p>
+<p>النتيجة إن الدالة دي <strong>بتتجاهل تماماً</strong> الـ Base Directory اللي المبرمج كان حاطه في الكود (زي <code>/var/www/images/</code>)، وبتعتبر إن المسار اللي إنت دخلته هو المسار الوحيد والنهائي اللي المفروض تقرأ منه.</p>
+<p>بكده، إنت قدرت توصل للملف الحساس من غير ما تكتب ولا <code>../</code> وتخطيت الفلتر اللي المبرمج كان معتمد عليه كلياً.</p>
+<hr />
+<h3 id="nested-traversal-sequences">Nested Traversal Sequences :</h3>
+<p>دي بتنجح لما المبرمج يحاول ينظف الـ Input بتاعه باستخدام طريقة الفلترة العادية (معادلة مسح بسيطة)، بس بيعملها <strong>مرة واحدة بس (Non-recursive stripping)</strong>.</p>
+<h2 id="_5">إزاي المبرمج بيفكر؟</h2>
+<p>المبرمج بيكتب كود بيمشي على الكلمة اللي إنت دخلتها، وأول ما يشوف الـ <code>../</code> يقوم ماسحها (يعني بيبدلها بنص فاضي <code>""</code>). هو فاكر إن بكده طالما مسح الـ <code>../</code> فالسيرفر في أمان.</p>
+<h2 id="pentesters-exploit">إزاي إحنا بنفكر كـ Pentesters؟ (الـ Exploit)</h2>
+<p>إحنا بنستغل إن عملية المسح دي بتحصل <strong>مرة واحدة بس</strong> على الـ Input. فبدل ما نكتب <code>../</code> العادية، بنلغم الـ Input ونكتبه كدة: <code>....//</code></p>
+<p>تعال نفصص الـ Payload ده (<code>....//</code>) ونشوف إيه اللي جواه: هو عبارة عن نقطتين (<code>..</code>)، بعدين جوة منهم <code>../</code> (دي المتداخلة أو الـ Nested)، وفي الآخر علامة slash (<code>/</code>).</p>
+<p>لما الـ Filter بتاع المبرمج يشتغل، هيلمح الـ <code>../</code> اللي في النص دي ويقوم ماسحها. <strong>شوف بقى السحر اللي هيحصل لما يمسحها:</strong></p>
+<pre><code>النص الأصلي:     .  .  [ .  .  / ]  /
+بعد المسح:       .  .               /
+النتيجة النهائية: .  .  /
+</code></pre>
+<p>النص اللي اتبقى ورجع للتطبيق عشان ينفذه هو <code>../</code> سليم ١٠٠٪! يعني الفلتر بإيده هو اللي ركب الـ Payload بتاعنا ورجعه لأصله.</p>
+<h2 id="_6">بالنسبة لويندوز؟</h2>
+<p>نفس الفكرة بالظبط بنطبقها على أنظمة ويندوز، بس بنلعب بالـ Backslash، فبنكتب الـ Payload كدة: <code>....\/</code></p>
+<p>لما الفلتر يمسح الـ <code>..\/</code> اللي في النص، هيتبقى عندك <code>..\</code> سليم يرجعك خطوة لورا في فولدرات الويندوز.</p>
+<blockquote>
+<p><strong>قاعدة ذهبية لك كـ Pentester:</strong> طول ما الـ Filter بيعمل <code>strip</code> (مسح) مش <code>block</code> (رفض كامل للطلب)، الـ Nested payloads دي بتكون حل عبقري لتخطي الحماية.</p>
+</blockquote>
+<hr />
+<h3 id="sequences-stripped-with-superfluous-url-decode">sequences stripped with superfluous URL-decode :</h3>
+<p>هنا بقى إحنا بندخل في مستوى أعلى شوية من اللعب، لأننا مش بنتعامل مع فلتر المبرمج بس، إحنا أحياناً بنتعامل مع <strong>الـ Web Server</strong> نفسه (زي Apache أو Nginx أو Tomcat) أو بنتعامل مع ميكانيزم الـ Request نفسه زي الـ <code>multipart/form-data</code> (اللي بنستخدمه واحنا بنرفع ملفات).</p>
+<p>السيرفرات دي أحياناً بتكون ذكية كفاية إنها تلقط الـ <code>../</code> وتمسحها قبل ما الـ Request يوصل للتطبيق (Application Layer) أصلاً. وعشان نتخطى العقبة دي، بنلجأ للـ <strong>Encoding (التشفير/الترميز)</strong>.</p>
+<p>خلينا نفصص التكنيكات دي:</p>
+<h2 id="url-encoding">١. الـ URL Encoding العادي</h2>
+<p>السيرفر بيفهم الحروف والأرقام عادي، بس لما بنحول الـ <code>../</code> للغة الـ URL (اللي هي Hexadecimal مسبوقة بعلامة <code>%</code>)، أحياناً السيرفر بيعديها من غير ما يفهم إن دي Traversal Sequence، ولما توصل للباك إند، التطبيق يترجمها وينفذها.</p>
+<ul>
+<li>
+<p>النقطة (<code>.</code>) = <code>%2e</code></p>
+</li>
+<li>
+<p>الـ Slash (<code>/</code>) = <code>%2f</code></p>
+</li>
+<li>
+<p><strong>الـ Payload النهائي:</strong> <code>%2e%2e%2f</code> (بدل <code>../</code>)</p>
+</li>
+</ul>
+<h2 id="double-url-encoding">٢. الـ Double URL Encoding (الضربة المزدوجة)</h2>
+<p>لو السيرفر ذكي شوية، وبيعمل Decode (فك تشفير) للـ Request قبل ما يفلتره، الـ URL Encoding العادي هيتكشف. هنا بنستخدم الـ <strong>Double Encoding</strong>. الفكرة إننا بنعمل تشفير للرمز <code>%</code> نفسه (اللي هو بيساوي <code>%25</code>)، وبنسيب باقي الحروف زي ما هي.</p>
+<ul>
+<li>
+<p>الـ Payload المشفر مرة واحدة: <code>%2e%2e%2f</code></p>
+</li>
+<li>
+<p>لما نشفر علامة الـ <code>%</code>: هتبقى <code>%25</code></p>
+</li>
+<li>
+<p><strong>الـ Payload النهائي:</strong> <code>%252e%252e%252f</code></p>
+</li>
+</ul>
+<p><strong>إيه اللي بيحصل في الكواليس؟</strong></p>
+<ol>
+<li>
+<p>الـ WAF أو السيرفر بيستقبل <code>%252e%252e%252f</code>، بيعملها Decode مرة واحدة فترجع <code>%2e%2e%2f</code>.</p>
+</li>
+<li>
+<p>السيرفر بيبص عليها ميلاقيش <code>../</code>، فيقول "تمام، مفيش خطر" ويبعتها للتطبيق.</p>
+</li>
+<li>
+<p>التطبيق بياخد الـ <code>%2e%2e%2f</code> ويعملها Decode للمرة التانية فترجع لأصلها <code>../</code> والثغرة تتنفذ!</p>
+</li>
+</ol>
+<h2 id="non-standard-encodings">٣. التشفير غير القياسي (Non-standard encodings)</h2>
+<p>دي حتة Advanced شوية بتعتمد على أخطاء في طريقة قراءة السيرفرات لليونيكود (Unicode) أو ما يسمى بالـ Overlong UTF-8. أنظمة معينة زي إصدارات قديمة من Tomcat كانت بتقع في الثغرات دي. مثال عليها إنك تبعت السلاش (<code>/</code>) بأشكال غريبة السيرفر مش متوقعها بس الباك إند بيترجمها لسلاش عادي، زي:</p>
+<ul>
+<li>
+<p><code>..%c0%af</code></p>
+</li>
+<li>
+<p><code>..%ef%bc%8f</code></p>
+</li>
+</ul>
+<h2 id="burp-suite">الأتمتة باستخدام Burp Suite 🛠️</h2>
+<p>طبعاً كـ Web Penetration Tester مش منطقي إنك تقعد تجرب كل التوليفات دي والتشفيرات دي يدوي (Manual). لو بتستخدم <strong>Burp Suite Professional</strong>، أداة الـ <strong>Intruder</strong> مريحة جداً في الحتة دي.</p>
+<p>لما تيجي تعمل Fuzzing على الـ Parameter، هتلاقي جوه الـ Payloads قائمة جاهزة اسمها: <code>Fuzzing - path traversal</code></p>
+<p>القائمة دي متلغمة بكل أشكال الـ Encoding العادية والمزدوجة والـ Non-standard لكل أنظمة التشغيل، بتوفر عليك وقت وتخليك تركز في تحليل الـ Responses بدل ما تضيع وقتك في كتابة الـ Payloads!</p>
+<hr />
+<h3 id="validation-of-start-of-path">validation of start of path :</h3>
+<p>في الحالة دي، المبرمج قرر يستخدم طريقة بنسميها <strong>Prefix Validation</strong> (التحقق من البداية). الكود بتاعه بيستخدم دالة برمجية (زي <code>startsWith()</code> في الجافا مثلاً) وبيقول للتطبيق: "لو الـ Input اللي اليوزر كاتبه بيبدأ بـ <code>/var/www/images</code>، إذن ده طلب شرعي وسيبه يمر، لو غير كده اعمله Block".</p>
+<h2 id="_7">إزاي بنضحك على الفلتر ده؟</h2>
+<p>القاعدة هنا: <strong>إدي الفلتر اللي هو عاوزه عشان يعديك، وبعدين نفذ هجومك!</strong></p>
+<p>لما بتبعت الـ Payload بالشكل ده: <code>filename=/var/www/images/../../../etc/passwd</code></p>
+<p>العملية بتتم على مرحلتين، وكل مرحلة بتفهم النص بطريقة مختلفة:</p>
+<ol>
+<li>
+<p><strong>على مستوى التطبيق (الـ Filter):</strong> التطبيق بيبص على أول الكلمة، بيلاقيها بتبدأ بـ <code>/var/www/images/</code>. الفلتر بيكون سعيد جداً وبيقول "الطلب ده أمن ١٠٠٪" وبيسمح بمروره لنظام التشغيل.</p>
+</li>
+<li>
+<p><strong>على مستوى نظام التشغيل (OS):</strong> نظام التشغيل بياخد المسار كامل عشان يفتحه. بالنسبة لنظام التشغيل، المسار ده معناه: "ادخل جوه <code>var</code>، وبعدين <code>www</code>، وبعدين <code>images</code>، وبعدين <strong>ارجع ٣ خطوات لورا</strong> (فترجع للـ Root <code>/</code>)، وبعدين ادخل على فولدر <code>etc</code> واقرأ ملف <code>passwd</code>".</p>
+</li>
+</ol>
+<blockquote>
+<p><strong>الخلاصة:</strong> الثغرة دي بتنجح بسبب الاختلاف بين طريقة <strong>التطبيق</strong> في قراءة الـ String (بياخد حتة منه بس)، وطريقة <strong>نظام التشغيل</strong> في تنفيذ المسار (بينفذ المسار بالكامل بما فيه أوامر الرجوع للخلف).</p>
+</blockquote>
+<hr />
+<h3 id="validation-of-file-extension-with-null-byte-bypass">validation of file extension with null byte bypass :</h3>
+<p>دي واحدة من أمتع تقنيات الـ Bypass، ورغم إنها كانت مشهورة جداً في الأنظمة القديمة (زي إصدارات PHP القديمة)، إلا إن فهمك ليها بيوريك إزاي المبرمجين والهاكرز بيفكروا في الـ "Under the hood" أو ما وراء الكواليس.</p>
+<p>عشان تفهم الـ <strong>Null Byte (بايت الصفر)</strong>، لازم ننزل مع بعض لمستوى أنظمة التشغيل ولغة الـ <strong>C</strong> اللي مبني عليها أغلب الأنظمة دي.</p>
+<h2 id="null-byte">يعني إيه Null Byte؟</h2>
+<p>الـ Null Byte هو بايت قيمته صفر (<code>0x00</code> في الـ Hexadecimal)، ولما بنكتبه في المتصفح أو في الـ URL بنعمله Encoding بالشكل ده: <code>%00</code>.</p>
+<h2 id="c">أصل المشكلة (مشكلة لغة C)</h2>
+<p>في لغات البرمجة المنخفضة المستوى (Low-level) زي C و C++، مفيش حاجة جاهزة اسمها "نص" (String) زي الموجودة في Python أو Java. النص هناك عبارة عن مصفوفة من الحروف (Array of Characters) مرصوصة جنب بعض.</p>
+<p>الكمبيوتر عشان يقرأ النص ده، محتاج يعرف <strong>النص بيخلص فين</strong>. هنا ابتكروا فكرة الـ <strong>Null Terminator</strong>. وهو عبارة عن Null Byte بيتحط دايماً في آخر النص عشان يقول لنظام التشغيل: "ستوب، النص خلص هنا، متقراش أي حاجة بعد كده".</p>
+<h2 id="_8">إزاي الثغرة دي بتحصل؟ (اختلاف اللغات)</h2>
+<p>الثغرة (الـ Bypass) بتحصل بسبب سوء تفاهم بين لغة البرمجة اللي التطبيق مكتوب بيها (زي PHP أو Java)، وبين نظام التشغيل اللي بينفذ الأوامر الفعيلة (اللي مكتوب بـ C).</p>
+<p>تعال نمشي مع الـ Payload بتاعك خطوة خطوة: <code>filename=../../../etc/passwd%00.png</code></p>
+<p><strong>1. مرحلة الفلترة (مستوى التطبيق):</strong> التطبيق (PHP مثلاً) بيعتبر النص ده كله بلوك واحد. الفلتر بيبص على آخر النص بيلاقيه بينتهي بـ <code>.png</code>. الفلتر بيكون سعيد جداً وبيقول: "عظيم، اليوزر طالب صورة وامتدادها سليم، سمحوا للطلب ده يمر".</p>
+<p><strong>2. مرحلة التنفيذ (مستوى نظام التشغيل):</strong> التطبيق بياخد المسار ده ويبعته لنظام التشغيل عشان يفتح الملف. دوال نظام التشغيل (المكتوبة بـ C) بتبدأ تقرأ المسار حرف حرف من الشمال لليمين. أول ما توصل عند الـ <code>%00</code>، نظام التشغيل بيترجمها لـ Null Byte، وبيفهم إن <strong>دي نهاية النص</strong>.</p>
+<p><strong>3. النتيجة:</strong> نظام التشغيل بيتجاهل تماماً أي حاجة بعد الـ <code>%00</code> (كأنها مش موجودة)، وبينفذ الأمر على الجزء اللي قرأه بس. فبيفتح الملف ده: <code>../../../etc/passwd</code> وتقع الـ <code>.png</code> في الزبالة وكأنها لم تكن! وبكده إنت قدرت تقرأ الملف وتتخطى الفلتر.</p>
+<blockquote>
+<p><strong>ملاحظة ليك كـ Security Researcher:</strong> التقنية دي مبقتش تشتغل في الإصدارات الحديثة من لغات البرمجة (مثلاً تم قفلها في PHP بداية من إصدار 5.3.4، وفي Java من إصدار 7u40) لأنهم عدلوا الطريقة اللي اللغات دي بتتعامل بيها مع الـ Null Byte وبقوا يرفضوا أي مسار بيحتوي عليه. بس إحنا دايماً بنجربه في شغلنا لأننا كتير بنصطدم بأنظمة قديمة (Legacy Systems).</p>
+</blockquote>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u062a\u0645 \u0627\u0644\u0646\u0633\u062e \u0627\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "clipboard.copy": "\u0646\u0633\u062e \u0625\u0644\u0649 \u0627\u0644\u062d\u0627\u0641\u0638\u0629", "search.result.more.one": "\u0623\u0643\u062b\u0631 \u0645\u0646 1 \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.more.other": "\u0623\u0643\u062b\u0631 \u0645\u0646 # \u0641\u064a \u0647\u0630\u0647 \u0627\u0644\u0635\u0641\u062d\u0629", "search.result.none": "\u0644\u0627 \u062a\u0648\u062c\u062f \u0646\u062a\u0627\u0626\u062c", "search.result.one": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b \u0645\u0633\u062a\u0646\u062f \u0648\u0627\u062d\u062f", "search.result.other": "\u0646\u062a\u0627\u0626\u062c \u0627\u0644\u0628\u062d\u062b # \u0645\u0633\u062a\u0646\u062f\u0627\u062a", "search.result.placeholder": "\u0627\u0643\u062a\u0628 \u0644\u0628\u062f\u0621 \u0627\u0644\u0628\u062d\u062b", "search.result.term.missing": "\u0645\u0641\u0642\u0648\u062f", "select.version": "\u0625\u062e\u062a\u0631 \u0627\u0644\u0625\u0635\u062f\u0627\u0631"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
